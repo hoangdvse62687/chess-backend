@@ -1,14 +1,16 @@
 package com.chess.chessapi.entities;
 
 import com.chess.chessapi.constant.AuthProvider;
-import org.hibernate.validator.constraints.Length;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.format.annotation.NumberFormat;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.List;
+import javax.validation.constraints.Size;
+import java.util.Set;
 
 @Entity
 @Table(name = "user")
@@ -31,6 +33,7 @@ public class User {
     private long isActive;
 
     @NumberFormat(style = NumberFormat.Style.NUMBER)
+    @Size(min=8,max=12)
     private String phone;
 
     private String district;
@@ -44,7 +47,8 @@ public class User {
     private String achievement;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
-    private List<Cetificates> cetificates;
+    @JsonManagedReference
+    private Set<Cetificates> cetificates;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -183,11 +187,11 @@ public class User {
         this.providerId = providerId;
     }
 
-    public List<Cetificates> getCetificates() {
+    public Set<Cetificates> getCetificates() {
         return cetificates;
     }
 
-    public void setCetificates(List<Cetificates> cetificates) {
+    public void setCetificates(Set<Cetificates> cetificates) {
         this.cetificates = cetificates;
     }
 }

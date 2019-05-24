@@ -29,8 +29,8 @@ public class UserService {
         UserDetails user = (UserDetails) authentication.getPrincipal();
         return user;
     }
-    public Optional<User> getUserById(long id){
-        return userRepository.findById(id);
+    public User getUserById(long id){
+        return userRepository.findById(id).get();
     }
 
     public User getUserByEmmail(String email){

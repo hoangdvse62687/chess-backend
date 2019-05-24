@@ -3,7 +3,6 @@ package com.chess.chessapi.controller;
 
 import com.chess.chessapi.entities.Cetificates;
 import com.chess.chessapi.entities.User;
-import com.chess.chessapi.exception.ResourceNotFoundException;
 import com.chess.chessapi.model.JsonResult;
 import com.chess.chessapi.security.CurrentUser;
 import com.chess.chessapi.security.UserPrincipal;
@@ -15,6 +14,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityManager;
 import javax.validation.Valid;
 
 
@@ -24,12 +24,13 @@ public class UserController {
     private UserService userService;
     @Autowired
     private CetificatesService cetificatesService;
+    @Autowired
+    private EntityManager entityManager;
 
     @GetMapping(value = "/user/getCurrentUserDetail")
     @PreAuthorize("isAuthenticated()")
     public @ResponseBody JsonResult getCurrentUserDetail(@CurrentUser UserPrincipal userPrincipal) {
-        User user = userService.getUserById(userPrincipal.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userPrincipal.getId()));
+        User user = userService.getUserById(userPrincipal.getId());
         return new JsonResult("",user);
     }
 

@@ -1,6 +1,6 @@
 package com.chess.chessapi.entities;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import com.fasterxml.jackson.annotation.*;
 
 import javax.persistence.*;
 
@@ -14,6 +14,7 @@ public class Cetificates {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="fk_user")
+    @JsonBackReference
     private User user;
 
     public long getId() {
