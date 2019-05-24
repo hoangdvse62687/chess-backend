@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration Page</title>
+</head>
+<body>
+    <label>Full Name:</label>
+    <input name="fullName" type="text" disabled/><br>
+    <label>Phone:</label>
+    <input name="phone" type="text"/><br>
+    <label>District:</label>
+    <input name="district" type="text"/><br>
+    <label>City:</label>
+    <input name="city" type="text"/><br>
+    <label>Achievement:</label>
+    <input name="achievement" type="text"/><br>
+    <label>Role:</label>
+    <select name="role">
+        <option value="ROLE_LEARNER">Learnner</option>
+        <option value="ROLE_INSTRUCTOR">Instructor</option>
+    </select>
+    <button id="register">Register</button>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<script th:src="@{/js/register.js}"></script>
+</html>
