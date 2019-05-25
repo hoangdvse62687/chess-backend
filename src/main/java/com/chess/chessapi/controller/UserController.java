@@ -3,6 +3,7 @@ package com.chess.chessapi.controller;
 
 import com.chess.chessapi.entities.Cetificates;
 import com.chess.chessapi.entities.User;
+import com.chess.chessapi.exception.ResourceNotFoundException;
 import com.chess.chessapi.model.JsonResult;
 import com.chess.chessapi.security.CurrentUser;
 import com.chess.chessapi.security.UserPrincipal;
@@ -30,12 +31,13 @@ public class UserController {
     @GetMapping(value = "/user/getCurrentUserDetail")
     @PreAuthorize("isAuthenticated()")
     public @ResponseBody JsonResult getCurrentUserDetail(@CurrentUser UserPrincipal userPrincipal) {
-        User user = userService.getUserById(userPrincipal.getId());
+        User user = userService.getUserById(userPrincipal.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("User","id",userPrincipal.getId()));
         return new JsonResult("",user);
     }
 
     @PutMapping(value = "/user/register")
-    @PreAuthorize("hasAuthority('ROLE_REGISTRATION')")
+    @PreAuthorize("hasRole('ROLE_REGISTRATION')")
     public @ResponseBody JsonResult register(@Valid @RequestBody User user, BindingResult bindingResult){
         String message = "";
         boolean isSuccess = true;

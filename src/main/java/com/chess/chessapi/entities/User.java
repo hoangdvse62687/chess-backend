@@ -1,16 +1,14 @@
 package com.chess.chessapi.entities;
 
 import com.chess.chessapi.constant.AuthProvider;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.NumberFormat;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.Pattern;
 import java.util.Set;
 
 @Entity
@@ -22,23 +20,23 @@ public class User {
 
     @Email
     @Length(max = 255,message = "Email shouldn't larger than 255 characters")
-    @NotBlank(message = "Email is required not null")
+    @NotNull(message = "Email is required not null")
     private String email;
-    @NotBlank(message = "Full Name is required not null")
+
+    @NotNull(message = "Full Name is required not null")
     @Length(max = 255,message = "Full name shouldn't larger than 255 characters")
-    private String fullName;
+    private String full_name;
 
     private int gender;
 
     @Length(max = 255,message = "Link avatar shouldn't larger than 255 characters")
     private String avatar;
 
-    private java.sql.Timestamp createdDate;
+    private java.sql.Timestamp created_date;
 
-    private long isActive;
+    private long is_active;
 
-    @NumberFormat(style = NumberFormat.Style.NUMBER)
-    @Length(min = 8,max = 15,message = "Phone should in range between 8 and 15 characters")
+    @Pattern(regexp="([0-9]{8,15})",message = "Phone should in range between 8 and 15 characters")
     private String phone;
 
     @Length(max = 255,message = "District shouldn't larger than 255 characters")
@@ -84,11 +82,11 @@ public class User {
 
 
     public String getFullName() {
-        return fullName;
+        return full_name;
     }
 
     public void setFullName(String fullName) {
-        this.fullName = fullName;
+        this.full_name = fullName;
     }
 
     public int getGender() {
@@ -110,20 +108,20 @@ public class User {
 
 
     public java.sql.Timestamp getCreatedDate() {
-        return createdDate;
+        return created_date;
     }
 
     public void setCreatedDate(java.sql.Timestamp createdDate) {
-        this.createdDate = createdDate;
+        this.created_date = createdDate;
     }
 
 
     public long getIsActive() {
-        return isActive;
+        return is_active;
     }
 
     public void setIsActive(long isActive) {
-        this.isActive = isActive;
+        this.is_active = isActive;
     }
 
 

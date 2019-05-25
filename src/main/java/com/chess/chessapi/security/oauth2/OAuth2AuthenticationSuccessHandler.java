@@ -4,11 +4,11 @@ import com.chess.chessapi.config.AppProperties;
 import com.chess.chessapi.constant.AppRole;
 import com.chess.chessapi.exception.BadRequestException;
 import com.chess.chessapi.security.TokenProvider;
+import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.services.UserService;
 import com.chess.chessapi.util.CookieUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -68,7 +68,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
         String targetUrl = "";
 
-        UserDetails currentUser = userService.getCurrentUser();
+        UserPrincipal currentUser = userService.getCurrentUser();
         String role = currentUser.getAuthorities().toString();
         if(role.contains(AppRole.ROLE_REGISTRATION)){
             targetUrl = REGISTRATION_URI;
