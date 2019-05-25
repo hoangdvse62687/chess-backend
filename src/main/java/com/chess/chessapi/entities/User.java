@@ -3,6 +3,7 @@ package com.chess.chessapi.entities;
 import com.chess.chessapi.constant.AuthProvider;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.NumberFormat;
 
 import javax.persistence.*;
@@ -18,14 +19,18 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
     @Email
+    @Length(max = 255,message = "Email shouldn't larger than 255 characters")
     @NotBlank(message = "Email is required not null")
     private String email;
     @NotBlank(message = "Full Name is required not null")
+    @Length(max = 255,message = "Full name shouldn't larger than 255 characters")
     private String fullName;
 
     private int gender;
 
+    @Length(max = 255,message = "Link avatar shouldn't larger than 255 characters")
     private String avatar;
 
     private java.sql.Timestamp createdDate;
@@ -33,17 +38,21 @@ public class User {
     private long isActive;
 
     @NumberFormat(style = NumberFormat.Style.NUMBER)
-    @Size(min=8,max=12)
+    @Length(min = 8,max = 15,message = "Phone should in range between 8 and 15 characters")
     private String phone;
 
+    @Length(max = 255,message = "District shouldn't larger than 255 characters")
     private String district;
 
+    @Length(max = 255,message = "City shouldn't larger than 255 characters")
     private String city;
 
     private long point;
 
+    @Length(max = 255,message = "Role shouldn't larger than 255 characters")
     private String role;
 
+    @Length(max = 255,message = "Achievement shouldn't larger than 255 characters")
     private String achievement;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
