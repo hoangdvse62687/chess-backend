@@ -3,12 +3,12 @@ package com.chess.chessapi.entities;
 import com.chess.chessapi.constant.AuthProvider;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.validator.constraints.Length;
-import org.springframework.format.annotation.NumberFormat;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.sql.Timestamp;
 import java.util.Set;
 
 @Entity
@@ -34,7 +34,7 @@ public class User {
 
     private java.sql.Timestamp created_date;
 
-    private long is_active;
+    private int is_active;
 
     @Pattern(regexp="([0-9]{8,15})",message = "Phone should in range between 8 and 15 characters")
     private String phone;
@@ -116,14 +116,29 @@ public class User {
     }
 
 
-    public long getIsActive() {
+    public String getFull_name() {
+        return full_name;
+    }
+
+    public void setFull_name(String full_name) {
+        this.full_name = full_name;
+    }
+
+    public Timestamp getCreated_date() {
+        return created_date;
+    }
+
+    public void setCreated_date(Timestamp created_date) {
+        this.created_date = created_date;
+    }
+
+    public int getIs_active() {
         return is_active;
     }
 
-    public void setIsActive(long isActive) {
-        this.is_active = isActive;
+    public void setIs_active(int is_active) {
+        this.is_active = is_active;
     }
-
 
     public String getPhone() {
         return phone;

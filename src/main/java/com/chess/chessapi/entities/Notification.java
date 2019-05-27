@@ -28,7 +28,7 @@ public class Notification {
     @Column(name = "is_viewed")
     private boolean isViewed;
 
-    @Column(name = "create_date")
+    @Column(name = "created_date")
     private java.sql.Timestamp createDate;
 
     @NotNull

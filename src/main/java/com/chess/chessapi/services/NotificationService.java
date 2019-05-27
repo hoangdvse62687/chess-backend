@@ -18,8 +18,15 @@ public class NotificationService {
         return notificationRepository.save(notification);
     }
 
-    public Page<Notification> getPagination(int page,int pageSize,String role,String userId){
-        PageRequest pageable = PageRequest.of(page - 1,pageSize, Sort.by("create_date").descending());
+    public Page<Notification> getPagination(int page,int pageSize,String role,String userId,boolean sortIsViewed){
+        PageRequest pageable =  null;
+
+        if(sortIsViewed){
+            pageable = PageRequest.of(page - 1,pageSize, Sort.by("is_viewed").ascending());
+        }else {
+            pageable = PageRequest.of(page - 1,pageSize, Sort.by("created_date").descending());
+        }
+
         Page<Notification> notificationPage;
         switch (role){
             case AppRole.ROLE_ADMIN:

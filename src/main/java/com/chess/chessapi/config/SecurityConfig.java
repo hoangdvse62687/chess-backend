@@ -1,12 +1,8 @@
 package com.chess.chessapi.config;
 
-import com.chess.chessapi.security.oauth2.CustomOAuth2UserService;
-import com.chess.chessapi.security.CustomUserDetailsService;
+import com.chess.chessapi.security.oauth2.*;
 import com.chess.chessapi.security.RestAuthenticationEntryPoint;
 import com.chess.chessapi.security.TokenAuthenticationFilter;
-import com.chess.chessapi.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
-import com.chess.chessapi.security.oauth2.OAuth2AuthenticationSuccessHandler;
-import com.chess.chessapi.security.oauth2.OAuth2AuthenticationFailureHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
@@ -33,8 +29,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 )
 @Order(SecurityProperties.BASIC_AUTH_ORDER)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
 
     @Autowired
     private CustomOAuth2UserService customOAuth2UserService;
@@ -44,9 +38,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
-
-    @Autowired
-    private HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
     @Bean
     public TokenAuthenticationFilter tokenAuthenticationFilter() {
@@ -104,11 +95,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .userService(customOAuth2UserService)
                 .and()
                 .successHandler(oAuth2AuthenticationSuccessHandler)
-                .failureHandler(oAuth2AuthenticationFailureHandler)
-                .and()
-                .logout()
-                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                .logoutSuccessUrl("/");
+                .failureHandler(oAuth2AuthenticationFailureHandler);
 
         // Add our custom Token based authentication filter
         http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

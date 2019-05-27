@@ -10,6 +10,7 @@ import com.chess.chessapi.security.CustomUserDetailsService;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.security.oauth2.user.OAuth2UserInfo;
 import com.chess.chessapi.security.oauth2.user.OAuth2UserInfoFactory;
+import com.chess.chessapi.util.ManualCastUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -52,10 +53,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
         }
 
-        Optional<User> userOptional = userRepository.findByEmail(oAuth2UserInfo.getEmail());
+        Optional<Object> object = userRepository.findByEmailCustom(oAuth2UserInfo.getEmail());
         User user;
-        if(userOptional.isPresent()) {
-            user = userOptional.get();
+        if(object.isPresent()) {
+            user = ManualCastUtils.castObjectToUserByFindCustom(object.get());
 
         } else {
             user = registerNewUser(oAuth2UserRequest, oAuth2UserInfo);
