@@ -20,7 +20,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -64,7 +63,7 @@ public class UserService {
         return redirectUri;
     }
 
-    public Page<User> getAllByFullName(int page,int pageSize,String fullName,String roleSort,Boolean sortFullName){
+    public Page<User> getPagination(int page,int pageSize,String fullName,String roleSort,Boolean sortFullName){
         PageRequest pageable =  null;
         if(sortFullName){
             pageable = PageRequest.of(page - 1,pageSize, Sort.by("full_name").ascending());

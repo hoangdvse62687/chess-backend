@@ -73,7 +73,7 @@ public class UserController {
         }
         Page<User> userPage = null;
         try{
-            userPage = userService.getAllByFullName(page,pageSize,fullName,roleSort,sortFullName);
+            userPage = userService.getPagination(page,pageSize,fullName,roleSort,sortFullName);
         }catch (IllegalArgumentException ex){
             throw new ResourceNotFoundException("Page","number",page);
         }
@@ -88,7 +88,7 @@ public class UserController {
         return new JsonResult(null,user);
     }
 
-    @GetMapping(value = "/user/updateStatus")
+    @PutMapping(value = "/user/updateStatus")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public @ResponseBody JsonResult updateStatus(@RequestParam("userId") int userId,@RequestParam("isActive") int isActive ){
         Boolean isSuccess = true;

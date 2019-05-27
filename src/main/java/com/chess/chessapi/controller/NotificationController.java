@@ -46,7 +46,7 @@ public class NotificationController {
         }catch (IllegalArgumentException ex){
             throw new ResourceNotFoundException("Page","number",page);
         }
-        PagedList<Notification> data = new PagedList(listNofication.getTotalPages()
+        PagedList<Notification> data = new PagedList<>(listNofication.getTotalPages()
                 ,listNofication.getTotalElements(),listNofication.getContent());
         return new JsonResult("",data);
     }
