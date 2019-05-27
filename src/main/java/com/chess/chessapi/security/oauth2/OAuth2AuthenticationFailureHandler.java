@@ -1,18 +1,16 @@
 package com.chess.chessapi.security.oauth2;
 
-import com.chess.chessapi.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.chess.chessapi.util.CookieUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import javax.naming.AuthenticationException;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 @Component
 public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
@@ -33,7 +31,11 @@ public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationF
 
         httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
 
-        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+        PrintWriter writer = response.getWriter();
+        writer.write(exception.getMessage());
+        writer.flush();
     }
 
 }

@@ -2,14 +2,15 @@ package com.chess.chessapi.security.oauth2;
 
 import com.chess.chessapi.config.AppProperties;
 import com.chess.chessapi.constant.AppRole;
-import com.chess.chessapi.exception.BadRequestException;
+import com.chess.chessapi.model.JsonResult;
 import com.chess.chessapi.security.TokenProvider;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.services.UserService;
 import com.chess.chessapi.util.CookieUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -18,11 +19,11 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URI;
+import java.io.PrintWriter;
 import java.util.Optional;
 
 @Component
-public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+public class OAuth2AuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
     public static final String REDIRECT_URI_PARAM_COOKIE_NAME = "redirect_uri";
     private static final String REGISTRATION_URI = "/user/registration";
     private static final String HOME_LEARNER_URI = "/learner/home";
@@ -32,6 +33,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     private AppProperties appProperties;
 
+    private ObjectMapper mapper;
+
     @Autowired
     private UserService userService;
 
@@ -40,10 +43,12 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     @Autowired
     OAuth2AuthenticationSuccessHandler(TokenProvider tokenProvider, AppProperties appProperties,
-                                       HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository) {
+                                       HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository,
+                                       ObjectMapper mapper) {
         this.tokenProvider = tokenProvider;
         this.appProperties = appProperties;
         this.httpCookieOAuth2AuthorizationRequestRepository = httpCookieOAuth2AuthorizationRequestRepository;
+        this.mapper = mapper;
     }
 
     @Override
@@ -56,21 +61,24 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
 
         clearAuthenticationAttributes(request, response);
-        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+        response.setStatus(HttpServletResponse.SC_OK);
+        PrintWriter writer = response.getWriter();
+        mapper.writeValue(writer, new JsonResult(null,targetUrl));
+        writer.flush();
     }
 
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         Optional<String> redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue);
 
-        if(redirectUri.isPresent() && !isAuthorizedRedirectUri(redirectUri.get())) {
-            throw new BadRequestException("Sorry! We've got an Unauthorized Redirect URI and can't proceed with the authentication");
-        }
+
         String targetUrl = "";
 
         UserPrincipal currentUser = userService.getCurrentUser();
         String role = currentUser.getAuthorities().toString();
-        if(role.contains(AppRole.ROLE_REGISTRATION)){
+        if(redirectUri.isPresent()){
+            targetUrl = redirectUri.get();
+        }else if(role.contains(AppRole.ROLE_REGISTRATION)){
             targetUrl = REGISTRATION_URI;
         }else if(role.contains(AppRole.ROLE_LEARNER)){
             targetUrl = HOME_LEARNER_URI;
@@ -91,21 +99,5 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
         super.clearAuthenticationAttributes(request);
         httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
-    }
-
-    private boolean isAuthorizedRedirectUri(String uri) {
-        URI clientRedirectUri = URI.create(uri);
-
-        return appProperties.getOauth2().getAuthorizedRedirectUris()
-                .stream()
-                .anyMatch(authorizedRedirectUri -> {
-                    // Only validate host and port. Let the clients use different paths if they want to
-                    URI authorizedURI = URI.create(authorizedRedirectUri);
-                    if(authorizedURI.getHost().equalsIgnoreCase(clientRedirectUri.getHost())
-                            && authorizedURI.getPort() == clientRedirectUri.getPort()) {
-                        return true;
-                    }
-                    return false;
-                });
     }
 }
