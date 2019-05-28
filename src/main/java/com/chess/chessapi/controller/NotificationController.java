@@ -8,11 +8,14 @@ import com.chess.chessapi.model.PagedList;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.services.NotificationService;
 import com.chess.chessapi.services.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,15 +23,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@RequestMapping(value = "/notification")
+@Api(value = "Notification Management")
 public class NotificationController {
     @Autowired
     private UserService userService;
     @Autowired
     private NotificationService notificationService;
 
-    @GetMapping("/notification/getNotification")
+    @ApiOperation(value = "Get notification pagings")
+    @GetMapping("/get-notifications-pagination")
     @PreAuthorize("hasAnyAuthority('ROLE_INSTRUCTOR','ROLE_LEARNER','ROLE_ADMIN')")
-    public JsonResult getNotification(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize,
+    public JsonResult getNotifications(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize,
                                       boolean sortIsViewed){
         UserPrincipal currentUser = userService.getCurrentUser();
 

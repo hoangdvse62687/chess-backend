@@ -1,12 +1,10 @@
 package com.chess.chessapi.security.oauth2;
 
 import com.chess.chessapi.constant.AppRole;
-import com.chess.chessapi.constant.Gender;
 import com.chess.chessapi.entities.User;
 import com.chess.chessapi.exception.OAuth2AuthenticationProcessingException;
 import com.chess.chessapi.constant.AuthProvider;
 import com.chess.chessapi.repositories.UserRepository;
-import com.chess.chessapi.security.CustomUserDetailsService;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.security.oauth2.user.OAuth2UserInfo;
 import com.chess.chessapi.security.oauth2.user.OAuth2UserInfoFactory;
@@ -18,7 +16,7 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.util.StringUtils;
+import org.springframework.util.StringUtils;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -26,14 +24,8 @@ import java.util.Optional;
 
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
-    private final String GOOGLE_GENDER_MALE = "male";
-    private final String GOOGLE_GENDER_FEMALE = "female";
-    private final String GOOGLE_GENDER_UNDEFINED = "undefined";
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
@@ -75,21 +67,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         user.setEmail(oAuth2UserInfo.getEmail());
         user.setAvatar(oAuth2UserInfo.getImageUrl());
         user.setRole(AppRole.ROLE_REGISTRATION);
-        user.setGender(Gender.GENDER_MALE);
-        String gender = oAuth2UserInfo.getGender();
-        if(gender == null){
-            gender = GOOGLE_GENDER_UNDEFINED;
-        }
-        switch (gender){
-            case GOOGLE_GENDER_MALE:
-                user.setGender(Gender.GENDER_MALE);
-                break;
-            case GOOGLE_GENDER_FEMALE:
-                user.setGender(Gender.GENDER_FEMALE);
-                break;
-            default:
-                 user.setGender(Gender.GENDER_UNDEFINED);
-        }
+
         user.setCreatedDate(new Timestamp(new Date().getTime()));
         return userRepository.save(user);
     }

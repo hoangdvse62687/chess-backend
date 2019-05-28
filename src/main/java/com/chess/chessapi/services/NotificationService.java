@@ -1,6 +1,7 @@
 package com.chess.chessapi.services;
 
 import com.chess.chessapi.constant.AppRole;
+import com.chess.chessapi.constant.EntitiesFieldName;
 import com.chess.chessapi.entities.Notification;
 import com.chess.chessapi.repositories.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,9 @@ public class NotificationService {
         PageRequest pageable =  null;
 
         if(sortIsViewed){
-            pageable = PageRequest.of(page - 1,pageSize, Sort.by("is_viewed").ascending());
+            pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.NOTIFICATION_IS_VIEWED).ascending());
         }else {
-            pageable = PageRequest.of(page - 1,pageSize, Sort.by("created_date").descending());
+            pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.NOTIFICATION_CREATED_DATE).descending());
         }
 
         Page<Notification> notificationPage;

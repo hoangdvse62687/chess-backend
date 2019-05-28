@@ -20,7 +20,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "Select u.id,u.email,u.role From user u where u.id = ?1",nativeQuery = true)
     Optional<Object> findByIdCustom(long id);
 
-    @Query(value = "Select u.id,u.email,u.role,u.avatar,u.full_name,u.gender,u.created_date,u.is_active " +
+    @Query(value = "Select u.id,u.email,u.role,u.avatar,u.full_name,u.created_date,u.is_active " +
             "From user u WHERE u.full_name like ?1",
             countQuery = "Select count(u.id) from user u WHERE u.full_name like ?1",
             nativeQuery = true)
@@ -39,4 +39,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "Update user u Set u.is_active = ?2 Where u.id = ?1"
             ,nativeQuery = true)
     void updateStatus(long id,int isActive);
+
+    @Modifying
+    @Transactional
+    @Query(value = "Update user u Set u.full_name = ?2,u.achievement = ?3 Where u.id = ?1"
+            ,nativeQuery = true)
+    void updateProfile(long id,String name,String achievement);
 }

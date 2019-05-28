@@ -10,16 +10,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private final long MAX_AGE_SECS = 3600;
 
     @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("home/index");
-        registry.addViewController("/user/login").setViewName("user/login");
-        registry.addViewController("/user/registration").setViewName("user/registration");
-        registry.addViewController("/admin/home").setViewName("admin/home");
-        registry.addViewController("/learner/home").setViewName("learner/home");
-        registry.addViewController("/instructor/home").setViewName("instructor/home");
-    }
-
-    @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("*")

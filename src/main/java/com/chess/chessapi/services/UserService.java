@@ -1,15 +1,15 @@
 package com.chess.chessapi.services;
 
-import com.chess.chessapi.constant.AppRole;
-import com.chess.chessapi.constant.NotificationMessage;
-import com.chess.chessapi.constant.ObjectType;
-import com.chess.chessapi.constant.Status;
+import com.chess.chessapi.constant.*;
+import com.chess.chessapi.entities.Cetificates;
 import com.chess.chessapi.entities.Notification;
 import com.chess.chessapi.entities.User;
+import com.chess.chessapi.repositories.CetificatesRepository;
 import com.chess.chessapi.repositories.NotificationRepository;
 import com.chess.chessapi.repositories.UserRepository;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.util.ManualCastUtils;
+import com.chess.chessapi.viewmodel.UserPagination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +34,9 @@ public class UserService {
     @Autowired
     private NotificationRepository notificationRepository;
 
+    @Autowired
+    private CetificatesRepository cetificatesRepository;
+
     public UserPrincipal getCurrentUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserPrincipal user = (UserPrincipal) authentication.getPrincipal();
@@ -46,42 +49,99 @@ public class UserService {
 
     public Optional<User> getUserByEmail(String email){return userRepository.findByEmail(email);}
 
-    public String register(User user){
+    public String register(User user,String redirectClient){
         String redirectUri = "";
         switch (user.getRole()){
             case AppRole
                     .ROLE_INSTRUCTOR:
                 this.registerInstructor(user);
-                redirectUri = "/instructor/home";
                 break;
             default:
                 this.registerLearner(user);
-                redirectUri = "/learner/home";
         }
+
+        redirectUri = redirectClient != null ? redirectClient : "/";
+
         this.setUserRoleAuthentication(user);
-        userRepository.save(user);
+        this.userRepository.save(user);
         return redirectUri;
     }
 
-    public Page<User> getPagination(int page,int pageSize,String fullName,String roleSort,Boolean sortFullName){
+    public void updateProfile(User user){
+        this.userRepository.updateProfile(user.getId(),user.getFullName(),user.getAchievement());
+
+        //handle cetificate update
+        List<Cetificates> oldCetificates = this.cetificatesRepository.findAllByUserId(user.getId());
+        if(oldCetificates.isEmpty()){
+            //add all
+            for (Cetificates newCetificate:
+                    user.getCetificates()) {
+                this.cetificatesRepository.save(newCetificate);
+            }
+        }else if(user.getCetificates() != null && !user.getCetificates().isEmpty()){
+            //check if new cetificate has already or not, if it not yet c=> create
+            for (Cetificates newCetificate:
+                 user.getCetificates()) {
+                boolean isExist = false;
+                for (Cetificates oldCetificate:
+                     oldCetificates) {
+                    if(newCetificate.getCetificateLink().equals(oldCetificate.getCetificateLink())){
+                       isExist = true;
+                        break;
+                    }
+                }
+                if(!isExist){
+                    this.cetificatesRepository.save(newCetificate);
+                }
+            }
+            //check old records should be deleted
+            for (Cetificates oldCetificate:
+                 oldCetificates) {
+                boolean isUpdatedRecord = false;
+                for (Cetificates newCetificate:
+                     user.getCetificates()) {
+                    if(oldCetificate.getCetificateLink().equals(newCetificate.getCetificateLink())){
+                        isUpdatedRecord = true;
+                        user.getCetificates().remove(newCetificate);
+                        break;
+                    }
+                }
+
+                if(!isUpdatedRecord){
+                    this.cetificatesRepository.delete(oldCetificate);
+                }
+            }
+        }
+        else{
+            //delete all
+            for (Cetificates cetificate:
+                 oldCetificates) {
+                this.cetificatesRepository.delete(cetificate);
+            }
+        }
+    }
+
+    public Page<UserPagination> getPagination(int page,int pageSize,String fullName,String sortRole,Boolean sortFullName,Boolean sortStatus){
         PageRequest pageable =  null;
         if(sortFullName){
-            pageable = PageRequest.of(page - 1,pageSize, Sort.by("full_name").ascending());
+            pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.USER_FULL_NAME).ascending());
+        }else if(sortStatus){
+            pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.USER_IS_ACTIVE).descending());
         }else {
-            pageable = PageRequest.of(page - 1,pageSize, Sort.by("created_date").descending());
+            pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.USER_CREATED_DATE).descending());
         }
 
         Page<Object> rawData = null;
-        Page<User> data = null;
-        if( roleSort != null && !roleSort.isEmpty()){
-            rawData = userRepository.findAllByFullNameSortByRoleCustom(pageable,fullName,roleSort);
+        Page<UserPagination> data = null;
+        if( sortRole != null && !sortRole.isEmpty()){
+            rawData = userRepository.findAllByFullNameSortByRoleCustom(pageable,fullName,sortRole);
         }else{
             rawData = userRepository.findAllByFullNameCustom(pageable,fullName);
         }
-        final List<User> content = ManualCastUtils.castPageObjectoUser(rawData);
+        final List<UserPagination> content = ManualCastUtils.castPageObjectsoUser(rawData);
         final int totalPages = rawData.getTotalPages();
         final long totalElements = rawData.getTotalElements();
-        data = new Page<User>() {
+        data = new Page<UserPagination>() {
             @Override
             public int getTotalPages() {
                 return totalPages;
@@ -93,7 +153,7 @@ public class UserService {
             }
 
             @Override
-            public <U> Page<U> map(Function<? super User, ? extends U> converter) {
+            public <U> Page<U> map(Function<? super UserPagination, ? extends U> converter) {
                 return null;
             }
 
@@ -113,7 +173,7 @@ public class UserService {
             }
 
             @Override
-            public List<User> getContent() {
+            public List<UserPagination> getContent() {
                 return content;
             }
 
@@ -158,7 +218,7 @@ public class UserService {
             }
 
             @Override
-            public Iterator<User> iterator() {
+            public Iterator<UserPagination> iterator() {
                 return null;
             }
         };
@@ -200,4 +260,5 @@ public class UserService {
         notification.setRoleTarget(AppRole.ROLE_ADMIN);
         notificationRepository.save(notification);
     }
+
 }

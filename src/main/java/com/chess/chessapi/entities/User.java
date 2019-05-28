@@ -7,9 +7,8 @@ import org.hibernate.validator.constraints.Length;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import java.sql.Timestamp;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -27,7 +26,6 @@ public class User {
     @Length(max = 255,message = "Full name shouldn't larger than 255 characters")
     private String full_name;
 
-    private int gender;
 
     @Length(max = 255,message = "Link avatar shouldn't larger than 255 characters")
     private String avatar;
@@ -36,26 +34,15 @@ public class User {
 
     private int is_active;
 
-    @Pattern(regexp="([0-9]{8,15})",message = "Phone should in range between 8 and 15 characters")
-    private String phone;
-
-    @Length(max = 255,message = "District shouldn't larger than 255 characters")
-    private String district;
-
-    @Length(max = 255,message = "City shouldn't larger than 255 characters")
-    private String city;
-
-    private long point;
-
     @Length(max = 255,message = "Role shouldn't larger than 255 characters")
     private String role;
 
     @Length(max = 255,message = "Achievement shouldn't larger than 255 characters")
     private String achievement;
 
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,mappedBy = "user")
     @JsonManagedReference
-    private Set<Cetificates> cetificates;
+    private List<Cetificates> cetificates;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -89,15 +76,6 @@ public class User {
         this.full_name = fullName;
     }
 
-    public int getGender() {
-        return gender;
-    }
-
-    public void setGender(int gender) {
-        this.gender = gender;
-    }
-
-
     public String getAvatar() {
         return avatar;
     }
@@ -115,23 +93,6 @@ public class User {
         this.created_date = createdDate;
     }
 
-
-    public String getFull_name() {
-        return full_name;
-    }
-
-    public void setFull_name(String full_name) {
-        this.full_name = full_name;
-    }
-
-    public Timestamp getCreated_date() {
-        return created_date;
-    }
-
-    public void setCreated_date(Timestamp created_date) {
-        this.created_date = created_date;
-    }
-
     public int getIs_active() {
         return is_active;
     }
@@ -139,42 +100,6 @@ public class User {
     public void setIs_active(int is_active) {
         this.is_active = is_active;
     }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-
-    public String getDistrict() {
-        return district;
-    }
-
-    public void setDistrict(String district) {
-        this.district = district;
-    }
-
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-
-    public long getPoint() {
-        return point;
-    }
-
-    public void setPoint(long point) {
-        this.point = point;
-    }
-
 
     public String getRole() {
         return role;
@@ -209,11 +134,11 @@ public class User {
         this.providerId = providerId;
     }
 
-    public Set<Cetificates> getCetificates() {
+    public List<Cetificates> getCetificates() {
         return cetificates;
     }
 
-    public void setCetificates(Set<Cetificates> cetificates) {
+    public void setCetificates(List<Cetificates> cetificates) {
         this.cetificates = cetificates;
     }
 }

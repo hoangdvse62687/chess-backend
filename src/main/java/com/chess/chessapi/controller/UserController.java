@@ -2,15 +2,17 @@ package com.chess.chessapi.controller;
 
 
 import com.chess.chessapi.constant.AppMessage;
-import com.chess.chessapi.entities.Cetificates;
+import com.chess.chessapi.constant.EntitiesFieldName;
 import com.chess.chessapi.entities.User;
 import com.chess.chessapi.exception.ResourceNotFoundException;
 import com.chess.chessapi.model.JsonResult;
 import com.chess.chessapi.model.PagedList;
 import com.chess.chessapi.security.CurrentUser;
 import com.chess.chessapi.security.UserPrincipal;
-import com.chess.chessapi.services.CetificatesService;
 import com.chess.chessapi.services.UserService;
+import com.chess.chessapi.viewmodel.UserPagination;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,13 +24,14 @@ import javax.validation.Valid;
 
 
 @RestController
+@RequestMapping(value = "/user")
+@Api(value = "User Management")
 public class UserController {
     @Autowired
     private UserService userService;
-    @Autowired
-    private CetificatesService cetificatesService;
 
-    @GetMapping(value = "/user/getCurrentUserDetail")
+    @ApiOperation(value = "Get an current user detail")
+    @GetMapping(value = "/get-current-user-detail")
     @PreAuthorize("isAuthenticated()")
     public @ResponseBody JsonResult getCurrentUserDetail(@CurrentUser UserPrincipal userPrincipal) {
         User user = userService.getUserById(userPrincipal.getId())
@@ -36,9 +39,18 @@ public class UserController {
         return new JsonResult("",user);
     }
 
-    @PutMapping(value = "/user/register")
+    @ApiOperation(value = "Get an current user ")
+    @GetMapping(value = "/get-current-user")
+    @PreAuthorize("isAuthenticated()")
+    public @ResponseBody JsonResult getCurrentUser(@CurrentUser UserPrincipal userPrincipal) {
+        return new JsonResult("",userPrincipal);
+    }
+
+    @ApiOperation(value = "Register an user")
+    @PutMapping(value = "/register")
     @PreAuthorize("hasAuthority('ROLE_REGISTRATION')")
-    public @ResponseBody JsonResult register(@Valid @RequestBody User user, BindingResult bindingResult){
+    public @ResponseBody JsonResult register(@Valid @RequestBody User user,@RequestParam("redirectUri") String redirectUri
+            , BindingResult bindingResult){
         String message = "";
         boolean isSuccess = true;
         if(bindingResult.hasErrors()){
@@ -48,12 +60,8 @@ public class UserController {
         }else{
             try{
                 //gain redirect uri base on role
-                message = userService.register(user);
-                for (Cetificates cetificates:
-                        user.getCetificates()) {
-                    cetificates.setUser(user);
-                    cetificatesService.create(cetificates);
-                }
+                message = userService.register(user,redirectUri);
+
             }catch (Exception ex){
                 message = ex.getMessage();
                 isSuccess = false;
@@ -62,43 +70,70 @@ public class UserController {
         return new JsonResult(message,isSuccess);
     }
 
-    @GetMapping(value = "/user/loadAll")
+    @ApiOperation(value = "Update profile user ")
+    @PutMapping(value = "/update-profile")
+    @PreAuthorize("isAuthenticated()")
+    public @ResponseBody JsonResult updateProfile(@Valid @RequestBody User user, BindingResult bindingResult){
+        String message = "";
+        boolean isSuccess = true;
+        if(bindingResult.hasErrors()){
+            FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
+            message = fieldError.getDefaultMessage();
+            isSuccess = false;
+        }else{
+            try{
+                userService.updateProfile(user);
+
+                message =  AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.PROFILE);;
+            }catch (Exception ex){
+                message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.PROFILE);
+                isSuccess = false;
+            }
+        }
+        return new JsonResult(message,isSuccess);
+    }
+
+    @ApiOperation(value = "Get user pagings")
+    @GetMapping(value = "/get-users-pagination")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public @ResponseBody JsonResult loadAll(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
-            ,String fullName,String roleSort,boolean sortFullName){
+    public @ResponseBody JsonResult getUsers(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
+            ,String fullName,String roleSort,boolean sortFullName,boolean sortStatus){
         if(fullName == null){
             fullName = '%' + "" + '%';
         }else{
             fullName = '%' + fullName + '%';
         }
-        Page<User> userPage = null;
+        Page<UserPagination> userPage = null;
         try{
-            userPage = userService.getPagination(page,pageSize,fullName,roleSort,sortFullName);
+            userPage = userService.getPagination(page,pageSize,fullName,roleSort,sortFullName,sortStatus);
         }catch (IllegalArgumentException ex){
             throw new ResourceNotFoundException("Page","number",page);
         }
-        PagedList<User> data = new PagedList<>(userPage.getTotalPages(),userPage.getTotalElements(),userPage.getContent());
+        PagedList<UserPagination> data = new PagedList<>(userPage.getTotalPages(),userPage.getTotalElements(),userPage.getContent());
+
         return new JsonResult(null,data);
     }
 
-    @GetMapping(value = "user/getUserById")
+    @ApiOperation(value = "Get an user by id")
+    @GetMapping(value = "/get-by-id")
     public @ResponseBody JsonResult getUserById(@RequestParam("userId") long userId){
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User","id",userId));
         return new JsonResult(null,user);
     }
 
-    @PutMapping(value = "/user/updateStatus")
+    @ApiOperation(value = "Update user status")
+    @PutMapping(value = "/update-status")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public @ResponseBody JsonResult updateStatus(@RequestParam("userId") int userId,@RequestParam("isActive") int isActive ){
         Boolean isSuccess = true;
         String message = "";
         try{
             userService.updateStatus(userId,isActive);
-            message = AppMessage.UPDATE_USER_STATUS_SUCCESSFUL + userId;
+            message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.USER, EntitiesFieldName.USER_ID,Integer.toString(userId));
         }catch (Exception ex){
             isSuccess = false;
-            message = AppMessage.UPDATE_USER_STATUS_FAIL + userId;
+            message =  AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.USER, EntitiesFieldName.USER_ID,Integer.toString(userId));
         }
         return new JsonResult(message,isSuccess);
     }
