@@ -4,6 +4,7 @@ import com.chess.chessapi.constant.*;
 import com.chess.chessapi.entities.Cetificates;
 import com.chess.chessapi.entities.Notification;
 import com.chess.chessapi.entities.User;
+import com.chess.chessapi.model.PaginationCustom;
 import com.chess.chessapi.repositories.CetificatesRepository;
 import com.chess.chessapi.repositories.NotificationRepository;
 import com.chess.chessapi.repositories.UserRepository;
@@ -121,107 +122,34 @@ public class UserService {
         }
     }
 
-    public Page<UserPagination> getPagination(int page,int pageSize,String fullName,String sortRole,Boolean sortFullName,Boolean sortStatus){
+    public PaginationCustom<UserPagination> getPagination(int page,int pageSize,String fullName,String sortRole,Boolean sortFullName
+            ,String sortStatus){
         PageRequest pageable =  null;
         if(sortFullName){
-            pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.USER_FULL_NAME).ascending());
-        }else if(sortStatus){
-            pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.USER_IS_ACTIVE).descending());
+            pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.USER_FULL_NAME).ascending()
+                    .by(EntitiesFieldName.USER_CREATED_DATE).descending());
         }else {
             pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.USER_CREATED_DATE).descending());
         }
 
         Page<Object> rawData = null;
-        Page<UserPagination> data = null;
+        PaginationCustom<UserPagination> data = null;
         if( sortRole != null && !sortRole.isEmpty()){
             rawData = userRepository.findAllByFullNameSortByRoleCustom(pageable,fullName,sortRole);
+        }else if(sortStatus != null && !sortStatus.isEmpty()){
+            if(sortStatus.equals(Integer.toString(Status.INACTIVE))){
+                rawData = userRepository.findAllByStatus(pageable,Status.INACTIVE);
+            }else{
+                rawData = userRepository.findAllByStatus(pageable,Status.ACTIVE);
+            }
         }else{
             rawData = userRepository.findAllByFullNameCustom(pageable,fullName);
         }
         final List<UserPagination> content = ManualCastUtils.castPageObjectsoUser(rawData);
         final int totalPages = rawData.getTotalPages();
         final long totalElements = rawData.getTotalElements();
-        data = new Page<UserPagination>() {
-            @Override
-            public int getTotalPages() {
-                return totalPages;
-            }
+        data = new PaginationCustom<UserPagination>(content,totalPages,totalElements);
 
-            @Override
-            public long getTotalElements() {
-                return totalElements;
-            }
-
-            @Override
-            public <U> Page<U> map(Function<? super UserPagination, ? extends U> converter) {
-                return null;
-            }
-
-            @Override
-            public int getNumber() {
-                return 0;
-            }
-
-            @Override
-            public int getSize() {
-                return 0;
-            }
-
-            @Override
-            public int getNumberOfElements() {
-                return 0;
-            }
-
-            @Override
-            public List<UserPagination> getContent() {
-                return content;
-            }
-
-            @Override
-            public boolean hasContent() {
-                return false;
-            }
-
-            @Override
-            public Sort getSort() {
-                return null;
-            }
-
-            @Override
-            public boolean isFirst() {
-                return false;
-            }
-
-            @Override
-            public boolean isLast() {
-                return false;
-            }
-
-            @Override
-            public boolean hasNext() {
-                return false;
-            }
-
-            @Override
-            public boolean hasPrevious() {
-                return false;
-            }
-
-            @Override
-            public Pageable nextPageable() {
-                return null;
-            }
-
-            @Override
-            public Pageable previousPageable() {
-                return null;
-            }
-
-            @Override
-            public Iterator<UserPagination> iterator() {
-                return null;
-            }
-        };
         return data;
     }
 

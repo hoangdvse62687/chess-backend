@@ -7,6 +7,7 @@ import com.chess.chessapi.entities.User;
 import com.chess.chessapi.exception.ResourceNotFoundException;
 import com.chess.chessapi.model.JsonResult;
 import com.chess.chessapi.model.PagedList;
+import com.chess.chessapi.model.PaginationCustom;
 import com.chess.chessapi.security.CurrentUser;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.services.UserService;
@@ -97,13 +98,13 @@ public class UserController {
     @GetMapping(value = "/get-users-pagination")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public @ResponseBody JsonResult getUsers(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
-            ,String fullName,String roleSort,boolean sortFullName,boolean sortStatus){
+            ,String fullName,String roleSort,boolean sortFullName,String sortStatus){
         if(fullName == null){
             fullName = '%' + "" + '%';
         }else{
             fullName = '%' + fullName + '%';
         }
-        Page<UserPagination> userPage = null;
+        PaginationCustom<UserPagination> userPage = null;
         try{
             userPage = userService.getPagination(page,pageSize,fullName,roleSort,sortFullName,sortStatus);
         }catch (IllegalArgumentException ex){
