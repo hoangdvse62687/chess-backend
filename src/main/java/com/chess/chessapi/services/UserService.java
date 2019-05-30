@@ -1,11 +1,11 @@
 package com.chess.chessapi.services;
 
 import com.chess.chessapi.constant.*;
-import com.chess.chessapi.entities.Cetificates;
+import com.chess.chessapi.entities.Certificates;
 import com.chess.chessapi.entities.Notification;
 import com.chess.chessapi.entities.User;
 import com.chess.chessapi.model.PaginationCustom;
-import com.chess.chessapi.repositories.CetificatesRepository;
+import com.chess.chessapi.repositories.CertificatesRepository;
 import com.chess.chessapi.repositories.NotificationRepository;
 import com.chess.chessapi.repositories.UserRepository;
 import com.chess.chessapi.security.UserPrincipal;
@@ -14,7 +14,6 @@ import com.chess.chessapi.viewmodel.UserPagination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -35,7 +34,7 @@ public class UserService {
     private NotificationRepository notificationRepository;
 
     @Autowired
-    private CetificatesRepository cetificatesRepository;
+    private CertificatesRepository certificatesRepository;
 
     public UserPrincipal getCurrentUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -71,7 +70,7 @@ public class UserService {
         this.userRepository.updateProfile(user.getId(),user.getFullName(),user.getAchievement());
 
         //handle cetificate update
-        List<Cetificates> oldCetificates = this.cetificatesRepository.findAllByUserId(user.getId());
+        List<Certificates> oldCetificates = this.certificatesRepository.findAllByUserId(user.getId());
 
         this.updateCetifications(oldCetificates,user.getCetificates());
     }
@@ -143,19 +142,19 @@ public class UserService {
         notificationRepository.save(notification);
     }
 
-    private void updateCetifications(List<Cetificates> oldCetificates, List<Cetificates> newCetificates){
+    private void updateCetifications(List<Certificates> oldCetificates, List<Certificates> newCetificates){
         if(oldCetificates.isEmpty()){
             //add all
-            for (Cetificates newCetificate:
+            for (Certificates newCetificate:
                     newCetificates) {
-                this.cetificatesRepository.save(newCetificate);
+                this.certificatesRepository.save(newCetificate);
             }
         }else if(newCetificates != null && !newCetificates.isEmpty()){
             //check if new cetificate has already or not, if it not yet c=> create
-            for (Cetificates newCetificate:
+            for (Certificates newCetificate:
                     newCetificates) {
                 boolean isExist = false;
-                for (Cetificates oldCetificate:
+                for (Certificates oldCetificate:
                         oldCetificates) {
                     if(newCetificate.getCetificateLink().equals(oldCetificate.getCetificateLink())){
                         isExist = true;
@@ -163,14 +162,14 @@ public class UserService {
                     }
                 }
                 if(!isExist){
-                    this.cetificatesRepository.save(newCetificate);
+                    this.certificatesRepository.save(newCetificate);
                 }
             }
             //check old records should be deleted
-            for (Cetificates oldCetificate:
+            for (Certificates oldCetificate:
                     oldCetificates) {
                 boolean isUpdatedRecord = false;
-                for (Cetificates newCetificate:
+                for (Certificates newCetificate:
                         newCetificates) {
                     if(oldCetificate.getCetificateLink().equals(newCetificate.getCetificateLink())){
                         isUpdatedRecord = true;
@@ -180,15 +179,15 @@ public class UserService {
                 }
 
                 if(!isUpdatedRecord){
-                    this.cetificatesRepository.delete(oldCetificate);
+                    this.certificatesRepository.delete(oldCetificate);
                 }
             }
         }
         else{
             //delete all
-            for (Cetificates cetificate:
+            for (Certificates cetificate:
                     oldCetificates) {
-                this.cetificatesRepository.delete(cetificate);
+                this.certificatesRepository.delete(cetificate);
             }
         }
     }

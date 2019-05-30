@@ -5,15 +5,15 @@ import com.fasterxml.jackson.annotation.*;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "cetificates")
-public class Cetificates {
+@Table(name = "certificates")
+public class Certificates {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    private String cetificate_link;
+    private String certificate_link;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="fk_user")
+    @JoinColumn(name="user_id")
     @JsonBackReference
     private User user;
 
@@ -27,11 +27,11 @@ public class Cetificates {
 
 
     public String getCetificateLink() {
-        return cetificate_link;
+        return certificate_link;
     }
 
     public void setCetificateLink(String cetificateLink) {
-        this.cetificate_link = cetificateLink;
+        this.certificate_link = cetificateLink;
     }
 
     public User getUser() {

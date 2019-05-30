@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -45,7 +45,7 @@ public class User {
 
     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,mappedBy = "user")
     @JsonManagedReference
-    private List<Cetificates> cetificates;
+    private List<Certificates> cetificates;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -136,11 +136,11 @@ public class User {
         this.providerId = providerId;
     }
 
-    public List<Cetificates> getCetificates() {
+    public List<Certificates> getCetificates() {
         return cetificates;
     }
 
-    public void setCetificates(List<Cetificates> cetificates) {
+    public void setCetificates(List<Certificates> cetificates) {
         this.cetificates = cetificates;
     }
 }

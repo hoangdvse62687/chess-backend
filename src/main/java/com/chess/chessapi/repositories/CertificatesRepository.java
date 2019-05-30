@@ -1,0 +1,15 @@
+package com.chess.chessapi.repositories;
+
+import com.chess.chessapi.entities.Certificates;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+
+@Repository
+public interface CertificatesRepository extends JpaRepository<Certificates,Long> {
+    @Query(value = "Select * From certificates c where c.fk_user = ?1",nativeQuery = true)
+    List<Certificates> findAllByUserId(long userId);
+}
