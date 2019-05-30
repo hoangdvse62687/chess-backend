@@ -2,13 +2,13 @@ package com.chess.chessapi.controller;
 
 
 import com.chess.chessapi.constant.AppMessage;
+import com.chess.chessapi.constant.AppRole;
 import com.chess.chessapi.constant.EntitiesFieldName;
 import com.chess.chessapi.entities.User;
 import com.chess.chessapi.exception.AccessDeniedException;
 import com.chess.chessapi.exception.ResourceNotFoundException;
 import com.chess.chessapi.model.JsonResult;
 import com.chess.chessapi.model.PagedList;
-import com.chess.chessapi.model.PaginationCustom;
 import com.chess.chessapi.security.CurrentUser;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.services.UserService;
@@ -16,7 +16,6 @@ import com.chess.chessapi.viewmodel.UserPagination;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -50,7 +49,7 @@ public class UserController {
 
     @ApiOperation(value = "Register an user")
     @PutMapping(value = "/register")
-    @PreAuthorize("hasAuthority('ROLE_REGISTRATION')")
+    @PreAuthorize("hasAuthority("+ AppRole.ROLE_REGISTRATION_AUTHENTICATIION +")")
     public @ResponseBody JsonResult register(@Valid @RequestBody User user,@RequestParam("redirectUri") String redirectUri
             , BindingResult bindingResult){
 
@@ -100,23 +99,39 @@ public class UserController {
         return new JsonResult(message,isSuccess);
     }
 
-    @ApiOperation(value = "Get user pagings")
-    @GetMapping(value = "/get-users-pagination")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public @ResponseBody JsonResult getUsers(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
-            ,String email,String roleSort,boolean sortFullName,String sortStatus){
-        if(email == null){
-            email = '%' + "" + '%';
-        }else{
-            email = '%' + email + '%';
-        }
-        PaginationCustom<UserPagination> userPage = null;
+    @ApiOperation(value = "Get user pagings by role")
+    @GetMapping(value = "/get-users-pagination-by-role")
+    @PreAuthorize("hasAuthority("+AppRole.ROLE_ADMIN_AUTHENTICATIION+")")
+    public @ResponseBody JsonResult getUsersByRole(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
+            ,@RequestParam("email")String email,@RequestParam("role") String role,boolean sortEmail){
+
+        email = '%' + email + '%';
+
+        PagedList<UserPagination> data = null;
         try{
-            userPage = userService.getPagination(page,pageSize,email,roleSort,sortFullName,sortStatus);
+            data = userService.getPaginationByRole(page,pageSize,email,role,sortEmail);
         }catch (IllegalArgumentException ex){
             throw new ResourceNotFoundException("Page","number",page);
         }
-        PagedList<UserPagination> data = new PagedList<>(userPage.getTotalPages(),userPage.getTotalElements(),userPage.getContent());
+
+        return new JsonResult(null,data);
+    }
+
+    @ApiOperation(value = "Get user pagings by status")
+    @GetMapping(value = "/get-users-pagination-by-status")
+    @PreAuthorize("hasAuthority("+AppRole.ROLE_ADMIN_AUTHENTICATIION+")")
+    public @ResponseBody JsonResult getUsersByStatus(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
+            ,@RequestParam("email") String email,@RequestParam("status") String status){
+
+        email = '%' + email + '%';
+
+        PagedList<UserPagination> data = null;
+        try{
+            data = userService.getPaginationByStatus(page,pageSize,email,status);
+        }catch (IllegalArgumentException ex){
+            throw new ResourceNotFoundException("Page","number",page);
+        }
+
 
         return new JsonResult(null,data);
     }
@@ -131,7 +146,7 @@ public class UserController {
 
     @ApiOperation(value = "Update user status")
     @PutMapping(value = "/update-status")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority("+AppRole.ROLE_ADMIN_AUTHENTICATIION+")")
     public @ResponseBody JsonResult updateStatus(@RequestParam("userId") int userId,@RequestParam("isActive") int isActive ){
         Boolean isSuccess = true;
         String message = "";

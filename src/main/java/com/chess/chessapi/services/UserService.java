@@ -4,7 +4,7 @@ import com.chess.chessapi.constant.*;
 import com.chess.chessapi.entities.Certificates;
 import com.chess.chessapi.entities.Notification;
 import com.chess.chessapi.entities.User;
-import com.chess.chessapi.model.PaginationCustom;
+import com.chess.chessapi.model.PagedList;
 import com.chess.chessapi.repositories.CertificatesRepository;
 import com.chess.chessapi.repositories.NotificationRepository;
 import com.chess.chessapi.repositories.UserRepository;
@@ -72,11 +72,10 @@ public class UserService {
         //handle cetificate update
         List<Certificates> oldCetificates = this.certificatesRepository.findAllByUserId(user.getId());
 
-        this.updateCetifications(oldCetificates,user.getCetificates());
+        this.updateCertifications(oldCetificates,user.getCetificates());
     }
 
-    public PaginationCustom<UserPagination> getPagination(int page,int pageSize,String email,String sortRole,Boolean sortFullName
-            ,String sortStatus){
+    public PagedList<UserPagination> getPaginationByRole(int page, int pageSize, String email, String role, Boolean sortFullName){
         PageRequest pageable =  null;
         if(sortFullName){
             pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.USER_FULL_NAME).ascending()
@@ -86,24 +85,27 @@ public class UserService {
         }
 
         Page<Object> rawData = null;
-        PaginationCustom<UserPagination> data = null;
-        if( sortRole != null && !sortRole.isEmpty()){
-            rawData = userRepository.findAllByFullNameSortByRoleCustom(pageable,email,sortRole);
-        }else if(sortStatus != null && !sortStatus.isEmpty()){
-            if(!Boolean.parseBoolean(sortStatus)){
-                rawData = userRepository.findAllByStatus(pageable,Status.INACTIVE,email);
-            }else{
-                rawData = userRepository.findAllByStatus(pageable,Status.ACTIVE,email);
-            }
+        if(!role.isEmpty()){
+            rawData = userRepository.findAllByFullNameSortByRoleCustom(pageable,email,role);
         }else{
             rawData = userRepository.findAllByFullNameCustom(pageable,email);
         }
-        final List<UserPagination> content = ManualCastUtils.castPageObjectsoUser(rawData);
-        final int totalPages = rawData.getTotalPages();
-        final long totalElements = rawData.getTotalElements();
-        data = new PaginationCustom<UserPagination>(content,totalPages,totalElements);
 
-        return data;
+        return this.fillDataToPaginationCustom(rawData);
+    }
+
+    public PagedList<UserPagination> getPaginationByStatus(int page,int pageSize,String email,String status){
+        PageRequest pageable =  null;
+        pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.USER_CREATED_DATE).descending());
+
+        Page<Object> rawData = null;
+        if(!Boolean.parseBoolean(status)){
+            rawData = userRepository.findAllByStatus(pageable,Status.INACTIVE,email);
+        }else{
+            rawData = userRepository.findAllByStatus(pageable,Status.ACTIVE,email);
+        }
+
+        return this.fillDataToPaginationCustom(rawData);
     }
 
     public void updateStatus(long id,int isActive){
@@ -142,7 +144,7 @@ public class UserService {
         notificationRepository.save(notification);
     }
 
-    private void updateCetifications(List<Certificates> oldCetificates, List<Certificates> newCetificates){
+    private void updateCertifications(List<Certificates> oldCetificates, List<Certificates> newCetificates){
         if(oldCetificates.isEmpty()){
             //add all
             for (Certificates newCetificate:
@@ -190,5 +192,12 @@ public class UserService {
                 this.certificatesRepository.delete(cetificate);
             }
         }
+    }
+
+    private PagedList<UserPagination> fillDataToPaginationCustom(Page<Object> rawData){
+        final List<UserPagination> content = ManualCastUtils.castPageObjectsoUser(rawData);
+        final int totalPages = rawData.getTotalPages();
+        final long totalElements = rawData.getTotalElements();
+        return new PagedList<UserPagination>(totalPages,totalElements,content);
     }
 }
