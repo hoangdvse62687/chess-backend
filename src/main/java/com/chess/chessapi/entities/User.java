@@ -18,29 +18,29 @@ public class User {
     private long id;
 
     @Email
-    @Length(max = 255,message = "Email shouldn't larger than 255 characters")
+    @Length(max = 255, message = "Email shouldn't larger than 255 characters")
     @NotNull(message = "Email is required not null")
     private String email;
 
     @NotNull(message = "Full Name is required not null")
-    @Length(max = 255,message = "Full name shouldn't larger than 255 characters")
+    @Length(max = 255, message = "Full name shouldn't larger than 255 characters")
     private String full_name;
 
 
-    @Length(max = 255,message = "Link avatar shouldn't larger than 255 characters")
+    @Length(max = 255, message = "Link avatar shouldn't larger than 255 characters")
     private String avatar;
 
     private java.sql.Timestamp created_date;
 
     private int is_active;
 
-    @Length(max = 255,message = "Role shouldn't larger than 255 characters")
+    @Length(max = 255, message = "Role shouldn't larger than 255 characters")
     private String role;
 
-    @Length(max = 255,message = "Achievement shouldn't larger than 255 characters")
+    @Length(max = 255, message = "Achievement shouldn't larger than 255 characters")
     private String achievement;
 
-    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,mappedBy = "user")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user")
     @JsonManagedReference
     private List<Cetificates> cetificates;
 

@@ -1,2 +1,0 @@
-# chess-backend
-Chess backend
