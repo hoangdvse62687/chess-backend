@@ -99,10 +99,10 @@ public class UserController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public @ResponseBody JsonResult getUsers(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
             ,String email,String roleSort,boolean sortFullName,String sortStatus){
-        if(fullName == null){
-            fullName = '%' + "" + '%';
+        if(email == null){
+            email = '%' + "" + '%';
         }else{
-            fullName = '%' + email + '%';
+            email = '%' + email + '%';
         }
         PaginationCustom<UserPagination> userPage = null;
         try{
