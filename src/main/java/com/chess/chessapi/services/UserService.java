@@ -1,11 +1,11 @@
 package com.chess.chessapi.services;
 
 import com.chess.chessapi.constant.*;
-import com.chess.chessapi.entities.Cetificates;
+import com.chess.chessapi.entities.Certificates;
 import com.chess.chessapi.entities.Notification;
 import com.chess.chessapi.entities.User;
-import com.chess.chessapi.model.PaginationCustom;
-import com.chess.chessapi.repositories.CetificatesRepository;
+import com.chess.chessapi.model.PagedList;
+import com.chess.chessapi.repositories.CertificatesRepository;
 import com.chess.chessapi.repositories.NotificationRepository;
 import com.chess.chessapi.repositories.UserRepository;
 import com.chess.chessapi.security.UserPrincipal;
@@ -14,7 +14,6 @@ import com.chess.chessapi.viewmodel.UserPagination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.function.Function;
 
 @Service
 public class UserService {
@@ -36,7 +34,7 @@ public class UserService {
     private NotificationRepository notificationRepository;
 
     @Autowired
-    private CetificatesRepository cetificatesRepository;
+    private CertificatesRepository certificatesRepository;
 
     public UserPrincipal getCurrentUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -72,58 +70,12 @@ public class UserService {
         this.userRepository.updateProfile(user.getId(),user.getFullName(),user.getAchievement());
 
         //handle cetificate update
-        List<Cetificates> oldCetificates = this.cetificatesRepository.findAllByUserId(user.getId());
-        if(oldCetificates.isEmpty()){
-            //add all
-            for (Cetificates newCetificate:
-                    user.getCetificates()) {
-                this.cetificatesRepository.save(newCetificate);
-            }
-        }else if(user.getCetificates() != null && !user.getCetificates().isEmpty()){
-            //check if new cetificate has already or not, if it not yet c=> create
-            for (Cetificates newCetificate:
-                 user.getCetificates()) {
-                boolean isExist = false;
-                for (Cetificates oldCetificate:
-                     oldCetificates) {
-                    if(newCetificate.getCetificateLink().equals(oldCetificate.getCetificateLink())){
-                       isExist = true;
-                        break;
-                    }
-                }
-                if(!isExist){
-                    this.cetificatesRepository.save(newCetificate);
-                }
-            }
-            //check old records should be deleted
-            for (Cetificates oldCetificate:
-                 oldCetificates) {
-                boolean isUpdatedRecord = false;
-                for (Cetificates newCetificate:
-                     user.getCetificates()) {
-                    if(oldCetificate.getCetificateLink().equals(newCetificate.getCetificateLink())){
-                        isUpdatedRecord = true;
-                        user.getCetificates().remove(newCetificate);
-                        break;
-                    }
-                }
+        List<Certificates> oldCetificates = this.certificatesRepository.findAllByUserId(user.getId());
 
-                if(!isUpdatedRecord){
-                    this.cetificatesRepository.delete(oldCetificate);
-                }
-            }
-        }
-        else{
-            //delete all
-            for (Cetificates cetificate:
-                 oldCetificates) {
-                this.cetificatesRepository.delete(cetificate);
-            }
-        }
+        this.updateCertifications(oldCetificates,user.getCetificates());
     }
 
-    public PaginationCustom<UserPagination> getPagination(int page,int pageSize,String email,String sortRole,Boolean sortFullName
-            ,String sortStatus){
+    public PagedList<UserPagination> getPaginationByRole(int page, int pageSize, String email, String role, Boolean sortFullName){
         PageRequest pageable =  null;
         if(sortFullName){
             pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.USER_FULL_NAME).ascending()
@@ -133,24 +85,27 @@ public class UserService {
         }
 
         Page<Object> rawData = null;
-        PaginationCustom<UserPagination> data = null;
-        if( sortRole != null && !sortRole.isEmpty()){
-            rawData = userRepository.findAllByFullNameSortByRoleCustom(pageable,email,sortRole);
-        }else if(sortStatus != null && !sortStatus.isEmpty()){
-            if(sortStatus.equals(Integer.toString(Status.INACTIVE))){
-                rawData = userRepository.findAllByStatus(pageable,Status.INACTIVE,email);
-            }else{
-                rawData = userRepository.findAllByStatus(pageable,Status.ACTIVE,email);
-            }
+        if(!role.isEmpty()){
+            rawData = userRepository.findAllByFullNameSortByRoleCustom(pageable,email,role);
         }else{
             rawData = userRepository.findAllByFullNameCustom(pageable,email);
         }
-        final List<UserPagination> content = ManualCastUtils.castPageObjectsoUser(rawData);
-        final int totalPages = rawData.getTotalPages();
-        final long totalElements = rawData.getTotalElements();
-        data = new PaginationCustom<UserPagination>(content,totalPages,totalElements);
 
-        return data;
+        return this.fillDataToPaginationCustom(rawData);
+    }
+
+    public PagedList<UserPagination> getPaginationByStatus(int page,int pageSize,String email,String status){
+        PageRequest pageable =  null;
+        pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.USER_CREATED_DATE).descending());
+
+        Page<Object> rawData = null;
+        if(!Boolean.parseBoolean(status)){
+            rawData = userRepository.findAllByStatus(pageable,Status.INACTIVE,email);
+        }else{
+            rawData = userRepository.findAllByStatus(pageable,Status.ACTIVE,email);
+        }
+
+        return this.fillDataToPaginationCustom(rawData);
     }
 
     public void updateStatus(long id,int isActive){
@@ -169,12 +124,12 @@ public class UserService {
     }
 
     private void registerLearner(User user){
-        user.setIs_active(Status.ACTIVE);
+        user.setActive(Status.ACTIVE);
         user.setRole(AppRole.ROLE_LEARNER);
     }
 
     private void registerInstructor(User user){
-        user.setIs_active(Status.INACTIVE);
+        user.setActive(Status.INACTIVE);
         user.setRole(AppRole.ROLE_INSTRUCTOR);
 
         // create notification for admin
@@ -189,4 +144,60 @@ public class UserService {
         notificationRepository.save(notification);
     }
 
+    private void updateCertifications(List<Certificates> oldCetificates, List<Certificates> newCetificates){
+        if(oldCetificates.isEmpty()){
+            //add all
+            for (Certificates newCetificate:
+                    newCetificates) {
+                this.certificatesRepository.save(newCetificate);
+            }
+        }else if(newCetificates != null && !newCetificates.isEmpty()){
+            //check if new cetificate has already or not, if it not yet c=> create
+            for (Certificates newCetificate:
+                    newCetificates) {
+                boolean isExist = false;
+                for (Certificates oldCetificate:
+                        oldCetificates) {
+                    if(newCetificate.getCetificateLink().equals(oldCetificate.getCetificateLink())){
+                        isExist = true;
+                        break;
+                    }
+                }
+                if(!isExist){
+                    this.certificatesRepository.save(newCetificate);
+                }
+            }
+            //check old records should be deleted
+            for (Certificates oldCetificate:
+                    oldCetificates) {
+                boolean isUpdatedRecord = false;
+                for (Certificates newCetificate:
+                        newCetificates) {
+                    if(oldCetificate.getCetificateLink().equals(newCetificate.getCetificateLink())){
+                        isUpdatedRecord = true;
+                        newCetificates.remove(newCetificate);
+                        break;
+                    }
+                }
+
+                if(!isUpdatedRecord){
+                    this.certificatesRepository.delete(oldCetificate);
+                }
+            }
+        }
+        else{
+            //delete all
+            for (Certificates cetificate:
+                    oldCetificates) {
+                this.certificatesRepository.delete(cetificate);
+            }
+        }
+    }
+
+    private PagedList<UserPagination> fillDataToPaginationCustom(Page<Object> rawData){
+        final List<UserPagination> content = ManualCastUtils.castPageObjectsoUser(rawData);
+        final int totalPages = rawData.getTotalPages();
+        final long totalElements = rawData.getTotalElements();
+        return new PagedList<UserPagination>(totalPages,totalElements,content);
+    }
 }

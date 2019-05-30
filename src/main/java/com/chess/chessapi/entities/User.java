@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -24,15 +24,18 @@ public class User {
 
     @NotNull(message = "Full Name is required not null")
     @Length(max = 255, message = "Full name shouldn't larger than 255 characters")
-    private String full_name;
+    @Column(name = "full_name")
+    private String fullName;
 
 
     @Length(max = 255, message = "Link avatar shouldn't larger than 255 characters")
     private String avatar;
 
-    private java.sql.Timestamp created_date;
+    @Column(name = "created_date")
+    private java.sql.Timestamp createdDate;
 
-    private int is_active;
+    @Column(name = "is_active")
+    private boolean isActive;
 
     @Length(max = 255, message = "Role shouldn't larger than 255 characters")
     private String role;
@@ -42,7 +45,7 @@ public class User {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user")
     @JsonManagedReference
-    private List<Cetificates> cetificates;
+    private List<Certificates> cetificates;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -68,14 +71,6 @@ public class User {
     }
 
 
-    public String getFullName() {
-        return full_name;
-    }
-
-    public void setFullName(String fullName) {
-        this.full_name = fullName;
-    }
-
     public String getAvatar() {
         return avatar;
     }
@@ -84,21 +79,28 @@ public class User {
         this.avatar = avatar;
     }
 
-
-    public java.sql.Timestamp getCreatedDate() {
-        return created_date;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setCreatedDate(java.sql.Timestamp createdDate) {
-        this.created_date = createdDate;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
-    public int getIs_active() {
-        return is_active;
+    public Timestamp getCreatedDate() {
+        return createdDate;
     }
 
-    public void setIs_active(int is_active) {
-        this.is_active = is_active;
+    public void setCreatedDate(Timestamp createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     public String getRole() {
@@ -134,11 +136,11 @@ public class User {
         this.providerId = providerId;
     }
 
-    public List<Cetificates> getCetificates() {
+    public List<Certificates> getCetificates() {
         return cetificates;
     }
 
-    public void setCetificates(List<Cetificates> cetificates) {
+    public void setCetificates(List<Certificates> cetificates) {
         this.cetificates = cetificates;
     }
 }

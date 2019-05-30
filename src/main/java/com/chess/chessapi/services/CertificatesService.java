@@ -4,6 +4,6 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class CetificatesService {
+public class CertificatesService {
 
 }

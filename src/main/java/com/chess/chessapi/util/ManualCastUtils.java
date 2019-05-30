@@ -28,7 +28,7 @@ public class ManualCastUtils implements Serializable {
         user.setId(Long.parseLong(data[USER_ID_INDEX].toString()));
         user.setEmail(data[USER_EMAIL_INDEX].toString());
         user.setRole(data[USER_ROLE_INDEX].toString());
-        user.setIs_active(Integer.parseInt(data[USER_ISACTIVE_INDEX].toString()));
+        user.setActive(Boolean.parseBoolean(data[USER_ISACTIVE_INDEX].toString()));
         return user;
     }
 

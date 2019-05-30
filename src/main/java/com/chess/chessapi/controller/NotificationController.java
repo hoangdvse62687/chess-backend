@@ -33,7 +33,8 @@ public class NotificationController {
 
     @ApiOperation(value = "Get notification pagings")
     @GetMapping("/get-notifications-pagination")
-    @PreAuthorize("hasAnyAuthority('ROLE_INSTRUCTOR','ROLE_LEARNER','ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority("+AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+","+AppRole.ROLE_LEARNER_AUTHENTICATIION+"" +
+            ","+AppRole.ROLE_ADMIN_AUTHENTICATIION+")")
     public JsonResult getNotifications(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize,
                                       boolean sortIsViewed){
         UserPrincipal currentUser = userService.getCurrentUser();
