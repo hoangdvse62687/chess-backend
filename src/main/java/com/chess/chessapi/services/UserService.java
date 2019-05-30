@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.function.Function;
 
 @Service
 public class UserService {
@@ -73,53 +72,8 @@ public class UserService {
 
         //handle cetificate update
         List<Cetificates> oldCetificates = this.cetificatesRepository.findAllByUserId(user.getId());
-        if(oldCetificates.isEmpty()){
-            //add all
-            for (Cetificates newCetificate:
-                    user.getCetificates()) {
-                this.cetificatesRepository.save(newCetificate);
-            }
-        }else if(user.getCetificates() != null && !user.getCetificates().isEmpty()){
-            //check if new cetificate has already or not, if it not yet c=> create
-            for (Cetificates newCetificate:
-                 user.getCetificates()) {
-                boolean isExist = false;
-                for (Cetificates oldCetificate:
-                     oldCetificates) {
-                    if(newCetificate.getCetificateLink().equals(oldCetificate.getCetificateLink())){
-                       isExist = true;
-                        break;
-                    }
-                }
-                if(!isExist){
-                    this.cetificatesRepository.save(newCetificate);
-                }
-            }
-            //check old records should be deleted
-            for (Cetificates oldCetificate:
-                 oldCetificates) {
-                boolean isUpdatedRecord = false;
-                for (Cetificates newCetificate:
-                     user.getCetificates()) {
-                    if(oldCetificate.getCetificateLink().equals(newCetificate.getCetificateLink())){
-                        isUpdatedRecord = true;
-                        user.getCetificates().remove(newCetificate);
-                        break;
-                    }
-                }
 
-                if(!isUpdatedRecord){
-                    this.cetificatesRepository.delete(oldCetificate);
-                }
-            }
-        }
-        else{
-            //delete all
-            for (Cetificates cetificate:
-                 oldCetificates) {
-                this.cetificatesRepository.delete(cetificate);
-            }
-        }
+        this.updateCetifications(oldCetificates,user.getCetificates());
     }
 
     public PaginationCustom<UserPagination> getPagination(int page,int pageSize,String email,String sortRole,Boolean sortFullName
@@ -137,7 +91,7 @@ public class UserService {
         if( sortRole != null && !sortRole.isEmpty()){
             rawData = userRepository.findAllByFullNameSortByRoleCustom(pageable,email,sortRole);
         }else if(sortStatus != null && !sortStatus.isEmpty()){
-            if(sortStatus.equals(Integer.toString(Status.INACTIVE))){
+            if(!Boolean.parseBoolean(sortStatus)){
                 rawData = userRepository.findAllByStatus(pageable,Status.INACTIVE,email);
             }else{
                 rawData = userRepository.findAllByStatus(pageable,Status.ACTIVE,email);
@@ -169,12 +123,12 @@ public class UserService {
     }
 
     private void registerLearner(User user){
-        user.setIs_active(Status.ACTIVE);
+        user.setActive(Status.ACTIVE);
         user.setRole(AppRole.ROLE_LEARNER);
     }
 
     private void registerInstructor(User user){
-        user.setIs_active(Status.INACTIVE);
+        user.setActive(Status.INACTIVE);
         user.setRole(AppRole.ROLE_INSTRUCTOR);
 
         // create notification for admin
@@ -189,4 +143,53 @@ public class UserService {
         notificationRepository.save(notification);
     }
 
+    private void updateCetifications(List<Cetificates> oldCetificates, List<Cetificates> newCetificates){
+        if(oldCetificates.isEmpty()){
+            //add all
+            for (Cetificates newCetificate:
+                    newCetificates) {
+                this.cetificatesRepository.save(newCetificate);
+            }
+        }else if(newCetificates != null && !newCetificates.isEmpty()){
+            //check if new cetificate has already or not, if it not yet c=> create
+            for (Cetificates newCetificate:
+                    newCetificates) {
+                boolean isExist = false;
+                for (Cetificates oldCetificate:
+                        oldCetificates) {
+                    if(newCetificate.getCetificateLink().equals(oldCetificate.getCetificateLink())){
+                        isExist = true;
+                        break;
+                    }
+                }
+                if(!isExist){
+                    this.cetificatesRepository.save(newCetificate);
+                }
+            }
+            //check old records should be deleted
+            for (Cetificates oldCetificate:
+                    oldCetificates) {
+                boolean isUpdatedRecord = false;
+                for (Cetificates newCetificate:
+                        newCetificates) {
+                    if(oldCetificate.getCetificateLink().equals(newCetificate.getCetificateLink())){
+                        isUpdatedRecord = true;
+                        newCetificates.remove(newCetificate);
+                        break;
+                    }
+                }
+
+                if(!isUpdatedRecord){
+                    this.cetificatesRepository.delete(oldCetificate);
+                }
+            }
+        }
+        else{
+            //delete all
+            for (Cetificates cetificate:
+                    oldCetificates) {
+                this.cetificatesRepository.delete(cetificate);
+            }
+        }
+    }
 }

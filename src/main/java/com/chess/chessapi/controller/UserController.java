@@ -4,6 +4,7 @@ package com.chess.chessapi.controller;
 import com.chess.chessapi.constant.AppMessage;
 import com.chess.chessapi.constant.EntitiesFieldName;
 import com.chess.chessapi.entities.User;
+import com.chess.chessapi.exception.AccessDeniedException;
 import com.chess.chessapi.exception.ResourceNotFoundException;
 import com.chess.chessapi.model.JsonResult;
 import com.chess.chessapi.model.PagedList;
@@ -52,6 +53,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('ROLE_REGISTRATION')")
     public @ResponseBody JsonResult register(@Valid @RequestBody User user,@RequestParam("redirectUri") String redirectUri
             , BindingResult bindingResult){
+
         String message = "";
         boolean isSuccess = true;
         if(bindingResult.hasErrors()){
@@ -75,6 +77,10 @@ public class UserController {
     @PutMapping(value = "/update-profile")
     @PreAuthorize("isAuthenticated()")
     public @ResponseBody JsonResult updateProfile(@Valid @RequestBody User user, BindingResult bindingResult){
+        UserPrincipal currentUser = userService.getCurrentUser();
+        if(currentUser.getId() != user.getId()){
+            throw new AccessDeniedException(AppMessage.PERMISSION_MESSAGE);
+        }
         String message = "";
         boolean isSuccess = true;
         if(bindingResult.hasErrors()){

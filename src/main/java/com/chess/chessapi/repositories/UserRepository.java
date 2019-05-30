@@ -36,7 +36,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "From user u WHERE u.is_active = ?1",
             countQuery = "Select count(u.id) from user u WHERE u.is_active = ?1 and u.email = ?2",
             nativeQuery = true)
-    Page<Object> findAllByStatus(Pageable pageable,int status,String email);
+    Page<Object> findAllByStatus(Pageable pageable,boolean status,String email);
 
     Optional<User> findByEmail(String email);
 
