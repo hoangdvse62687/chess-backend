@@ -122,7 +122,7 @@ public class UserService {
         }
     }
 
-    public PaginationCustom<UserPagination> getPagination(int page,int pageSize,String fullName,String sortRole,Boolean sortFullName
+    public PaginationCustom<UserPagination> getPagination(int page,int pageSize,String email,String sortRole,Boolean sortFullName
             ,String sortStatus){
         PageRequest pageable =  null;
         if(sortFullName){
@@ -135,15 +135,15 @@ public class UserService {
         Page<Object> rawData = null;
         PaginationCustom<UserPagination> data = null;
         if( sortRole != null && !sortRole.isEmpty()){
-            rawData = userRepository.findAllByFullNameSortByRoleCustom(pageable,fullName,sortRole);
+            rawData = userRepository.findAllByFullNameSortByRoleCustom(pageable,email,sortRole);
         }else if(sortStatus != null && !sortStatus.isEmpty()){
             if(sortStatus.equals(Integer.toString(Status.INACTIVE))){
-                rawData = userRepository.findAllByStatus(pageable,Status.INACTIVE);
+                rawData = userRepository.findAllByStatus(pageable,Status.INACTIVE,email);
             }else{
-                rawData = userRepository.findAllByStatus(pageable,Status.ACTIVE);
+                rawData = userRepository.findAllByStatus(pageable,Status.ACTIVE,email);
             }
         }else{
-            rawData = userRepository.findAllByFullNameCustom(pageable,fullName);
+            rawData = userRepository.findAllByFullNameCustom(pageable,email);
         }
         final List<UserPagination> content = ManualCastUtils.castPageObjectsoUser(rawData);
         final int totalPages = rawData.getTotalPages();
@@ -180,7 +180,7 @@ public class UserService {
         // create notification for admin
         Notification notification = new Notification();
         notification.setObjectId(ObjectType.USER);
-        notification.setObjectName(user.getFullName());
+        notification.setObjectName(user.getEmail());
         notification.setObjectId(user.getId());
         notification.setContent(NotificationMessage.CREATE_NEW_USER_AS_INSTRUCTOR);
         notification.setCreateDate(new Timestamp(new Date().getTime()));
