@@ -1,6 +1,6 @@
 package com.chess.chessapi.security;
 
-import com.chess.chessapi.config.AppProperties;
+import com.chess.chessapi.configs.AppProperties;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

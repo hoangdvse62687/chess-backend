@@ -1,16 +1,16 @@
 package com.chess.chessapi.services;
 
-import com.chess.chessapi.constant.*;
+import com.chess.chessapi.constants.*;
 import com.chess.chessapi.entities.Certificates;
 import com.chess.chessapi.entities.Notification;
 import com.chess.chessapi.entities.User;
-import com.chess.chessapi.model.PagedList;
+import com.chess.chessapi.models.PagedList;
 import com.chess.chessapi.repositories.CertificatesRepository;
 import com.chess.chessapi.repositories.NotificationRepository;
 import com.chess.chessapi.repositories.UserRepository;
 import com.chess.chessapi.security.UserPrincipal;
-import com.chess.chessapi.util.ManualCastUtils;
-import com.chess.chessapi.viewmodel.UserPagination;
+import com.chess.chessapi.utils.ManualCastUtils;
+import com.chess.chessapi.viewmodels.UserPagination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

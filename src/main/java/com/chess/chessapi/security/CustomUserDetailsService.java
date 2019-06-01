@@ -1,17 +1,15 @@
 package com.chess.chessapi.security;
 
 import com.chess.chessapi.entities.User;
-import com.chess.chessapi.exception.ResourceNotFoundException;
+import com.chess.chessapi.exceptions.ResourceNotFoundException;
 import com.chess.chessapi.repositories.UserRepository;
-import com.chess.chessapi.util.ManualCastUtils;
+import com.chess.chessapi.utils.ManualCastUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService{

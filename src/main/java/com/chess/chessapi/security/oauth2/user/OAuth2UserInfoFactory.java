@@ -1,7 +1,7 @@
 package com.chess.chessapi.security.oauth2.user;
 
-import com.chess.chessapi.exception.OAuth2AuthenticationProcessingException;
-import com.chess.chessapi.constant.AuthProvider;
+import com.chess.chessapi.exceptions.OAuth2AuthenticationProcessingException;
+import com.chess.chessapi.constants.AuthProvider;
 
 import java.util.Map;
 
