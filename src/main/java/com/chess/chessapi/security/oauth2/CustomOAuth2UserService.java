@@ -1,14 +1,14 @@
 package com.chess.chessapi.security.oauth2;
 
-import com.chess.chessapi.constant.AppRole;
+import com.chess.chessapi.constants.AppRole;
 import com.chess.chessapi.entities.User;
-import com.chess.chessapi.exception.OAuth2AuthenticationProcessingException;
-import com.chess.chessapi.constant.AuthProvider;
+import com.chess.chessapi.exceptions.OAuth2AuthenticationProcessingException;
+import com.chess.chessapi.constants.AuthProvider;
 import com.chess.chessapi.repositories.UserRepository;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.security.oauth2.user.OAuth2UserInfo;
 import com.chess.chessapi.security.oauth2.user.OAuth2UserInfoFactory;
-import com.chess.chessapi.util.ManualCastUtils;
+import com.chess.chessapi.utils.ManualCastUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -66,6 +66,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         user.setFullName(oAuth2UserInfo.getName());
         user.setEmail(oAuth2UserInfo.getEmail());
         user.setAvatar(oAuth2UserInfo.getImageUrl());
+        user.setPoint(0);
         user.setRole(AppRole.ROLE_REGISTRATION);
 
         user.setCreatedDate(new Timestamp(new Date().getTime()));

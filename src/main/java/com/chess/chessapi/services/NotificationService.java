@@ -1,7 +1,7 @@
 package com.chess.chessapi.services;
 
-import com.chess.chessapi.constant.AppRole;
-import com.chess.chessapi.constant.EntitiesFieldName;
+import com.chess.chessapi.constants.AppRole;
+import com.chess.chessapi.constants.EntitiesFieldName;
 import com.chess.chessapi.entities.Notification;
 import com.chess.chessapi.repositories.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;

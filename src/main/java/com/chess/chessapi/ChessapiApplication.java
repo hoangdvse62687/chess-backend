@@ -1,6 +1,6 @@
 package com.chess.chessapi;
 
-import com.chess.chessapi.config.AppProperties;
+import com.chess.chessapi.configs.AppProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

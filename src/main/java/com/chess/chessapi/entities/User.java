@@ -1,6 +1,6 @@
 package com.chess.chessapi.entities;
 
-import com.chess.chessapi.constant.AuthProvider;
+import com.chess.chessapi.constants.AuthProvider;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.validator.constraints.Length;
 
@@ -37,7 +37,13 @@ public class User {
     @Column(name = "is_active")
     private boolean isActive;
 
+<<<<<<< HEAD
     @Length(max = 255, message = "Role shouldn't larger than 255 characters")
+=======
+    private float point;
+
+    @Length(max = 255,message = "Role shouldn't larger than 255 characters")
+>>>>>>> origin/HoangDV
     private String role;
 
     @Length(max = 255, message = "Achievement shouldn't larger than 255 characters")
@@ -47,10 +53,15 @@ public class User {
     @JsonManagedReference
     private List<Certificates> cetificates;
 
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,mappedBy = "user")
+    @JsonManagedReference
+    private List<UserHasCourse> userHasCourses;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;
 
+    @Column(name = "provider_id")
     private String providerId;
 
     public long getId() {
@@ -142,5 +153,21 @@ public class User {
 
     public void setCetificates(List<Certificates> cetificates) {
         this.cetificates = cetificates;
+    }
+
+    public float getPoint() {
+        return point;
+    }
+
+    public void setPoint(float point) {
+        this.point = point;
+    }
+
+    public List<UserHasCourse> getUserHasCourses() {
+        return userHasCourses;
+    }
+
+    public void setUserHasCourses(List<UserHasCourse> userHasCourses) {
+        this.userHasCourses = userHasCourses;
     }
 }
