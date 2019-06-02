@@ -37,7 +37,6 @@ public class User {
     @Column(name = "is_active")
     private boolean isActive;
 
-    @Length(max = 255, message = "Role shouldn't larger than 255 characters")
     private float point;
 
     @Length(max = 255,message = "Role shouldn't larger than 255 characters")
