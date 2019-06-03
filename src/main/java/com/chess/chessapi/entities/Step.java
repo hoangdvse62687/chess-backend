@@ -1,6 +1,7 @@
 package com.chess.chessapi.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
@@ -8,6 +9,7 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "step")
+@JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id",scope = Step.class)
 public class Step {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -42,7 +44,6 @@ public class Step {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="ilesson_id")
-    @JsonBackReference
     private InteractiveLesson interactiveLesson;
 
     public long getId() {

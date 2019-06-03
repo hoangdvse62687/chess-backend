@@ -41,15 +41,15 @@ public class NotificationController {
 
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.addAll(currentUser.getAuthorities());
-        String role = AppRole.ROLE_LEARNER;
+        long role_id = AppRole.ROLE_LEARNER;
         for (GrantedAuthority authority:
              authorities) {
-            role = authority.toString();
+            role_id = Integer.parseInt(authority.toString());
         }
         Page<Notification> listNofication = null;
         try{
             listNofication = notificationService
-                    .getPagination(page,pageSize, role,currentUser.getId().toString(),sortIsViewed);
+                    .getPagination(page,pageSize, role_id,currentUser.getId().toString(),sortIsViewed);
         }catch (IllegalArgumentException ex){
             throw new ResourceNotFoundException("Page","number",page);
         }

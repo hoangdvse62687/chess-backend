@@ -1,11 +1,13 @@
 package com.chess.chessapi.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "category_has_course")
+@JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id",scope = CategoryHasCourse.class)
 public class CategoryHasCourse {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -13,12 +15,10 @@ public class CategoryHasCourse {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="course_id")
-    @JsonBackReference
     private Course course;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="category_id")
-    @JsonBackReference
     private Category category;
 
     public long getId() {

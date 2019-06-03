@@ -6,15 +6,16 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "certificates")
+@JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id",scope = Certificates.class)
 public class Certificates {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
     private String certificate_link;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_id")
-    @JsonBackReference
+    @JoinColumn(name = "user_id")
     private User user;
 
     public long getId() {
@@ -24,7 +25,6 @@ public class Certificates {
     public void setId(long id) {
         this.id = id;
     }
-
 
     public String getCetificateLink() {
         return certificate_link;

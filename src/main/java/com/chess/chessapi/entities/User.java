@@ -1,7 +1,8 @@
 package com.chess.chessapi.entities;
 
 import com.chess.chessapi.constants.AuthProvider;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
+@JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id",scope = User.class)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -39,18 +41,17 @@ public class User {
 
     private float point;
 
-    @Length(max = 255,message = "Role shouldn't larger than 255 characters")
-    private String role;
+    @Column(name = "role_id")
+    private long roleId;
+
 
     @Length(max = 255, message = "Achievement shouldn't larger than 255 characters")
     private String achievement;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user")
-    @JsonManagedReference
     private List<Certificates> cetificates;
 
     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,mappedBy = "user")
-    @JsonManagedReference
     private List<UserHasCourse> userHasCourses;
 
     @NotNull
@@ -110,15 +111,6 @@ public class User {
         isActive = active;
     }
 
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-
     public String getAchievement() {
         return achievement;
     }
@@ -165,5 +157,13 @@ public class User {
 
     public void setUserHasCourses(List<UserHasCourse> userHasCourses) {
         this.userHasCourses = userHasCourses;
+    }
+
+    public long getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(long roleId) {
+        this.roleId = roleId;
     }
 }

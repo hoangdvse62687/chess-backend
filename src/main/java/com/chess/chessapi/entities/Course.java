@@ -1,6 +1,7 @@
 package com.chess.chessapi.entities;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
@@ -10,6 +11,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "course")
+@JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id",scope = Course.class)
 public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -29,15 +31,12 @@ public class Course {
     private String status;
 
     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,mappedBy = "course")
-    @JsonManagedReference
     private List<UserHasCourse> userHasCourses;
 
     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,mappedBy = "course")
-    @JsonManagedReference
     private List<CategoryHasCourse> categoryHasCourses;
 
     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,mappedBy = "course")
-    @JsonManagedReference
     private List<CouseHasInteractiveLesson> couseHasInteractiveLessons;
 
     public long getId() {

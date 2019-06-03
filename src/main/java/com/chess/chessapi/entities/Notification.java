@@ -33,7 +33,7 @@ public class Notification {
 
     @NotNull
     @Column(name = "role_target")
-    private String roleTarget;
+    private long roleTarget;
 
     public long getId() {
         return id;
@@ -91,11 +91,11 @@ public class Notification {
         this.createDate = createDate;
     }
 
-    public String getRoleTarget() {
+    public long getRoleTarget() {
         return roleTarget;
     }
 
-    public void setRoleTarget(String roleTarget) {
+    public void setRoleTarget(long roleTarget) {
         this.roleTarget = roleTarget;
     }
 }

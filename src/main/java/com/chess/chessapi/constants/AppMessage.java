@@ -12,6 +12,8 @@ public class AppMessage implements Serializable {
     public static final String FAIL_MESSAGE = "fail";
 
     public static final String PERMISSION_MESSAGE = "you don't have permission to this action";
+
+    public static final String CREATE_NEW_USER_AS_INSTRUCTOR = " is created as instructor role. Click to review its.";
     public static String getMessageSuccess(String action,String table,String field,String value){
         return action + " " + table + " " + field + " " + SUCCESSFUL_MESSAGE + " " + value;
     }

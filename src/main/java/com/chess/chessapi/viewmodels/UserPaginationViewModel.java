@@ -3,7 +3,7 @@ package com.chess.chessapi.viewmodels;
 
 import java.sql.Timestamp;
 
-public class UserPagination {
+public class UserPaginationViewModel {
     private long id;
 
     private String email;
@@ -16,19 +16,19 @@ public class UserPagination {
 
     private int is_active;
 
-    private String role;
+    private int role_id;
 
-    public UserPagination() {
+    public UserPaginationViewModel() {
     }
 
-    public UserPagination(long id, String email, String full_name, String avatar, Timestamp created_date, int is_active, String role) {
+    public UserPaginationViewModel(long id, String email, String full_name, String avatar, Timestamp created_date, int is_active, int role_id) {
         this.id = id;
         this.email = email;
         this.full_name = full_name;
         this.avatar = avatar;
         this.created_date = created_date;
         this.is_active = is_active;
-        this.role = role;
+        this.role_id = role_id;
     }
 
     public long getId() {
@@ -79,11 +79,11 @@ public class UserPagination {
         this.is_active = is_active;
     }
 
-    public String getRole() {
-        return role;
+    public int getRole_id() {
+        return role_id;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setRole_id(int role_id) {
+        this.role_id = role_id;
     }
 }

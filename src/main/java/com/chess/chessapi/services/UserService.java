@@ -10,7 +10,7 @@ import com.chess.chessapi.repositories.NotificationRepository;
 import com.chess.chessapi.repositories.UserRepository;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.utils.ManualCastUtils;
-import com.chess.chessapi.viewmodels.UserPagination;
+import com.chess.chessapi.viewmodels.UserPaginationViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -48,21 +48,20 @@ public class UserService {
 
     public Optional<User> getUserByEmail(String email){return userRepository.findByEmail(email);}
 
-    public String register(User user,String redirectClient){
+    public String register(User user, String redirectClient){
         String redirectUri = "";
-        switch (user.getRole()){
-            case AppRole
-                    .ROLE_INSTRUCTOR:
-                this.registerInstructor(user);
-                break;
-            default:
-                this.registerLearner(user);
+        if(user.getRoleId() == AppRole.ROLE_INSTRUCTOR){
+            this.registerInstructor(user);
+        }else {
+            this.registerLearner(user);
         }
 
         redirectUri = redirectClient != null ? redirectClient : "/";
 
         this.setUserRoleAuthentication(user);
+
         this.userRepository.save(user);
+
         return redirectUri;
     }
 
@@ -75,7 +74,7 @@ public class UserService {
         this.updateCertifications(oldCetificates,user.getCetificates());
     }
 
-    public PagedList<UserPagination> getPaginationByRole(int page, int pageSize, String email, String role, Boolean sortFullName){
+    public PagedList<UserPaginationViewModel> getPaginationByRole(int page, int pageSize, String email, String role, Boolean sortFullName){
         PageRequest pageable =  null;
         if(sortFullName){
             pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.USER_FULL_NAME).ascending()
@@ -94,7 +93,7 @@ public class UserService {
         return this.fillDataToPaginationCustom(rawData);
     }
 
-    public PagedList<UserPagination> getPaginationByStatus(int page,int pageSize,String email,String status){
+    public PagedList<UserPaginationViewModel> getPaginationByStatus(int page, int pageSize, String email, String status){
         PageRequest pageable =  null;
         pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.USER_CREATED_DATE).descending());
 
@@ -114,7 +113,7 @@ public class UserService {
 
     private void setUserRoleAuthentication(User user){
         List<GrantedAuthority> authorities = Collections.
-                singletonList(new SimpleGrantedAuthority(user.getRole()));
+                singletonList(new SimpleGrantedAuthority(Long.toString(user.getRoleId())));
         UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
@@ -125,19 +124,18 @@ public class UserService {
 
     private void registerLearner(User user){
         user.setActive(Status.ACTIVE);
-        user.setRole(AppRole.ROLE_LEARNER);
+        user.setRoleId(AppRole.ROLE_LEARNER);
     }
 
     private void registerInstructor(User user){
         user.setActive(Status.INACTIVE);
-        user.setRole(AppRole.ROLE_INSTRUCTOR);
-
+        user.setRoleId(AppRole.ROLE_INSTRUCTOR);
         // create notification for admin
         Notification notification = new Notification();
         notification.setObjectId(ObjectType.USER);
         notification.setObjectName(user.getEmail());
         notification.setObjectId(user.getId());
-        notification.setContent(NotificationMessage.CREATE_NEW_USER_AS_INSTRUCTOR);
+        notification.setContent(AppMessage.CREATE_NEW_USER_AS_INSTRUCTOR);
         notification.setCreateDate(new Timestamp(new Date().getTime()));
         notification.setViewed(false);
         notification.setRoleTarget(AppRole.ROLE_ADMIN);
@@ -194,10 +192,10 @@ public class UserService {
         }
     }
 
-    private PagedList<UserPagination> fillDataToPaginationCustom(Page<Object> rawData){
-        final List<UserPagination> content = ManualCastUtils.castPageObjectsoUser(rawData);
+    private PagedList<UserPaginationViewModel> fillDataToPaginationCustom(Page<Object> rawData){
+        final List<UserPaginationViewModel> content = ManualCastUtils.castPageObjectsoUser(rawData);
         final int totalPages = rawData.getTotalPages();
         final long totalElements = rawData.getTotalElements();
-        return new PagedList<UserPagination>(totalPages,totalElements,content);
+        return new PagedList<UserPaginationViewModel>(totalPages,totalElements,content);
     }
 }

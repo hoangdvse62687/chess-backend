@@ -12,7 +12,7 @@ import com.chess.chessapi.models.PagedList;
 import com.chess.chessapi.security.CurrentUser;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.services.UserService;
-import com.chess.chessapi.viewmodels.UserPagination;
+import com.chess.chessapi.viewmodels.UserPaginationViewModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +50,7 @@ public class UserController {
     @ApiOperation(value = "Register an user")
     @PutMapping(value = "/register")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_REGISTRATION_AUTHENTICATIION +")")
-    public @ResponseBody JsonResult register(@Valid @RequestBody User user,@RequestParam("redirectUri") String redirectUri
+    public @ResponseBody JsonResult register(@Valid @RequestBody User user, @RequestParam("redirectUri") String redirectUri
             , BindingResult bindingResult){
 
         String message = "";
@@ -107,7 +107,7 @@ public class UserController {
 
         email = '%' + email + '%';
 
-        PagedList<UserPagination> data = null;
+        PagedList<UserPaginationViewModel> data = null;
         try{
             data = userService.getPaginationByRole(page,pageSize,email,role,sortEmail);
         }catch (IllegalArgumentException ex){
@@ -125,7 +125,7 @@ public class UserController {
 
         email = '%' + email + '%';
 
-        PagedList<UserPagination> data = null;
+        PagedList<UserPaginationViewModel> data = null;
         try{
             data = userService.getPaginationByStatus(page,pageSize,email,status);
         }catch (IllegalArgumentException ex){

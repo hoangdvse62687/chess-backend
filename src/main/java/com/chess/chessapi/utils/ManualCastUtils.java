@@ -1,7 +1,7 @@
 package com.chess.chessapi.utils;
 
 import com.chess.chessapi.entities.User;
-import com.chess.chessapi.viewmodels.UserPagination;
+import com.chess.chessapi.viewmodels.UserPaginationViewModel;
 import org.springframework.data.domain.Page;
 
 import java.io.Serializable;
@@ -27,20 +27,20 @@ public class ManualCastUtils implements Serializable {
         Object[] data = (Object[]) object;
         user.setId(Long.parseLong(data[USER_ID_INDEX].toString()));
         user.setEmail(data[USER_EMAIL_INDEX].toString());
-        user.setRole(data[USER_ROLE_INDEX].toString());
+        user.setRoleId(Long.parseLong(data[USER_ROLE_INDEX].toString()));
         user.setActive(Boolean.parseBoolean(data[USER_ISACTIVE_INDEX].toString()));
         return user;
     }
 
-    public static List<UserPagination> castPageObjectsoUser(Page<Object> objects){
-        List<UserPagination> users = new ArrayList<>();
+    public static List<UserPaginationViewModel> castPageObjectsoUser(Page<Object> objects){
+        List<UserPaginationViewModel> users = new ArrayList<>();
         for (Object object:
              objects.getContent()) {
-            UserPagination user = new UserPagination();
+            UserPaginationViewModel user = new UserPaginationViewModel();
             Object[] data = (Object[]) object;
             user.setId(Long.parseLong(data[USER_ID_INDEX].toString()));
             user.setEmail(data[USER_EMAIL_INDEX].toString());
-            user.setRole(data[USER_ROLE_INDEX].toString());
+            user.setRole_id(Integer.parseInt(data[USER_ROLE_INDEX].toString()));
             user.setIs_active(Integer.parseInt(data[USER_ISACTIVE_INDEX].toString()));
             user.setAvatar(data[USER_AVATAR_INDEX].toString());
             user.setFull_name(data[USER_FULLNAME_INDEX].toString());

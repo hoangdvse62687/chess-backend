@@ -14,26 +14,26 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    @Query(value = "Select u.id,u.email,u.role,u.is_active From users u where u.email = ?1",nativeQuery = true)
+    @Query(value = "Select u.id,u.email,u.role_id,u.is_active From users u where u.email = ?1",nativeQuery = true)
     Optional<Object> findByEmailCustom(String email);
 
-    @Query(value = "Select u.id,u.email,u.role,u.is_active From users u where u.id = ?1",nativeQuery = true)
+    @Query(value = "Select u.id,u.email,u.role_id,u.is_active From users u where u.id = ?1",nativeQuery = true)
     Optional<Object> findByIdCustom(long id);
 
-    @Query(value = "Select u.id,u.email,u.role,u.is_active,u.avatar,u.full_name,u.created_date " +
+    @Query(value = "Select u.id,u.email,u.role_id,u.is_active,u.avatar,u.full_name,u.created_date " +
             "From users u WHERE u.full_name like ?1",
             countQuery = "Select count(u.id) from user u WHERE u.email like ?1",
             nativeQuery = true)
     Page<Object> findAllByFullNameCustom(Pageable pageable,String email);
 
-    @Query(value = "Select u.id,u.email,u.role,u.is_active,u.avatar,u.full_name,u.created_date " +
-            "From users u WHERE u.full_name like ?1 and u.role = ?2",
-            countQuery = "Select count(u.id) from user u WHERE u.email like ?1 and u.role = ?2",
+    @Query(value = "Select u.id,u.email,u.role_id,u.is_active,u.avatar,u.full_name,u.created_date " +
+            "From users u WHERE u.full_name like ?1 and u.role_id = ?2",
+            countQuery = "Select count(u.id) from user u WHERE u.email like ?1 and u.role_id = ?2",
             nativeQuery = true)
     Page<Object> findAllByFullNameSortByRoleCustom(Pageable pageable,String email,String role);
 
-    @Query(value = "Select u.id,u.email,u.role,u.is_active,u.avatar,u.full_name,u.created_date " +
-            "From users u WHERE u.is_active = ?1",
+    @Query(value = "Select u.id,u.email,u.role_id,u.is_active,u.avatar,u.full_name,u.created_date " +
+            "From users u WHERE u.is_active = ?1 and u.email = ?2",
             countQuery = "Select count(u.id) from user u WHERE u.is_active = ?1 and u.email = ?2",
             nativeQuery = true)
     Page<Object> findAllByStatus(Pageable pageable,boolean status,String email);
