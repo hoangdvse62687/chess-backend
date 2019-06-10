@@ -9,11 +9,12 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "step")
-@JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id",scope = Step.class)
+@JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="stepId",scope = Step.class)
 public class Step {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @Column(name = "id")
+    private long stepId;
 
     @NotNull
     @Length(max = 1000,message = "Content is required not large than 1000 characters")
@@ -42,16 +43,16 @@ public class Step {
     @NotNull
     private String status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="ilesson_id")
     private InteractiveLesson interactiveLesson;
 
-    public long getId() {
-        return id;
+    public long getStepId() {
+        return stepId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setStepId(long stepId) {
+        this.stepId = stepId;
     }
 
     public String getContent() {

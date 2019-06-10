@@ -35,8 +35,9 @@ public class UserController {
     @GetMapping(value = "/get-current-user-detail")
     @PreAuthorize("isAuthenticated()")
     public @ResponseBody JsonResult getCurrentUserDetail(@CurrentUser UserPrincipal userPrincipal) {
-        User user = userService.getUserById(userPrincipal.getId())
+        User user = this.userService.getUserById(userPrincipal.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("User","id",userPrincipal.getId()));
+        this.userService.getUserDetails(user);
         return new JsonResult("",user);
     }
 
@@ -62,7 +63,7 @@ public class UserController {
         }else{
             try{
                 //gain redirect uri base on role
-                message = userService.register(user,redirectUri);
+                message = this.userService.register(user,redirectUri);
 
             }catch (Exception ex){
                 message = ex.getMessage();
@@ -76,8 +77,8 @@ public class UserController {
     @PutMapping(value = "/update-profile")
     @PreAuthorize("isAuthenticated()")
     public @ResponseBody JsonResult updateProfile(@Valid @RequestBody User user, BindingResult bindingResult){
-        UserPrincipal currentUser = userService.getCurrentUser();
-        if(currentUser.getId() != user.getId()){
+        UserPrincipal currentUser = this.userService.getCurrentUser();
+        if(currentUser.getId() != user.getUserId()){
             throw new AccessDeniedException(AppMessage.PERMISSION_MESSAGE);
         }
         String message = "";
@@ -88,9 +89,9 @@ public class UserController {
             isSuccess = false;
         }else{
             try{
-                userService.updateProfile(user);
+                this.userService.updateProfile(user);
 
-                message =  AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.PROFILE);;
+                message =  AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.PROFILE);
             }catch (Exception ex){
                 message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.PROFILE);
                 isSuccess = false;
@@ -99,39 +100,29 @@ public class UserController {
         return new JsonResult(message,isSuccess);
     }
 
-    @ApiOperation(value = "Get user pagings by role")
-    @GetMapping(value = "/get-users-pagination-by-role")
+    @ApiOperation(value = "Get user pagination")
+    @GetMapping(value = "/get-users-pagination")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_ADMIN_AUTHENTICATIION+")")
-    public @ResponseBody JsonResult getUsersByRole(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
-            ,@RequestParam("email")String email,@RequestParam("role") String role,boolean sortEmail){
+    public @ResponseBody JsonResult getUsers(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
+            ,String email, String role, String isActive){
 
+        if(email == null){
+            email = "";
+        }
+        if(role == null){
+            role = "";
+        }
+        if(isActive == null){
+            isActive = "";
+        }
         email = '%' + email + '%';
 
         PagedList<UserPaginationViewModel> data = null;
         try{
-            data = userService.getPaginationByRole(page,pageSize,email,role,sortEmail);
+            data = this.userService.getPagination(page,pageSize,email,role,isActive);
         }catch (IllegalArgumentException ex){
             throw new ResourceNotFoundException("Page","number",page);
         }
-
-        return new JsonResult(null,data);
-    }
-
-    @ApiOperation(value = "Get user pagings by status")
-    @GetMapping(value = "/get-users-pagination-by-status")
-    @PreAuthorize("hasAuthority("+AppRole.ROLE_ADMIN_AUTHENTICATIION+")")
-    public @ResponseBody JsonResult getUsersByStatus(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
-            ,@RequestParam("email") String email,@RequestParam("status") String status){
-
-        email = '%' + email + '%';
-
-        PagedList<UserPaginationViewModel> data = null;
-        try{
-            data = userService.getPaginationByStatus(page,pageSize,email,status);
-        }catch (IllegalArgumentException ex){
-            throw new ResourceNotFoundException("Page","number",page);
-        }
-
 
         return new JsonResult(null,data);
     }
@@ -139,23 +130,26 @@ public class UserController {
     @ApiOperation(value = "Get an user by id")
     @GetMapping(value = "/get-by-id")
     public @ResponseBody JsonResult getUserById(@RequestParam("userId") long userId){
-        User user = userService.getUserById(userId)
+        User user = this.userService.getUserById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User","id",userId));
+        this.userService.getUserDetails(user);
         return new JsonResult(null,user);
     }
 
     @ApiOperation(value = "Update user status")
     @PutMapping(value = "/update-status")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_ADMIN_AUTHENTICATIION+")")
-    public @ResponseBody JsonResult updateStatus(@RequestParam("userId") int userId,@RequestParam("isActive") int isActive ){
+    public @ResponseBody JsonResult updateStatus(@RequestParam("userId") int userId,@RequestParam("isActive") boolean isActive ){
         Boolean isSuccess = true;
         String message = "";
         try{
-            userService.updateStatus(userId,isActive);
-            message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.USER, EntitiesFieldName.USER_ID,Integer.toString(userId));
+            User user = this.userService.getUserById(userId)
+                    .orElseThrow(() -> new ResourceNotFoundException("User","id",userId));
+            this.userService.updateStatus(user,userId,isActive);
+            message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.USER);
         }catch (Exception ex){
             isSuccess = false;
-            message =  AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.USER, EntitiesFieldName.USER_ID,Integer.toString(userId));
+            message =  AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.USER);
         }
         return new JsonResult(message,isSuccess);
     }

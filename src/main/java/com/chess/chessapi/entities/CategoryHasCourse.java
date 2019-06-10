@@ -7,26 +7,27 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "category_has_course")
-@JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id",scope = CategoryHasCourse.class)
+@JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="categoryHasCourseId",scope = CategoryHasCourse.class)
 public class CategoryHasCourse {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @Column(name = "id")
+    private long categoryHasCourseId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="course_id")
     private Course course;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="category_id")
     private Category category;
 
-    public long getId() {
-        return id;
+    public long getCategoryHasCourseId() {
+        return categoryHasCourseId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setCategoryHasCourseId(long categoryHasCourseId) {
+        this.categoryHasCourseId = categoryHasCourseId;
     }
 
     public Course getCourse() {

@@ -30,11 +30,11 @@ public class NotificationService {
 
         Page<Notification> notificationPage;
         if(role_id == AppRole.ROLE_ADMIN){
-            notificationPage = notificationRepository.findAllByRoleWithPagination(pageable,AppRole.ROLE_ADMIN);
+            notificationPage = this.notificationRepository.findAllByRoleWithPagination(pageable,AppRole.ROLE_ADMIN);
         }else if(role_id == AppRole.ROLE_INSTRUCTOR){
-            notificationPage = notificationRepository.findAllByRoleAndObjectIdWithPagination(pageable,AppRole.ROLE_INSTRUCTOR,userId);
+            notificationPage = this.notificationRepository.findAllByRoleAndObjectIdWithPagination(pageable,AppRole.ROLE_INSTRUCTOR,userId);
         }else{
-            notificationPage = notificationRepository.findAllByRoleAndObjectIdWithPagination(pageable,AppRole.ROLE_LEARNER,userId);
+            notificationPage = this.notificationRepository.findAllByRoleAndObjectIdWithPagination(pageable,AppRole.ROLE_LEARNER,userId);
         }
 
         return notificationPage;

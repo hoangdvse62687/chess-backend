@@ -9,6 +9,7 @@ import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.security.oauth2.user.OAuth2UserInfo;
 import com.chess.chessapi.security.oauth2.user.OAuth2UserInfoFactory;
 import com.chess.chessapi.utils.ManualCastUtils;
+import com.chess.chessapi.utils.TimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -68,7 +69,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         user.setAvatar(oAuth2UserInfo.getImageUrl());
         user.setPoint(0);
         user.setRoleId(AppRole.ROLE_REGISTRATION);
-        user.setCreatedDate(new Timestamp(new Date().getTime()));
+        user.setCreatedDate(TimeUtils.getCurrentTime());
 
         return userRepository.save(user);
     }

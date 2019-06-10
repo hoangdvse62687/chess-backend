@@ -6,32 +6,35 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "certificates")
-@JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id",scope = Certificates.class)
+@JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="certificateId",scope = Certificates.class)
 public class Certificates {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @Column(name = "id")
+    private long certificateId;
 
-    private String certificate_link;
+    @Column(name = "certificate_link")
+    private String certificateLink;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
 
-    public long getId() {
-        return id;
+
+    public long getCertificateId() {
+        return certificateId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setCertificateId(long certificateId) {
+        this.certificateId = certificateId;
     }
 
-    public String getCetificateLink() {
-        return certificate_link;
+    public String getCertificateLink() {
+        return certificateLink;
     }
 
-    public void setCetificateLink(String cetificateLink) {
-        this.certificate_link = cetificateLink;
+    public void setCertificateLink(String certificateLink) {
+        this.certificateLink = certificateLink;
     }
 
     public User getUser() {

@@ -1,7 +1,9 @@
 package com.chess.chessapi.utils;
 
+import com.chess.chessapi.entities.Course;
 import com.chess.chessapi.entities.User;
-import com.chess.chessapi.viewmodels.UserPaginationViewModel;
+import com.chess.chessapi.entities.UserHasCourse;
+import com.chess.chessapi.viewmodels.*;
 import org.springframework.data.domain.Page;
 
 import java.io.Serializable;
@@ -10,43 +12,130 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ManualCastUtils implements Serializable {
-
+    //USER DEFINED
     private static final int USER_ID_INDEX = 0;
-    private static  final int USER_EMAIL_INDEX = 1;
+    private static final int USER_EMAIL_INDEX = 1;
     private static final int USER_ROLE_INDEX = 2;
     private static final int USER_ISACTIVE_INDEX = 3;
     private static final int USER_AVATAR_INDEX = 4;
     private static final int USER_FULLNAME_INDEX = 5;
     private static final int USER_CREATEDDATE_INDEX = 6;
+    //END USER DEFINED
 
-    public static User castObjectToUserByFindCustom(Object object){
+    //COURSE DEFINED
+    private static final int COURSE_ID_INDEX = 0;
+    private static final int COURSE_NAME_INDEX = 1;
+    private static final int COURSE_STATUS_ID_INDEX = 2;
+    private static final int COURSE_DESCRIPTION_INDEX = 3;
+    private static final int COURSE_CREATED_DATE_INDEX = 4;
+    private static final int COURSE_POINT_INDEX = 5;
+    private static final int COURSE_USERID_INDEX = 6;
+    private static final int COURSE_USER_FULLNAME_INDEX = 7;
+    //END COURSE DEFINED
+
+    //INTERACTIVE LESSON DEFINED
+    private static final int INTERACTIVE_ID_INDEX = 0;
+    private static final int INTERACTIVE_NAME_INDEX = 1;
+    //END INTERACTIVE LESSON DEFINED
+
+    public static User castObjectToUserByFindCustom(Object object)
+            throws NumberFormatException{
         if(object == null){
             return null;
         }
         User user = new User();
         Object[] data = (Object[]) object;
-        user.setId(Long.parseLong(data[USER_ID_INDEX].toString()));
+        user.setUserId(Long.parseLong(data[USER_ID_INDEX].toString()));
         user.setEmail(data[USER_EMAIL_INDEX].toString());
         user.setRoleId(Long.parseLong(data[USER_ROLE_INDEX].toString()));
         user.setActive(Boolean.parseBoolean(data[USER_ISACTIVE_INDEX].toString()));
         return user;
     }
 
-    public static List<UserPaginationViewModel> castPageObjectsoUser(Page<Object> objects){
+    public static List<UserPaginationViewModel> castPageObjectsoUser(Page<Object> objects)
+            throws NumberFormatException{
         List<UserPaginationViewModel> users = new ArrayList<>();
         for (Object object:
              objects.getContent()) {
             UserPaginationViewModel user = new UserPaginationViewModel();
             Object[] data = (Object[]) object;
-            user.setId(Long.parseLong(data[USER_ID_INDEX].toString()));
+            user.setUserId(Long.parseLong(data[USER_ID_INDEX].toString()));
             user.setEmail(data[USER_EMAIL_INDEX].toString());
-            user.setRole_id(Integer.parseInt(data[USER_ROLE_INDEX].toString()));
-            user.setIs_active(Integer.parseInt(data[USER_ISACTIVE_INDEX].toString()));
+            user.setRoleId(Integer.parseInt(data[USER_ROLE_INDEX].toString()));
+            user.setIsActive(Integer.parseInt(data[USER_ISACTIVE_INDEX].toString()));
             user.setAvatar(data[USER_AVATAR_INDEX].toString());
-            user.setFull_name(data[USER_FULLNAME_INDEX].toString());
-            user.setCreated_date(Timestamp.valueOf(data[USER_CREATEDDATE_INDEX].toString()));
+            user.setFullName(data[USER_FULLNAME_INDEX].toString());
+            user.setCreatedDate(Timestamp.valueOf(data[USER_CREATEDDATE_INDEX].toString()));
             users.add(user);
         }
         return users;
+    }
+
+    public static List<CoursePaginationViewModel> castListObjectToCourseFromGetCoursePaginations(List<Object[]> objects)
+    throws NumberFormatException{
+        List<CoursePaginationViewModel> data = new ArrayList<>();
+        for (Object[] object:
+             objects) {
+            CoursePaginationViewModel coursePaginationViewModel = new CoursePaginationViewModel();
+            coursePaginationViewModel.setCourseId(Long.parseLong(object[COURSE_ID_INDEX].toString()));
+            coursePaginationViewModel.setCourseName(object[COURSE_NAME_INDEX].toString());
+            coursePaginationViewModel.setStatusId(Long.parseLong(object[COURSE_STATUS_ID_INDEX].toString()));
+            coursePaginationViewModel.setCourseDescription(object[COURSE_DESCRIPTION_INDEX].toString());
+            coursePaginationViewModel.setCourseCreatedDate(Timestamp.valueOf(object[COURSE_CREATED_DATE_INDEX].toString()));
+            coursePaginationViewModel.setPoint(Float.parseFloat(object[COURSE_POINT_INDEX].toString()));
+            coursePaginationViewModel.setAuthorId(Long.parseLong(object[COURSE_USERID_INDEX].toString()));
+            coursePaginationViewModel.setAuthorName(object[COURSE_USER_FULLNAME_INDEX].toString());
+            data.add(coursePaginationViewModel);
+        }
+        return data;
+    }
+
+    public static List<CourseDetailViewModel> castListObjectToCourseDetails(List<Object[]> objects)
+    throws NumberFormatException{
+        List<CourseDetailViewModel> data = new ArrayList<>();
+        for (Object[] object:
+             objects) {
+            CourseDetailViewModel courseDetailViewModel = new CourseDetailViewModel();
+            courseDetailViewModel.setCourseId(Long.parseLong(object[COURSE_ID_INDEX].toString()));
+            courseDetailViewModel.setName(object[COURSE_NAME_INDEX].toString());
+            courseDetailViewModel.setStatusId(Long.parseLong(object[COURSE_STATUS_ID_INDEX].toString()));
+            data.add(courseDetailViewModel);
+        }
+        return data;
+    }
+
+    public static List<UserDetailViewModel> castListObjectToUserDetailsFromGetUsersByCourseid(List<Object[]> objects){
+        List<UserDetailViewModel> data = new ArrayList<>();
+        for (Object[] object:
+                objects) {
+            UserDetailViewModel userDetailViewModel = new UserDetailViewModel();
+            userDetailViewModel.setUserId(Long.parseLong(object[USER_ID_INDEX].toString()));
+            userDetailViewModel.setEmail(object[USER_EMAIL_INDEX].toString());
+            userDetailViewModel.setRoleId(Integer.parseInt(object[USER_ROLE_INDEX].toString()));
+            data.add(userDetailViewModel);
+        }
+        return data;
+    }
+
+    public static List<Long> castListObjectToCategoryIdFromGetCategoryByCourseId(List<Object[]> objects)
+    throws NumberFormatException{
+        List<Long> data = new ArrayList<>();
+        for (Object[] object:
+             objects) {
+            data.add(Long.parseLong(object[0].toString()));
+        }
+        return data;
+    }
+
+    public static List<InteractiveLessonViewModel> castListObjectToInteractiveLessonDetails(List<Object[]> objects){
+        List<InteractiveLessonViewModel> data = new ArrayList<>();
+        for (Object[] object:
+             objects) {
+            InteractiveLessonViewModel interactiveLessonViewModel = new InteractiveLessonViewModel();
+            interactiveLessonViewModel.setInteractiveLessonId(Long.parseLong(object[INTERACTIVE_ID_INDEX].toString()));
+            interactiveLessonViewModel.setName(object[INTERACTIVE_NAME_INDEX].toString());
+            data.add(interactiveLessonViewModel);
+        }
+        return data;
     }
 }

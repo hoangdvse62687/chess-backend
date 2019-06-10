@@ -1,6 +1,8 @@
 package com.chess.chessapi.entities;
 
+import com.chess.chessapi.viewmodels.CourseDetailViewModel;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.hibernate.validator.constraints.Length;
 
@@ -10,25 +12,39 @@ import java.util.List;
 
 @Entity
 @Table(name = "category")
-@JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id",scope = Category.class)
+@JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="categoryId",scope = Category.class)
+@NamedStoredProcedureQueries({
+        @NamedStoredProcedureQuery(
+                name = "getCategoryByCourseid",
+                procedureName = "get_category_by_courseid",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseId",type = Long.class)
+                }
+        )
+})
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @Column(name = "id")
+    private long categoryId;
 
     @NotNull
     @Length(max = 1000,message = "name is required not large than 1000 characters")
     private String name;
 
     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,mappedBy = "category")
+    @JsonIgnore
     private List<CategoryHasCourse> categoryHasCourses;
 
-    public long getId() {
-        return id;
+    @Transient
+    private List<CourseDetailViewModel> courseDetailViewModels;
+
+    public long getCategoryId() {
+        return categoryId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setCategoryId(long categoryId) {
+        this.categoryId = categoryId;
     }
 
     public String getName() {
@@ -45,5 +61,13 @@ public class Category {
 
     public void setCategoryHasCourses(List<CategoryHasCourse> categoryHasCourses) {
         this.categoryHasCourses = categoryHasCourses;
+    }
+
+    public List<CourseDetailViewModel> getCourseDetailViewModels() {
+        return courseDetailViewModels;
+    }
+
+    public void setCourseDetailViewModels(List<CourseDetailViewModel> courseDetailViewModels) {
+        this.courseDetailViewModels = courseDetailViewModels;
     }
 }

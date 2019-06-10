@@ -5,11 +5,12 @@ import com.chess.chessapi.entities.Certificates;
 import com.chess.chessapi.entities.Notification;
 import com.chess.chessapi.entities.User;
 import com.chess.chessapi.models.PagedList;
-import com.chess.chessapi.repositories.CertificatesRepository;
 import com.chess.chessapi.repositories.NotificationRepository;
 import com.chess.chessapi.repositories.UserRepository;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.utils.ManualCastUtils;
+import com.chess.chessapi.utils.TimeUtils;
+import com.chess.chessapi.viewmodels.CourseDetailViewModel;
 import com.chess.chessapi.viewmodels.UserPaginationViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,7 +23,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.StoredProcedureQuery;
 import java.util.*;
 
 @Service
@@ -34,16 +37,24 @@ public class UserService {
     private NotificationRepository notificationRepository;
 
     @Autowired
-    private CertificatesRepository certificatesRepository;
+    private CertificatesService certificatesService;
+
+    @PersistenceContext
+    private EntityManager em;
 
     public UserPrincipal getCurrentUser(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserPrincipal user = (UserPrincipal) authentication.getPrincipal();
+        UserPrincipal user = null;
+        try{
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            user = (UserPrincipal) authentication.getPrincipal();
+        }catch (ClassCastException ex){
+
+        }
         return user;
     }
 
     public Optional<User> getUserById(long id){
-        return userRepository.findById(id);
+        return this.userRepository.findById(id);
     }
 
     public Optional<User> getUserByEmail(String email){return userRepository.findByEmail(email);}
@@ -66,51 +77,64 @@ public class UserService {
     }
 
     public void updateProfile(User user){
-        this.userRepository.updateProfile(user.getId(),user.getFullName(),user.getAchievement());
+        this.userRepository.updateProfile(user.getUserId(),user.getFullName(),user.getAchievement());
 
         //handle cetificate update
-        List<Certificates> oldCetificates = this.certificatesRepository.findAllByUserId(user.getId());
+        List<Certificates> oldCetificates = this.certificatesService.findAllByUserId(user.getUserId());
 
-        this.updateCertifications(oldCetificates,user.getCetificates());
+        this.certificatesService.updateCertifications(oldCetificates,user.getCetificates());
     }
 
-    public PagedList<UserPaginationViewModel> getPaginationByRole(int page, int pageSize, String email, String role, Boolean sortFullName){
-        PageRequest pageable =  null;
-        if(sortFullName){
-            pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.USER_FULL_NAME).ascending()
-                    .by(EntitiesFieldName.USER_CREATED_DATE).descending());
-        }else {
-            pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.USER_CREATED_DATE).descending());
-        }
-
-        Page<Object> rawData = null;
-        if(!role.isEmpty()){
-            rawData = userRepository.findAllByFullNameSortByRoleCustom(pageable,email,role);
-        }else{
-            rawData = userRepository.findAllByFullNameCustom(pageable,email);
-        }
-
-        return this.fillDataToPaginationCustom(rawData);
-    }
-
-    public PagedList<UserPaginationViewModel> getPaginationByStatus(int page, int pageSize, String email, String status){
+    public PagedList<UserPaginationViewModel> getPagination(int page, int pageSize, String email, String role, String isActive){
         PageRequest pageable =  null;
         pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.USER_CREATED_DATE).descending());
 
         Page<Object> rawData = null;
-        if(!Boolean.parseBoolean(status)){
-            rawData = userRepository.findAllByStatus(pageable,Status.INACTIVE,email);
+        if(!role.isEmpty()){
+            rawData = this.userRepository.findAllByFullNameFilterRole(pageable,email,'%' + role + '%');
+        }else if(!isActive.isEmpty()){
+            rawData = this.userRepository.findAllByFullNameFilterStatus(pageable,email,Boolean.valueOf(isActive));
+        }else if(!role.isEmpty() && !isActive.isEmpty()){
+            rawData = this.userRepository.findAllByFullNameFilterRoleAndStatus(pageable,email,'%' + role + '%',Boolean.valueOf(isActive));
         }else{
-            rawData = userRepository.findAllByStatus(pageable,Status.ACTIVE,email);
+            rawData = this.userRepository.findAllByFullNameCustom(pageable,email);
         }
 
         return this.fillDataToPaginationCustom(rawData);
     }
 
-    public void updateStatus(long id,int isActive){
-        userRepository.updateStatus(id,isActive);
+    public void updateStatus(User user,long userId,boolean isActive){
+        //notification send to user
+        Notification notification = new Notification();
+        notification.setUserId(userId);
+        notification.setViewed(false);
+        notification.setObjectTypeId(ObjectType.USER);
+        notification.setContent(isActive ? AppMessage.UPDATE_USER_STATUS_ACTIVE : AppMessage.UPDATE_USER_STATUS_INACTIVE);
+        notification.setCreateDate(TimeUtils.getCurrentTime());
+        notification.setObjectId(userId);
+        notification.setRoleTarget(user.getRoleId());
+        notification.setObjectName(user.getEmail());
+        this.notificationRepository.save(notification);
+        this.userRepository.updateStatus(userId,isActive);
     }
 
+    public void getUserDetails(User user){
+        if(user != null){
+            user.setCourseDetailViewModels(this.getCourseDetails(user.getUserId()));
+        }
+    }
+
+    public List<CourseDetailViewModel> getCourseDetails(long userId){
+        //getting courses by userId
+        StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getCourseByUserId");
+        query.setParameter("userId",userId);
+
+        query.execute();
+        //end getting courses by userid
+
+        return ManualCastUtils.castListObjectToCourseDetails(query.getResultList());
+    }
+    // private method
     private void setUserRoleAuthentication(User user){
         List<GrantedAuthority> authorities = Collections.
                 singletonList(new SimpleGrantedAuthority(Long.toString(user.getRoleId())));
@@ -132,64 +156,14 @@ public class UserService {
         user.setRoleId(AppRole.ROLE_INSTRUCTOR);
         // create notification for admin
         Notification notification = new Notification();
-        notification.setObjectId(ObjectType.USER);
+        notification.setObjectTypeId(ObjectType.USER);
         notification.setObjectName(user.getEmail());
-        notification.setObjectId(user.getId());
+        notification.setObjectId(user.getUserId());
         notification.setContent(AppMessage.CREATE_NEW_USER_AS_INSTRUCTOR);
-        notification.setCreateDate(new Timestamp(new Date().getTime()));
+        notification.setCreateDate(TimeUtils.getCurrentTime());
         notification.setViewed(false);
         notification.setRoleTarget(AppRole.ROLE_ADMIN);
-        notificationRepository.save(notification);
-    }
-
-    private void updateCertifications(List<Certificates> oldCetificates, List<Certificates> newCetificates){
-        if(oldCetificates.isEmpty()){
-            //add all
-            for (Certificates newCetificate:
-                    newCetificates) {
-                this.certificatesRepository.save(newCetificate);
-            }
-        }else if(newCetificates != null && !newCetificates.isEmpty()){
-            //check if new cetificate has already or not, if it not yet c=> create
-            for (Certificates newCetificate:
-                    newCetificates) {
-                boolean isExist = false;
-                for (Certificates oldCetificate:
-                        oldCetificates) {
-                    if(newCetificate.getCetificateLink().equals(oldCetificate.getCetificateLink())){
-                        isExist = true;
-                        break;
-                    }
-                }
-                if(!isExist){
-                    this.certificatesRepository.save(newCetificate);
-                }
-            }
-            //check old records should be deleted
-            for (Certificates oldCetificate:
-                    oldCetificates) {
-                boolean isUpdatedRecord = false;
-                for (Certificates newCetificate:
-                        newCetificates) {
-                    if(oldCetificate.getCetificateLink().equals(newCetificate.getCetificateLink())){
-                        isUpdatedRecord = true;
-                        newCetificates.remove(newCetificate);
-                        break;
-                    }
-                }
-
-                if(!isUpdatedRecord){
-                    this.certificatesRepository.delete(oldCetificate);
-                }
-            }
-        }
-        else{
-            //delete all
-            for (Certificates cetificate:
-                    oldCetificates) {
-                this.certificatesRepository.delete(cetificate);
-            }
-        }
+        this.notificationRepository.save(notification);
     }
 
     private PagedList<UserPaginationViewModel> fillDataToPaginationCustom(Page<Object> rawData){
@@ -198,4 +172,5 @@ public class UserService {
         final long totalElements = rawData.getTotalElements();
         return new PagedList<UserPaginationViewModel>(totalPages,totalElements,content);
     }
+    // end private method
 }

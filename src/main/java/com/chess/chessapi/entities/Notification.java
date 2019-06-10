@@ -9,7 +9,8 @@ import java.sql.Timestamp;
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @Column(name = "id")
+    private long notificationId;
 
     @NotNull
     @Column(name = "object_id")
@@ -35,12 +36,15 @@ public class Notification {
     @Column(name = "role_target")
     private long roleTarget;
 
-    public long getId() {
-        return id;
+    @Column(name = "user_id")
+    private long userId;
+
+    public long getNotificationId() {
+        return notificationId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setNotificationId(long notificationId) {
+        this.notificationId = notificationId;
     }
 
     public long getObjectId() {
@@ -97,5 +101,13 @@ public class Notification {
 
     public void setRoleTarget(long roleTarget) {
         this.roleTarget = roleTarget;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 }

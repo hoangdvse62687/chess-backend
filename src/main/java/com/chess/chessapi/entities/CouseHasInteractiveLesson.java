@@ -7,26 +7,27 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "couse_has_interactive_lesson")
-@JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id",scope = CouseHasInteractiveLesson.class)
+@JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="courseHasInteractiveLessionId",scope = CouseHasInteractiveLesson.class)
 public class CouseHasInteractiveLesson {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @Column(name = "id")
+    private long courseHasInteractiveLessionId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="course_id")
     private Course course;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="interactive_lesson_id")
     private InteractiveLesson interactiveLesson;
 
-    public long getId() {
-        return id;
+    public long getCourseHasInteractiveLessionId() {
+        return courseHasInteractiveLessionId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setCourseHasInteractiveLessionId(long courseHasInteractiveLessionId) {
+        this.courseHasInteractiveLessionId = courseHasInteractiveLessionId;
     }
 
     public Course getCourse() {

@@ -1,7 +1,9 @@
 package com.chess.chessapi.entities;
 
 import com.chess.chessapi.constants.AuthProvider;
+import com.chess.chessapi.viewmodels.CourseDetailViewModel;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.hibernate.validator.constraints.Length;
 
@@ -13,11 +15,21 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-@JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id",scope = User.class)
+@JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="userId",scope = User.class)
+@NamedStoredProcedureQueries({
+        @NamedStoredProcedureQuery(
+                name = "getUsersByCourseid",
+                procedureName = "get_users_by_courseid",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseId",type = Long.class)
+                }
+        )
+})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @Column(name = "id")
+    private long userId;
 
     @Email
     @Length(max = 255, message = "Email shouldn't larger than 255 characters")
@@ -51,8 +63,12 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user")
     private List<Certificates> cetificates;
 
-    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,mappedBy = "user")
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
+    @JsonIgnore
     private List<UserHasCourse> userHasCourses;
+
+    @Transient
+    private List<CourseDetailViewModel> courseDetailViewModels;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -61,14 +77,13 @@ public class User {
     @Column(name = "provider_id")
     private String providerId;
 
-    public long getId() {
-        return id;
+    public long getUserId() {
+        return userId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
-
 
     public String getEmail() {
         return email;
@@ -151,6 +166,7 @@ public class User {
         this.point = point;
     }
 
+    @JsonIgnore
     public List<UserHasCourse> getUserHasCourses() {
         return userHasCourses;
     }
@@ -165,5 +181,13 @@ public class User {
 
     public void setRoleId(long roleId) {
         this.roleId = roleId;
+    }
+
+    public List<CourseDetailViewModel> getCourseDetailViewModels() {
+        return courseDetailViewModels;
+    }
+
+    public void setCourseDetailViewModels(List<CourseDetailViewModel> courseDetailViewModels) {
+        this.courseDetailViewModels = courseDetailViewModels;
     }
 }

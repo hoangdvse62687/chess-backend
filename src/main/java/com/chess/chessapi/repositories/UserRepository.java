@@ -21,22 +21,34 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<Object> findByIdCustom(long id);
 
     @Query(value = "Select u.id,u.email,u.role_id,u.is_active,u.avatar,u.full_name,u.created_date " +
+            "From users u",
+            countQuery = "Select count(u.id) from users u",
+            nativeQuery = true)
+    Page<Object> findAllCustom(Pageable pageable);
+
+    @Query(value = "Select u.id,u.email,u.role_id,u.is_active,u.avatar,u.full_name,u.created_date " +
             "From users u WHERE u.full_name like ?1",
-            countQuery = "Select count(u.id) from user u WHERE u.email like ?1",
+            countQuery = "Select count(u.id) from users u WHERE u.email like ?1",
             nativeQuery = true)
     Page<Object> findAllByFullNameCustom(Pageable pageable,String email);
 
     @Query(value = "Select u.id,u.email,u.role_id,u.is_active,u.avatar,u.full_name,u.created_date " +
-            "From users u WHERE u.full_name like ?1 and u.role_id = ?2",
-            countQuery = "Select count(u.id) from user u WHERE u.email like ?1 and u.role_id = ?2",
+            "From users u WHERE u.full_name like ?1 and u.role_id like ?2",
+            countQuery = "Select count(u.id) from users u WHERE u.email like ?1 and u.role_id like ?2",
             nativeQuery = true)
-    Page<Object> findAllByFullNameSortByRoleCustom(Pageable pageable,String email,String role);
+    Page<Object> findAllByFullNameFilterRole(Pageable pageable,String email,String role);
 
     @Query(value = "Select u.id,u.email,u.role_id,u.is_active,u.avatar,u.full_name,u.created_date " +
-            "From users u WHERE u.is_active = ?1 and u.email = ?2",
-            countQuery = "Select count(u.id) from user u WHERE u.is_active = ?1 and u.email = ?2",
+            "From users u WHERE u.full_name like ?1 and u.is_active = ?2",
+            countQuery = "Select count(u.id) from users u WHERE u.email like ?1 and u.is_active = ?2",
             nativeQuery = true)
-    Page<Object> findAllByStatus(Pageable pageable,boolean status,String email);
+    Page<Object> findAllByFullNameFilterStatus(Pageable pageable,String email,boolean isActive);
+
+    @Query(value = "Select u.id,u.email,u.role_id,u.is_active,u.avatar,u.full_name,u.created_date " +
+            "From users u WHERE u.full_name like ?1 and u.role_id like ?2 and u.is_active = ?3",
+            countQuery = "Select count(u.id) from users u WHERE u.email like ?1 and u.role_id like ?2 and u.is_active = ?3",
+            nativeQuery = true)
+    Page<Object> findAllByFullNameFilterRoleAndStatus(Pageable pageable,String email,String role,boolean isActive);
 
     Optional<User> findByEmail(String email);
 
@@ -44,7 +56,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Transactional
     @Query(value = "Update users u Set u.is_active = ?2 Where u.id = ?1"
             ,nativeQuery = true)
-    void updateStatus(long id,int isActive);
+    void updateStatus(long id,boolean isActive);
 
     @Modifying
     @Transactional
