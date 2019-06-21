@@ -1,7 +1,7 @@
 package com.chess.chessapi.services;
 
 import com.chess.chessapi.constants.*;
-import com.chess.chessapi.entities.Certificates;
+import com.chess.chessapi.entities.Certificate;
 import com.chess.chessapi.entities.Notification;
 import com.chess.chessapi.entities.User;
 import com.chess.chessapi.models.PagedList;
@@ -11,6 +11,7 @@ import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.utils.ManualCastUtils;
 import com.chess.chessapi.utils.TimeUtils;
 import com.chess.chessapi.viewmodels.CourseDetailViewModel;
+import com.chess.chessapi.viewmodels.UserDetailViewModel;
 import com.chess.chessapi.viewmodels.UserPaginationViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -41,6 +42,9 @@ public class UserService {
 
     @PersistenceContext
     private EntityManager em;
+
+    @Autowired
+    private CourseService courseService;
 
     public UserPrincipal getCurrentUser(){
         UserPrincipal user = null;
@@ -80,7 +84,7 @@ public class UserService {
         this.userRepository.updateProfile(user.getUserId(),user.getFullName(),user.getAchievement());
 
         //handle cetificate update
-        List<Certificates> oldCetificates = this.certificatesService.findAllByUserId(user.getUserId());
+        List<Certificate> oldCetificates = this.certificatesService.findAllByUserId(user.getUserId());
 
         this.certificatesService.updateCertifications(oldCetificates,user.getCetificates());
     }
@@ -120,20 +124,29 @@ public class UserService {
 
     public void getUserDetails(User user){
         if(user != null){
-            user.setCourseDetailViewModels(this.getCourseDetails(user.getUserId()));
+            user.setCourseDetailViewModels(this.courseService.getCourseDetailsByUserId(user.getUserId()));
         }
     }
 
-    public List<CourseDetailViewModel> getCourseDetails(long userId){
-        //getting courses by userId
-        StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getCourseByUserId");
-        query.setParameter("userId",userId);
-
-        query.execute();
-        //end getting courses by userid
-
-        return ManualCastUtils.castListObjectToCourseDetails(query.getResultList());
+    public boolean checkPermissionModify(long userId){
+        UserPrincipal currentUser = this.getCurrentUser();
+        if(userId == currentUser.getId()){
+            return true;
+        }
+        return false;
     }
+
+    public List<UserDetailViewModel> getUserDetailsByCourseId(long courseId){
+        //getting users by courseid only get the in-process
+        StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getUsersByCourseid");
+        query.setParameter("courseId",courseId);
+        query.setParameter("userHasCourseStatusId",Status.USER_HAS_COURSE_STATUS_IN_PROCESS);
+        query.execute();
+
+        //end getting users by courseid
+        return ManualCastUtils.castListObjectToUserDetailsFromGetUsersByCourseid(query.getResultList());
+    }
+
     // private method
     private void setUserRoleAuthentication(User user){
         List<GrantedAuthority> authorities = Collections.
@@ -167,7 +180,7 @@ public class UserService {
     }
 
     private PagedList<UserPaginationViewModel> fillDataToPaginationCustom(Page<Object> rawData){
-        final List<UserPaginationViewModel> content = ManualCastUtils.castPageObjectsoUser(rawData);
+        final List<UserPaginationViewModel> content = ManualCastUtils.castPageObjectsToUser(rawData);
         final int totalPages = rawData.getTotalPages();
         final long totalElements = rawData.getTotalElements();
         return new PagedList<UserPaginationViewModel>(totalPages,totalElements,content);

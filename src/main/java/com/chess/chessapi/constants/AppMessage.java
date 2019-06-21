@@ -6,12 +6,18 @@ public class AppMessage implements Serializable {
     //ACTION DEFINE
     public static final String UPDATE = "Update";
     public static final String CREATE = "Create";
+    public static final String DELETE = "Delete";
     //END ACTION DEFINE
 
     //SPECIAL DEFINE
     public static final String USER = "user";
     public static final String PROFILE = "profile";
     public static final String COURSE = "course";
+    public static final String CATEGORY = "category";
+    public static final String LESSON = "lesson";
+    public static final String INTERACTIVE_LESSON = "interactive lesson";
+    public static final String UNINTERACTIVE_LESSON = "uninteractive lesson";
+    public static final String LEARNING_LOG = "learning log";
     //END SPECIAL DEFINE
 
     //STATUS MESSAGE DEFINE

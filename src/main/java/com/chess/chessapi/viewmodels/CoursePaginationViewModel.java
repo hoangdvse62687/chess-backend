@@ -6,25 +6,16 @@ public class CoursePaginationViewModel {
     private long courseId;
     private String courseName;
     private String courseDescription;
+    private String courseImage;
     private Timestamp courseCreatedDate;
     private Float point;
     private long statusId;
     private long authorId;
     private String authorName;
+    private String authorAvatar;
 
     public CoursePaginationViewModel() {
 
-    }
-
-    public CoursePaginationViewModel(long courseId, String courseName, String courseDescription, Timestamp courseCreatedDate, Float point, long statusId, long authorId, String authorName) {
-        this.courseId = courseId;
-        this.courseName = courseName;
-        this.courseDescription = courseDescription;
-        this.courseCreatedDate = courseCreatedDate;
-        this.point = point;
-        this.statusId = statusId;
-        this.authorId = authorId;
-        this.authorName = authorName;
     }
 
     public long getCourseId() {
@@ -89,5 +80,21 @@ public class CoursePaginationViewModel {
 
     public void setAuthorName(String authorName) {
         this.authorName = authorName;
+    }
+
+    public String getCourseImage() {
+        return courseImage;
+    }
+
+    public void setCourseImage(String courseImage) {
+        this.courseImage = courseImage;
+    }
+
+    public String getAuthorAvatar() {
+        return authorAvatar;
+    }
+
+    public void setAuthorAvatar(String authorAvatar) {
+        this.authorAvatar = authorAvatar;
     }
 }

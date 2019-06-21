@@ -15,6 +15,10 @@ public class CourseDetailViewModel {
 
     private Long statusId;
 
+    private String image;
+
+    private String authorName;
+
     public CourseDetailViewModel() {
     }
 
@@ -64,5 +68,21 @@ public class CourseDetailViewModel {
 
     public void setStatusId(Long statusId) {
         this.statusId = statusId;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getAuthorName() {
+        return authorName;
+    }
+
+    public void setAuthorName(String authorName) {
+        this.authorName = authorName;
     }
 }

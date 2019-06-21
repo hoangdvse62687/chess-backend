@@ -13,6 +13,7 @@ import com.chess.chessapi.security.CurrentUser;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.services.UserService;
 import com.chess.chessapi.viewmodels.UserPaginationViewModel;
+import com.chess.chessapi.viewmodels.UserUpdateStatusViewModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,8 +78,7 @@ public class UserController {
     @PutMapping(value = "/update-profile")
     @PreAuthorize("isAuthenticated()")
     public @ResponseBody JsonResult updateProfile(@Valid @RequestBody User user, BindingResult bindingResult){
-        UserPrincipal currentUser = this.userService.getCurrentUser();
-        if(currentUser.getId() != user.getUserId()){
+        if(!this.userService.checkPermissionModify(user.getUserId())){
             throw new AccessDeniedException(AppMessage.PERMISSION_MESSAGE);
         }
         String message = "";
@@ -139,13 +139,13 @@ public class UserController {
     @ApiOperation(value = "Update user status")
     @PutMapping(value = "/update-status")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_ADMIN_AUTHENTICATIION+")")
-    public @ResponseBody JsonResult updateStatus(@RequestParam("userId") int userId,@RequestParam("isActive") boolean isActive ){
+    public @ResponseBody JsonResult updateStatus(@RequestBody UserUpdateStatusViewModel userUpdateStatusViewModel){
         Boolean isSuccess = true;
         String message = "";
         try{
-            User user = this.userService.getUserById(userId)
-                    .orElseThrow(() -> new ResourceNotFoundException("User","id",userId));
-            this.userService.updateStatus(user,userId,isActive);
+            User user = this.userService.getUserById(userUpdateStatusViewModel.getUserId())
+                    .orElseThrow(() -> new ResourceNotFoundException("User","id",userUpdateStatusViewModel.getUserId()));
+            this.userService.updateStatus(user,userUpdateStatusViewModel.getUserId(),userUpdateStatusViewModel.isActive());
             message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.USER);
         }catch (Exception ex){
             isSuccess = false;

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "user_has_course")
@@ -14,13 +15,19 @@ public class UserHasCourse {
     @Column(name = "id")
     private long userHasCourseId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="course_id")
     private Course course;
+
+    @Column(name = "enrolled_date")
+    private Timestamp enrolledDate;
+
+    @Column(name = "status_id")
+    private long statusId;
 
     public long getUserHasCourseId() {
         return userHasCourseId;
@@ -44,5 +51,21 @@ public class UserHasCourse {
 
     public void setCourse(Course course) {
         this.course = course;
+    }
+
+    public Timestamp getEnroledDate() {
+        return enrolledDate;
+    }
+
+    public void setEnroledDate(Timestamp enrolledDate) {
+        this.enrolledDate = enrolledDate;
+    }
+
+    public long getStatusId() {
+        return statusId;
+    }
+
+    public void setStatusId(long statusId) {
+        this.statusId = statusId;
     }
 }

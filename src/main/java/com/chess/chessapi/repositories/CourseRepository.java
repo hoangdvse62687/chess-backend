@@ -7,11 +7,19 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
+import java.sql.Timestamp;
 
 @Repository
 public interface CourseRepository extends JpaRepository<Course,Long> {
+
     @Query(value = "Update course c Set c.status_id = ?2 where c.id = ?1",nativeQuery = true)
     @Modifying
     @Transactional
     void updateStatus(long courseId,long statusId);
+
+    @Query(value = "Update course c Set c.name = ?2,c.description = ?3,c.point = ?4,c.status_id = ?5,c.image = ?6" +
+            " where c.id = ?1",nativeQuery = true)
+    @Modifying
+    @Transactional
+    void updateCourse(long courseId,String name,String description,Float point,long statusId,String image);
 }

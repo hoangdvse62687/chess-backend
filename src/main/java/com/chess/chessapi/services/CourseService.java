@@ -1,16 +1,16 @@
 package com.chess.chessapi.services;
 
 import com.chess.chessapi.constants.*;
-import com.chess.chessapi.entities.Course;
-import com.chess.chessapi.entities.Notification;
+import com.chess.chessapi.entities.*;
 import com.chess.chessapi.models.PagedList;
 import com.chess.chessapi.repositories.CourseRepository;
 import com.chess.chessapi.repositories.NotificationRepository;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.utils.ManualCastUtils;
 import com.chess.chessapi.utils.TimeUtils;
+import com.chess.chessapi.viewmodels.CourseCreateViewModel;
+import com.chess.chessapi.viewmodels.CourseDetailViewModel;
 import com.chess.chessapi.viewmodels.CoursePaginationViewModel;
-import com.chess.chessapi.viewmodels.InteractiveLessonViewModel;
 import com.chess.chessapi.viewmodels.UserDetailViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,12 +36,28 @@ public class CourseService {
     @Autowired
     private NotificationRepository notificationRepository;
 
+    @Autowired
+    private UserHasCourseService userHasCourseService;
+
+    @Autowired
+    private CategoryHasCourseService categoryHasCourseService;
+
+    @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private LessonService lessonService;
     //Public method
-    public Course create(Course course){
+    public Course create(CourseCreateViewModel courseCreateViewModel, long userId){
         //default setting when created course is inactive
-        course.setCreatedDate(TimeUtils.getCurrentTime());
-        course.setStatusId(Status.COURSE_STATUS_DRAFTED);
-        course.setPoint(Float.parseFloat("0"));
+        courseCreateViewModel.setCreatedDate(TimeUtils.getCurrentTime());
+        courseCreateViewModel.setStatusId(Status.COURSE_STATUS_DRAFTED);
+        courseCreateViewModel.setPoint(Float.parseFloat("0"));
+        Course course = ManualCastUtils.castCourseCreateViewModelToCourse(courseCreateViewModel);
+        //manual mapping author
+        User user = new User();
+        user.setUserId(userId);
+        course.setUser(user);
         Course savedCourse = courseRepository.save(course);
 
         //Send notification to Admin
@@ -64,8 +80,7 @@ public class CourseService {
         storedProcedureQuery.setParameter("courseName",courseName);
         storedProcedureQuery.setParameter("pageIndex",(pageIndex - 1) * pageSize);
         storedProcedureQuery.setParameter("pageSize",pageSize);
-        storedProcedureQuery.setParameter("status_id",statusId);
-        storedProcedureQuery.setParameter("role_id",AppRole.ROLE_INSTRUCTOR);
+        storedProcedureQuery.setParameter("statusId",statusId);
         storedProcedureQuery.setParameter("totalElements",Long.parseLong("0"));
 
 
@@ -86,51 +101,50 @@ public class CourseService {
 
     public void getCourseDetails(Course course){
         if(course != null){
-            course.setUserDetailViewModels(this.getUserDetails(course.getCourseId()));
-            course.setListCategoryIds(this.getListCategoryIds(course.getCourseId()));
+            course.setUserDetailViewModels(this.userService.getUserDetailsByCourseId(course.getCourseId()));
+            course.setListCategoryIds(this.categoryService.getListCategoryIdsByCourseId(course.getCourseId()));
 
             //check permission only learner join this course can view the detail
             if(this.checkPermissionViewCourseDetail(course)){
-                course.setInteractiveLessonViewModels(this.getInteractiveLessonDetails(course.getCourseId()));
+                course.setLessonViewModels(this.lessonService.getLessonByCourseId(course.getCourseId()));
             }
         }
     }
 
-    public List<UserDetailViewModel> getUserDetails(long courseId){
-        //getting users by courseid
-        StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getUsersByCourseid");
-        query.setParameter("courseId",courseId);
+    public List<CourseDetailViewModel> getCourseDetailsByUserId(long userId){
+        //getting courses by userId
+        StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getCourseByUserId");
+        query.setParameter("userId",userId);
 
         query.execute();
+        //end getting courses by userid
 
-        //end getting users by courseid
-        return ManualCastUtils.castListObjectToUserDetailsFromGetUsersByCourseid(query.getResultList());
+        return ManualCastUtils.castListObjectToCourseDetails(query.getResultList());
     }
 
-    public List<Long> getListCategoryIds(long courseId){
-        //getting category by courseid
-        StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getCategoryByCourseid");
-        query.setParameter("courseId",courseId);
+    public List<CourseDetailViewModel> getCourseDetailsByLessonId(long lessonId){
+        //getting courses by userId
+        StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getCoursesByLessonId");
+        query.setParameter("lessonId",lessonId);
 
         query.execute();
-        //end getting category by courseid
-        return ManualCastUtils.castListObjectToCategoryIdFromGetCategoryByCourseId(query.getResultList());
+        //end getting courses by userid
+
+        return ManualCastUtils.castListObjectToCourseDetails(query.getResultList());
     }
 
-    public List<InteractiveLessonViewModel> getInteractiveLessonDetails(long courseId){
-        //getting interactive by courseid
-        StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getInteractiveLessonByCourseId");
-        query.setParameter("courseId",courseId);
+    public List<CourseDetailViewModel> getCourseDetailsByCategoryId(long categoryId){
+        StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getCourseByCategoryId");
+        query.setParameter("categoryId",categoryId);
 
         query.execute();
-        //end getting interactive by courseid
-        return ManualCastUtils.castListObjectToInteractiveLessonDetails(query.getResultList());
+        return ManualCastUtils.castListObjectToCourseDetailsFromGetCourseByCategoryId(query.getResultList());
     }
 
     public UserDetailViewModel getAuthor(Course course){
         if(course != null){
             if(course.getUserDetailViewModels() == null){
-                course.setUserDetailViewModels(this.getUserDetails(course.getCourseId()));
+                course.setUserDetailViewModels(this.userService.getUserDetailsByCourseId(course.getCourseId()));
             }
             UserDetailViewModel author = null;
             for (UserDetailViewModel userDetailViewModel:
@@ -148,22 +162,39 @@ public class CourseService {
     public boolean checkPermissionViewCourseDetail(Course course){
         if(course != null){
             if(course.getUserDetailViewModels() == null){
-                course.setUserDetailViewModels(this.getUserDetails(course.getCourseId()));
+                course.setUserDetailViewModels(this.userService.getUserDetailsByCourseId(course.getCourseId()));
             }
             UserPrincipal userPrincipal = userService.getCurrentUser();
 
-            if(userPrincipal == null){
-                return false;
+            //allow admin permission view course
+            if(Long.parseLong(userPrincipal.getRole()) == AppRole.ROLE_ADMIN){
+                return true;
             }
 
-            for (UserDetailViewModel userDetailViewModel:
-                    course.getUserDetailViewModels()) {
-                if(userDetailViewModel.getUserId() == userPrincipal.getId()){
-                    return true;
-                }
-            }
+            return this.callStoreProcedureCheckPermission(course.getCourseId(),userPrincipal.getId());
         }
         return false;
+    }
+
+    public boolean checkPermissionModifyCourse(long courseId){
+        //check current user has this course
+        UserPrincipal userPrincipal = this.userService.getCurrentUser();
+
+        return this.callStoreProcedureCheckPermission(courseId,userPrincipal.getId());
+    }
+
+    public void updateCourse(Course course){
+         this.courseRepository.updateCourse(course.getCourseId(),course.getName(),course.getDescription(),
+                 course.getPoint(),course.getStatusId(),course.getImage());
+         //only get old has status in-process
+        List<UserHasCourse> oldUserHasCourses = this.userHasCourseService
+                .getAllByCourseIdAndStatusId(course.getCourseId(),Status.USER_HAS_COURSE_STATUS_IN_PROCESS);
+        //update user has course
+        this.userHasCourseService.updateUserHasCourse(oldUserHasCourses,course.getUserDetailViewModels(),course.getCourseId());
+        //update category list id
+        List<CategoryHasCourse> oldCategoryHasCourses = this.categoryHasCourseService
+                .getAllByCourseId(course.getCourseId());
+        this.categoryHasCourseService.UpdateCategoryHasCourse(oldCategoryHasCourses,course.getListCategoryIds(),course.getCourseId());
     }
     //End Pulbic method
 
@@ -172,6 +203,17 @@ public class CourseService {
         long totalPages = (totalElements / pageSize) + 1;
         List<CoursePaginationViewModel> data = ManualCastUtils.castListObjectToCourseFromGetCoursePaginations(rawData);
         return new PagedList<CoursePaginationViewModel>(Math.toIntExact(totalPages),totalElements,data);
+    }
+
+    private boolean callStoreProcedureCheckPermission(long courseId,long userId){
+        StoredProcedureQuery storedProcedureQuery = this.em.createNamedStoredProcedureQuery("checkPermissionUserCourse");
+        storedProcedureQuery.setParameter("userId",userId);
+        storedProcedureQuery.setParameter("courseId",courseId);
+        storedProcedureQuery.setParameter("hasPermission",true);
+
+        storedProcedureQuery.execute();
+
+        return Boolean.parseBoolean(storedProcedureQuery.getOutputParameterValue("hasPermission").toString());
     }
     //Public method
 }

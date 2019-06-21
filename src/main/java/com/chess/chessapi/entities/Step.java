@@ -1,6 +1,7 @@
 package com.chess.chessapi.entities;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.hibernate.validator.constraints.Length;
 
@@ -16,35 +17,31 @@ public class Step {
     @Column(name = "id")
     private long stepId;
 
-    @NotNull
+    @NotNull(message = "Content must not be null")
     @Length(max = 1000,message = "Content is required not large than 1000 characters")
     private String content;
 
-    @NotNull
+    @NotNull(message = "Step code must not be null")
     @Length(max = 255,message = "step_code is required not large than 255 characters")
     @Column(name = "step_code")
     private String stepCode;
 
-    @NotNull
-    @Length(max = 255,message = "learner_step is required not large than 255 characters")
-    @Column(name = "learner_step")
-    private String learnerStep;
-
-    @NotNull
+    @NotNull(message = "Right response must not be null")
     @Length(max = 255,message = "right_response is required not large than 255 characters")
     @Column(name = "right_response")
     private String rightResponse;
 
-    @NotNull
+    @NotNull(message = "Wrong response must not be null")
     @Length(max = 255,message = "wrong_response is required not large than 255 characters")
     @Column(name = "wrong_response")
     private String wrongResponse;
 
-    @NotNull
-    private String status;
+    @Column(name = "order_step")
+    private int orderStep;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="ilesson_id")
+    @JsonIgnore
     private InteractiveLesson interactiveLesson;
 
     public long getStepId() {
@@ -71,14 +68,6 @@ public class Step {
         this.stepCode = stepCode;
     }
 
-    public String getLearnerStep() {
-        return learnerStep;
-    }
-
-    public void setLearnerStep(String learnerStep) {
-        this.learnerStep = learnerStep;
-    }
-
     public String getRightResponse() {
         return rightResponse;
     }
@@ -95,19 +84,19 @@ public class Step {
         this.wrongResponse = wrongResponse;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public InteractiveLesson getInteractiveLesson() {
         return interactiveLesson;
     }
 
     public void setInteractiveLesson(InteractiveLesson interactiveLesson) {
         this.interactiveLesson = interactiveLesson;
+    }
+
+    public int getOrderStep() {
+        return orderStep;
+    }
+
+    public void setOrderStep(int orderStep) {
+        this.orderStep = orderStep;
     }
 }

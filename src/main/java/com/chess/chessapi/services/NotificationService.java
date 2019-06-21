@@ -15,6 +15,7 @@ public class NotificationService {
     @Autowired
     private NotificationRepository notificationRepository;
 
+    //public method
     public Notification create(Notification notification){
         return notificationRepository.save(notification);
     }
@@ -39,4 +40,5 @@ public class NotificationService {
 
         return notificationPage;
     }
+    //end public method
 }

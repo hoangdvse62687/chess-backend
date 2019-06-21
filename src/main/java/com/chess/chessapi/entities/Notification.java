@@ -12,15 +12,15 @@ public class Notification {
     @Column(name = "id")
     private long notificationId;
 
-    @NotNull
+    @NotNull(message = "Object id must not be null")
     @Column(name = "object_id")
     private long objectId;
 
-    @NotNull
+    @NotNull(message = "Object name must not be null")
     @Column(name = "object_name")
     private String objectName;
 
-    @NotNull
+    @NotNull(message = "Object Type must not be null")
     @Column(name = "object_type_id")
     private long objectTypeId;
 
@@ -32,7 +32,7 @@ public class Notification {
     @Column(name = "created_date")
     private java.sql.Timestamp createDate;
 
-    @NotNull
+    @NotNull(message = "Role target must not be null")
     @Column(name = "role_target")
     private long roleTarget;
 

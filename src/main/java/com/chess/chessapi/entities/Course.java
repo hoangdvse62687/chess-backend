@@ -1,6 +1,6 @@
 package com.chess.chessapi.entities;
 
-import com.chess.chessapi.viewmodels.InteractiveLessonViewModel;
+import com.chess.chessapi.viewmodels.LessonViewModel;
 import com.chess.chessapi.viewmodels.UserDetailViewModel;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -23,8 +23,7 @@ import java.util.List;
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseName",type = String.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageIndex",type = Integer.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageSize",type = Integer.class),
-                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "status_id",type = String.class),
-                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "role_id",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "statusId",type = String.class),
                         @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalElements",type = Long.class)
                 }
         ),
@@ -39,14 +38,23 @@ import java.util.List;
                 name = "getCourseByCategoryId",
                 procedureName = "get_courses_by_categoryid",
                 parameters = {
-                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "categoryId",type = Long.class)
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "categoryId",type = Long.class),
                 }
         ),
         @NamedStoredProcedureQuery(
-                name = "getCourseByInteractiveId",
-                procedureName = "get_courses_by_interactiveid",
+                name = "getCoursesByLessonId",
+                procedureName = "get_courses_by_lessonid",
                 parameters = {
-                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "interactiveId",type = Long.class)
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "lessonId",type = Long.class),
+                }
+        ),
+        @NamedStoredProcedureQuery(
+                name = "checkPermissionUserCourse",
+                procedureName = "check_permission_user_course",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "userId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "hasPermission",type = Boolean.class)
                 }
         )
 })
@@ -56,7 +64,7 @@ public class Course {
     @Column(name = "id")
     private long courseId;
 
-    @NotNull
+    @NotNull(message = "Name must not be null")
     @Length(max = 1000,message = "name is required not large than 1000 characters")
     private String name;
 
@@ -70,6 +78,8 @@ public class Course {
     @Column(name = "status_id")
     private Long statusId;
 
+    private String image;
+
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "course")
     @JsonIgnore
     private List<UserHasCourse> userHasCourses;
@@ -80,7 +90,11 @@ public class Course {
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "course")
     @JsonIgnore
-    private List<CouseHasInteractiveLesson> couseHasInteractiveLessons;
+    private List<CourseHasLesson> courseHasLessons;
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "course")
+    @JsonIgnore
+    private List<LearningLog> learningLogs;
 
     @Transient
     private List<UserDetailViewModel> userDetailViewModels;
@@ -89,7 +103,13 @@ public class Course {
     private List<Long> listCategoryIds;
 
     @Transient
-    private List<InteractiveLessonViewModel> interactiveLessonViewModels;
+    private List<LessonViewModel> lessonViewModels;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="owner")
+    @JsonIgnore
+    private User user;
+
 
     public long getCourseId() {
         return courseId;
@@ -139,6 +159,14 @@ public class Course {
         this.statusId = statusId;
     }
 
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
     @JsonIgnore
     public List<UserHasCourse> getUserHasCourses() {
         return userHasCourses;
@@ -157,15 +185,6 @@ public class Course {
         this.categoryHasCourses = categoryHasCourses;
     }
 
-    @JsonIgnore
-    public List<CouseHasInteractiveLesson> getCouseHasInteractiveLessons() {
-        return couseHasInteractiveLessons;
-    }
-
-    public void setCouseHasInteractiveLessons(List<CouseHasInteractiveLesson> couseHasInteractiveLessons) {
-        this.couseHasInteractiveLessons = couseHasInteractiveLessons;
-    }
-
     public List<UserDetailViewModel> getUserDetailViewModels() {
         return userDetailViewModels;
     }
@@ -182,11 +201,35 @@ public class Course {
         this.listCategoryIds = listCategoryIds;
     }
 
-    public List<InteractiveLessonViewModel> getInteractiveLessonViewModels() {
-        return interactiveLessonViewModels;
+    public List<CourseHasLesson> getCourseHasLessons() {
+        return courseHasLessons;
     }
 
-    public void setInteractiveLessonViewModels(List<InteractiveLessonViewModel> interactiveLessonViewModels) {
-        this.interactiveLessonViewModels = interactiveLessonViewModels;
+    public void setCourseHasLessons(List<CourseHasLesson> courseHasLessons) {
+        this.courseHasLessons = courseHasLessons;
+    }
+
+    public List<LessonViewModel> getLessonViewModels() {
+        return lessonViewModels;
+    }
+
+    public void setLessonViewModels(List<LessonViewModel> lessonViewModels) {
+        this.lessonViewModels = lessonViewModels;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public List<LearningLog> getLearningLogs() {
+        return learningLogs;
+    }
+
+    public void setLearningLogs(List<LearningLog> learningLogs) {
+        this.learningLogs = learningLogs;
     }
 }

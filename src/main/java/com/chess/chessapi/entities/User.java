@@ -21,7 +21,8 @@ import java.util.List;
                 name = "getUsersByCourseid",
                 procedureName = "get_users_by_courseid",
                 parameters = {
-                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseId",type = Long.class)
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "userHasCourseStatusId",type = Long.class)
                 }
         )
 })
@@ -61,16 +62,28 @@ public class User {
     private String achievement;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user")
-    private List<Certificates> cetificates;
+    private List<Certificate> cetificates;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
     @JsonIgnore
     private List<UserHasCourse> userHasCourses;
 
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
+    @JsonIgnore
+    private List<Lesson> lessons;
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
+    @JsonIgnore
+    private List<Course> courses;
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
+    @JsonIgnore
+    private List<LearningLog> learningLogs;
+
     @Transient
     private List<CourseDetailViewModel> courseDetailViewModels;
 
-    @NotNull
+    @NotNull(message = "Provider mut not be null")
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;
 
@@ -150,11 +163,11 @@ public class User {
         this.providerId = providerId;
     }
 
-    public List<Certificates> getCetificates() {
+    public List<Certificate> getCetificates() {
         return cetificates;
     }
 
-    public void setCetificates(List<Certificates> cetificates) {
+    public void setCetificates(List<Certificate> cetificates) {
         this.cetificates = cetificates;
     }
 
@@ -189,5 +202,29 @@ public class User {
 
     public void setCourseDetailViewModels(List<CourseDetailViewModel> courseDetailViewModels) {
         this.courseDetailViewModels = courseDetailViewModels;
+    }
+
+    public List<Lesson> getLessons() {
+        return lessons;
+    }
+
+    public void setLessons(List<Lesson> lessons) {
+        this.lessons = lessons;
+    }
+
+    public List<Course> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(List<Course> courses) {
+        this.courses = courses;
+    }
+
+    public List<LearningLog> getLearningLogs() {
+        return learningLogs;
+    }
+
+    public void setLearningLogs(List<LearningLog> learningLogs) {
+        this.learningLogs = learningLogs;
     }
 }

@@ -28,7 +28,7 @@ public class Category {
     @Column(name = "id")
     private long categoryId;
 
-    @NotNull
+    @NotNull(message = "Name must not be null")
     @Length(max = 1000,message = "name is required not large than 1000 characters")
     private String name;
 
