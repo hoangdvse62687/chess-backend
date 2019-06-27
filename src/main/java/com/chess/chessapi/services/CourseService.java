@@ -34,53 +34,35 @@ public class CourseService {
     private EntityManager em;
 
     @Autowired
-    private NotificationRepository notificationRepository;
-
-    @Autowired
     private UserHasCourseService userHasCourseService;
 
     @Autowired
     private CategoryHasCourseService categoryHasCourseService;
 
-    @Autowired
-    private CategoryService categoryService;
 
-    @Autowired
-    private LessonService lessonService;
     //Public method
     public Course create(CourseCreateViewModel courseCreateViewModel, long userId){
         //default setting when created course is inactive
-        courseCreateViewModel.setCreatedDate(TimeUtils.getCurrentTime());
         courseCreateViewModel.setStatusId(Status.COURSE_STATUS_DRAFTED);
-        courseCreateViewModel.setPoint(Float.parseFloat("0"));
         Course course = ManualCastUtils.castCourseCreateViewModelToCourse(courseCreateViewModel);
+        course.setCreatedDate(TimeUtils.getCurrentTime());
         //manual mapping author
         User user = new User();
         user.setUserId(userId);
         course.setUser(user);
         Course savedCourse = courseRepository.save(course);
 
-        //Send notification to Admin
-        Notification notification = new Notification();
-        notification.setObjectTypeId(ObjectType.COURSE);
-        notification.setObjectName(savedCourse.getName());
-        notification.setObjectId(savedCourse.getCourseId());
-        notification.setContent(AppMessage.CREATE_NEW_COURSE);
-        notification.setCreateDate(TimeUtils.getCurrentTime());
-        notification.setViewed(false);
-        notification.setRoleTarget(AppRole.ROLE_ADMIN);
-        this.notificationRepository.save(notification);
-
         return savedCourse;
     }
 
-    public PagedList<CoursePaginationViewModel> getCoursePaginationByStatusId(String courseName,int pageIndex, int pageSize, String statusId)
+    public PagedList<CoursePaginationViewModel> getCoursePaginationByStatusId(String courseName,int pageIndex, int pageSize, String statusId,long userId)
             throws NumberFormatException{
         StoredProcedureQuery storedProcedureQuery = this.em.createNamedStoredProcedureQuery("getCoursePaginations");
         storedProcedureQuery.setParameter("courseName",courseName);
         storedProcedureQuery.setParameter("pageIndex",(pageIndex - 1) * pageSize);
         storedProcedureQuery.setParameter("pageSize",pageSize);
         storedProcedureQuery.setParameter("statusId",statusId);
+        storedProcedureQuery.setParameter("userId",userId);
         storedProcedureQuery.setParameter("totalElements",Long.parseLong("0"));
 
 
@@ -91,24 +73,26 @@ public class CourseService {
         return this.fillDataToPaginationCustom(rawData,totalElements,pageSize);
     }
 
+    public PagedList<CoursePaginationViewModel> getCoursePaginationsByCategoryId(int pageIndex,int pageSize,long categoryId,long userId){
+        StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getCourseByCategoryId");
+        query.setParameter("pageSize",pageSize);
+        query.setParameter("pageIndex",(pageIndex - 1) * pageSize);
+        query.setParameter("userId",userId);
+        query.setParameter("categoryId",categoryId);
+        query.setParameter("totalElements",Long.parseLong("0"));
+
+        query.execute();
+        List<Object[]> rawData = query.getResultList();
+        final long totalElements = Long.parseLong(query.getOutputParameterValue("totalElements").toString());
+        return this.fillDataToPaginationCustom(rawData,totalElements,pageSize);
+    }
+
     public void updateStatus(long courseId,long statusId){
         this.courseRepository.updateStatus(courseId,statusId);
     }
 
     public Optional<Course> getCourseById(long id){
         return this.courseRepository.findById(id);
-    }
-
-    public void getCourseDetails(Course course){
-        if(course != null){
-            course.setUserDetailViewModels(this.userService.getUserDetailsByCourseId(course.getCourseId()));
-            course.setListCategoryIds(this.categoryService.getListCategoryIdsByCourseId(course.getCourseId()));
-
-            //check permission only learner join this course can view the detail
-            if(this.checkPermissionViewCourseDetail(course)){
-                course.setLessonViewModels(this.lessonService.getLessonByCourseId(course.getCourseId()));
-            }
-        }
     }
 
     public List<CourseDetailViewModel> getCourseDetailsByUserId(long userId){
@@ -133,53 +117,25 @@ public class CourseService {
         return ManualCastUtils.castListObjectToCourseDetails(query.getResultList());
     }
 
-    public List<CourseDetailViewModel> getCourseDetailsByCategoryId(long categoryId){
-        StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getCourseByCategoryId");
-        query.setParameter("categoryId",categoryId);
-
-        query.execute();
-        return ManualCastUtils.castListObjectToCourseDetailsFromGetCourseByCategoryId(query.getResultList());
-    }
-
-    public UserDetailViewModel getAuthor(Course course){
-        if(course != null){
-            if(course.getUserDetailViewModels() == null){
-                course.setUserDetailViewModels(this.userService.getUserDetailsByCourseId(course.getCourseId()));
-            }
-            UserDetailViewModel author = null;
-            for (UserDetailViewModel userDetailViewModel:
-                    course.getUserDetailViewModels()) {
-                if(userDetailViewModel.getRoleId() == AppRole.ROLE_INSTRUCTOR){
-                    author = userDetailViewModel;
-                    break;
-                }
-            }
-            return author;
+    public boolean checkPermissionViewCourseDetail(long courseId,UserPrincipal userPrincipal){
+        if(userPrincipal == null){
+            return false;
         }
-        return null;
-    }
 
-    public boolean checkPermissionViewCourseDetail(Course course){
-        if(course != null){
-            if(course.getUserDetailViewModels() == null){
-                course.setUserDetailViewModels(this.userService.getUserDetailsByCourseId(course.getCourseId()));
-            }
-            UserPrincipal userPrincipal = userService.getCurrentUser();
-
-            //allow admin permission view course
-            if(Long.parseLong(userPrincipal.getRole()) == AppRole.ROLE_ADMIN){
-                return true;
-            }
-
-            return this.callStoreProcedureCheckPermission(course.getCourseId(),userPrincipal.getId());
+        //allow admin permission view course
+        if(Long.parseLong(userPrincipal.getRole()) == AppRole.ROLE_ADMIN){
+            return true;
         }
-        return false;
+
+        return this.callStoreProcedureCheckPermission(courseId,userPrincipal.getId());
     }
 
     public boolean checkPermissionModifyCourse(long courseId){
         //check current user has this course
+        //only method authorized used this method => not check null
         UserPrincipal userPrincipal = this.userService.getCurrentUser();
 
+        //it's only used instructor authentication => check for modifying course
         return this.callStoreProcedureCheckPermission(courseId,userPrincipal.getId());
     }
 
@@ -195,6 +151,13 @@ public class CourseService {
         List<CategoryHasCourse> oldCategoryHasCourses = this.categoryHasCourseService
                 .getAllByCourseId(course.getCourseId());
         this.categoryHasCourseService.UpdateCategoryHasCourse(oldCategoryHasCourses,course.getListCategoryIds(),course.getCourseId());
+    }
+
+    public boolean isExist(long courseId){
+        return this.courseRepository.existsById(courseId);
+    }
+    public long getAuthorIdByCourseId(long courseId){
+        return this.courseRepository.findAuthorIdByCourseId(courseId);
     }
     //End Pulbic method
 
@@ -215,5 +178,6 @@ public class CourseService {
 
         return Boolean.parseBoolean(storedProcedureQuery.getOutputParameterValue("hasPermission").toString());
     }
+
     //Public method
 }

@@ -15,7 +15,7 @@ public interface UserHasCourseRepository extends JpaRepository<UserHasCourse,Lon
     @Modifying
     @Transactional
     @Query(value = "Insert into user_has_course (user_id,course_id,enrolled_date,status_id) " +
-            "VALUES (?1,?2,?3,?4,?5)"
+            "VALUES (?1,?2,?3,?4)"
             ,nativeQuery = true)
     void create(long userId, long courseId, Timestamp enrolledDate,long statusId);
 
@@ -28,4 +28,6 @@ public interface UserHasCourseRepository extends JpaRepository<UserHasCourse,Lon
     @Query(value = "Select * From user_has_course where course_id = ?1 and status_id = ?2"
             ,nativeQuery = true)
     List<UserHasCourse> findAllByCourseIdAndStatusId(long courseId,long statusId);
+
+
 }

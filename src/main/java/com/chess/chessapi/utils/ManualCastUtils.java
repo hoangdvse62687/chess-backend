@@ -34,6 +34,7 @@ public class ManualCastUtils implements Serializable {
     private static final int COURSE_USERID_INDEX = 7;
     private static final int COURSE_USER_FULLNAME_INDEX = 8;
     private static final int COURSE_USER_AVATAR_INDEX = 9;
+    private static final int COURSE_USER_IS_ENROLLED = 10;
     //END COURSE DEFINED
 
     //LESSON DEFINED
@@ -58,6 +59,13 @@ public class ManualCastUtils implements Serializable {
     private static final int COURSE_VIEW_MODEL_AUTHOR_NAME_INDEX = 5;
     //END COURSE VIEW MODEL DEFINED
 
+    //REVIEW VIEW MODEL DEFINED
+    private static final int REVIEW_VIEW_MODEL_RATING = 0;
+    private static final int REVIEW_VIEW_MODEL_CONTENT = 1;
+    private static final int REVIEW_VIEW_MODEL_USER_ID = 2;
+    private static final int REVIEW_VIEW_MODEL_USER_FULLNAME = 3;
+    private static final int REVIEW_VIEW_MODEL_EMAIL = 4;
+    //END REVIEW VIEW MODEL DEFINED
     //CAST STORED PROCEDURE DEFINED
     public static User castObjectToUserByFindCustom(Object object)
             throws NumberFormatException{
@@ -108,6 +116,7 @@ public class ManualCastUtils implements Serializable {
             coursePaginationViewModel.setAuthorId(Long.parseLong(object[COURSE_USERID_INDEX].toString()));
             coursePaginationViewModel.setAuthorName(object[COURSE_USER_FULLNAME_INDEX].toString());
             coursePaginationViewModel.setAuthorAvatar(handleNullValueObject(object[COURSE_USER_AVATAR_INDEX],String.class));
+            coursePaginationViewModel.setEnrolled(parseBoolean(object[COURSE_USER_IS_ENROLLED].toString()));
             data.add(coursePaginationViewModel);
         }
         return data;
@@ -205,15 +214,50 @@ public class ManualCastUtils implements Serializable {
         if(courseCreateViewModel != null){
             course.setName(courseCreateViewModel.getName());
             course.setDescription(courseCreateViewModel.getDescription());
-            course.setCreatedDate(courseCreateViewModel.getCreatedDate());
             course.setPoint(courseCreateViewModel.getPoint());
             course.setStatusId(courseCreateViewModel.getStatusId());
             course.setImage(courseCreateViewModel.getImage());
         }
         return course;
     }
-    //END CAST OBJECT TO OBJECT DEFINED
 
+    public static CourseDetailsViewModel castCourseToCourseDetailsViewModel(Course course,int totalLesson){
+        CourseDetailsViewModel courseDetailsViewModel = new CourseDetailsViewModel();
+        courseDetailsViewModel.setCourseId(course.getCourseId());
+        courseDetailsViewModel.setName(course.getName());
+        courseDetailsViewModel.setDescription(course.getDescription());
+        courseDetailsViewModel.setCreatedDate(course.getCreatedDate());
+        courseDetailsViewModel.setPoint(course.getPoint());
+        courseDetailsViewModel.setStatusId(course.getStatusId());
+        courseDetailsViewModel.setImage(course.getImage());
+        courseDetailsViewModel.setUserDetailViewModels(course.getUserDetailViewModels());
+        courseDetailsViewModel.setListCategoryIds(course.getListCategoryIds());
+        courseDetailsViewModel.setLessonViewModels(course.getLessonViewModels());
+        courseDetailsViewModel.setListLearningLogLessonIds(course.getListLearningLogLessonIds());
+        courseDetailsViewModel.setAuthorId(course.getUser().getUserId());
+        courseDetailsViewModel.setAuthorName(course.getUser().getFullName());
+        courseDetailsViewModel.setAuthorAvatar(course.getUser().getAvatar());
+        courseDetailsViewModel.setTotalLesson(totalLesson);
+        return courseDetailsViewModel;
+    }
+
+    public static List<ReviewPaginationViewModel> castListObjectToReviewFromGetReview(List<Object[]> objects)
+    throws NumberFormatException{
+        List<ReviewPaginationViewModel> data = new ArrayList<>();
+        for (Object[] object:
+                objects) {
+            ReviewPaginationViewModel reviewPaginationViewModel = new ReviewPaginationViewModel();
+            reviewPaginationViewModel.setRating(Float.parseFloat(object[REVIEW_VIEW_MODEL_RATING].toString()));
+            reviewPaginationViewModel.setContent(object[REVIEW_VIEW_MODEL_CONTENT].toString());
+            reviewPaginationViewModel.setUserId(Long.parseLong(object[REVIEW_VIEW_MODEL_USER_ID].toString()));
+            reviewPaginationViewModel.setUserFullName(object[REVIEW_VIEW_MODEL_USER_FULLNAME].toString());
+            reviewPaginationViewModel.setUserEmail(object[REVIEW_VIEW_MODEL_EMAIL].toString());
+            data.add(reviewPaginationViewModel);
+        }
+        return data;
+    }
+    //END CAST OBJECT TO OBJECT DEFINED
+    //PRIVATE DEFINED
     private static String handleNullValueObject(Object object,Class clazz){
         if(object != null){
             return object.toString();
@@ -225,4 +269,9 @@ public class ManualCastUtils implements Serializable {
             return NUMBER_DEFAULT;
         }
     }
+
+    private static boolean parseBoolean(String strBoolean){
+        return strBoolean.equals("1") ? true : false;
+    }
+    //END PRIVATE DEFINED
 }

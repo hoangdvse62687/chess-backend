@@ -10,8 +10,6 @@ public class UninteractiveLessonUpdateViewModel {
     @NotNull(message = "Name must not be null")
     private String name;
 
-    private Timestamp createdDate;
-
     @NotNull(message = "Uninteractive Lesson must not be null")
     private UninteractiveLesson uninteractiveLesson;
 
@@ -29,14 +27,6 @@ public class UninteractiveLessonUpdateViewModel {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Timestamp getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Timestamp createdDate) {
-        this.createdDate = createdDate;
     }
 
     public UninteractiveLesson getUninteractiveLesson() {

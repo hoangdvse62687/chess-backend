@@ -13,6 +13,7 @@ public class CoursePaginationViewModel {
     private long authorId;
     private String authorName;
     private String authorAvatar;
+    private boolean isEnrolled;
 
     public CoursePaginationViewModel() {
 
@@ -96,5 +97,13 @@ public class CoursePaginationViewModel {
 
     public void setAuthorAvatar(String authorAvatar) {
         this.authorAvatar = authorAvatar;
+    }
+
+    public boolean isEnrolled() {
+        return isEnrolled;
+    }
+
+    public void setEnrolled(boolean enrolled) {
+        isEnrolled = enrolled;
     }
 }

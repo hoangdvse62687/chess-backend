@@ -24,6 +24,7 @@ import java.util.List;
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageIndex",type = Integer.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageSize",type = Integer.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "statusId",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "userId",type = Long.class),
                         @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalElements",type = Long.class)
                 }
         ),
@@ -38,7 +39,11 @@ import java.util.List;
                 name = "getCourseByCategoryId",
                 procedureName = "get_courses_by_categoryid",
                 parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageIndex",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageSize",type = Integer.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "categoryId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "userId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalElements",type = Long.class)
                 }
         ),
         @NamedStoredProcedureQuery(
@@ -96,11 +101,22 @@ public class Course {
     @JsonIgnore
     private List<LearningLog> learningLogs;
 
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "course")
+    @JsonIgnore
+    private List<Exercise> exercises;
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "course")
+    @JsonIgnore
+    private List<Review> reviews;
+
     @Transient
     private List<UserDetailViewModel> userDetailViewModels;
 
     @Transient
     private List<Long> listCategoryIds;
+
+    @Transient
+    private List<Long> listLearningLogLessonIds;
 
     @Transient
     private List<LessonViewModel> lessonViewModels;
@@ -231,5 +247,29 @@ public class Course {
 
     public void setLearningLogs(List<LearningLog> learningLogs) {
         this.learningLogs = learningLogs;
+    }
+
+    public List<Long> getListLearningLogLessonIds() {
+        return listLearningLogLessonIds;
+    }
+
+    public void setListLearningLogLessonIds(List<Long> listLearningLogLessonIds) {
+        this.listLearningLogLessonIds = listLearningLogLessonIds;
+    }
+
+    public List<Exercise> getExercises() {
+        return exercises;
+    }
+
+    public void setExercises(List<Exercise> exercises) {
+        this.exercises = exercises;
+    }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
     }
 }

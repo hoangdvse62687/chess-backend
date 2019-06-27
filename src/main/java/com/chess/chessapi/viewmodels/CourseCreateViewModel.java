@@ -7,29 +7,20 @@ import java.sql.Timestamp;
 import java.util.List;
 
 public class CourseCreateViewModel {
-    private long courseId;
 
     @NotNull(message = "Name must not be null")
     @Length(max = 1000,message = "name is required not large than 1000 characters")
     private String name;
 
     private String description;
-    private Timestamp createdDate;
 
     private Float point;
     private Long statusId;
 
     private String image;
 
+    @NotNull(message = "List category must not be null")
     private List<Long> listCategoryIds;
-
-    public long getCourseId() {
-        return courseId;
-    }
-
-    public void setCourseId(long courseId) {
-        this.courseId = courseId;
-    }
 
     public String getName() {
         return name;
@@ -45,14 +36,6 @@ public class CourseCreateViewModel {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Timestamp getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Timestamp createdDate) {
-        this.createdDate = createdDate;
     }
 
     public Float getPoint() {

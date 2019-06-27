@@ -36,9 +36,6 @@ public class Category {
     @JsonIgnore
     private List<CategoryHasCourse> categoryHasCourses;
 
-    @Transient
-    private List<CourseDetailViewModel> courseDetailViewModels;
-
     public long getCategoryId() {
         return categoryId;
     }
@@ -61,13 +58,5 @@ public class Category {
 
     public void setCategoryHasCourses(List<CategoryHasCourse> categoryHasCourses) {
         this.categoryHasCourses = categoryHasCourses;
-    }
-
-    public List<CourseDetailViewModel> getCourseDetailViewModels() {
-        return courseDetailViewModels;
-    }
-
-    public void setCourseDetailViewModels(List<CourseDetailViewModel> courseDetailViewModels) {
-        this.courseDetailViewModels = courseDetailViewModels;
     }
 }

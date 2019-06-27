@@ -23,9 +23,6 @@ public class UninteractiveLesson {
     @JsonIgnore
     private Lesson lesson;
 
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "uninteractiveLesson")
-    private List<ResourseLink> resourseLinks;
-
     public long getUninteractiveLessonId() {
         return uninteractiveLessonId;
     }
@@ -48,13 +45,5 @@ public class UninteractiveLesson {
 
     public void setLesson(Lesson lesson) {
         this.lesson = lesson;
-    }
-
-    public List<ResourseLink> getResourseLinks() {
-        return resourseLinks;
-    }
-
-    public void setResourseLinks(List<ResourseLink> resourseLinks) {
-        this.resourseLinks = resourseLinks;
     }
 }

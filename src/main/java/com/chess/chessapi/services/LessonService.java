@@ -38,10 +38,10 @@ public class LessonService {
     private UserService userService;
 
     @Autowired
-    private ResourseLinkService resourseLinkService;
+    private UninteractiveLessonService uninteractiveLessonService;
 
     @Autowired
-    private UninteractiveLessonService uninteractiveLessonService;
+    private LearningLogService learningLogService;
 
     @PersistenceContext
     private EntityManager em;
@@ -66,7 +66,7 @@ public class LessonService {
         return this.lessonRepository.findLessonAuthorByLessonId(lessonId);
     }
 
-    public void createInteractiveLesson(InteractiveLessonCreateViewModel lessonViewModel, long userId){
+    public long createInteractiveLesson(InteractiveLessonCreateViewModel lessonViewModel, long userId){
         //Create Lesson
         Lesson savedLesson = this.createLesson(lessonViewModel.getName(),userId);
         //create interactive lesson
@@ -89,16 +89,17 @@ public class LessonService {
             this.courseHasLessonService.create(savedLesson.getLessonId()
                     ,lessonViewModel.getCourseId(),lessonOrder);
         }
+        return savedLesson.getLessonId();
     }
 
-    public void createUninteractiveLesson(UninteractiveLessonCreateViewModel uninteractiveLessonCreateViewModel,long userId){
+    public long createUninteractiveLesson(UninteractiveLessonCreateViewModel uninteractiveLessonCreateViewModel,long userId){
         //Create Lesson
         Lesson savedLesson = this.createLesson(uninteractiveLessonCreateViewModel.getName(),userId);
         //create uninteractive lesson
-        UninteractiveLesson uninteractiveLesson = uninteractiveLessonCreateViewModel.getUninteractiveLesson();
+        UninteractiveLesson uninteractiveLesson = new UninteractiveLesson();
+        uninteractiveLesson.setContent(uninteractiveLessonCreateViewModel.getContent());
         uninteractiveLesson.setLesson(savedLesson);
-        UninteractiveLesson savedUninteractiveLesson = this.uninteractiveLessonService.create(uninteractiveLesson);
-        //continue trigger resource
+        this.uninteractiveLessonService.create(uninteractiveLesson);
 
         //create mapping course has lesson in case has course id
         if(uninteractiveLessonCreateViewModel.getCourseId() != 0){
@@ -108,6 +109,7 @@ public class LessonService {
             this.courseHasLessonService.create(savedLesson.getLessonId()
                     ,uninteractiveLessonCreateViewModel.getCourseId(),lessonOrder);
         }
+        return savedLesson.getLessonId();
     }
 
     public void updateInteractiveLesson(InteractiveLessonUpdateViewModel lessonViewModel){
@@ -131,8 +133,6 @@ public class LessonService {
         this.uninteractiveLessonService.update(uninteractiveLessonUpdateViewModel.getUninteractiveLesson().getUninteractiveLessonId(),
                 uninteractiveLessonUpdateViewModel.getUninteractiveLesson().getContent());
 
-        //update continue trigger resource
-
     }
 
     public void updateLesson(long lessonId,String name){
@@ -141,7 +141,7 @@ public class LessonService {
 
     public PagedList<LessonViewModel> getAllByOwner(int page, int pageSize, String name, long userId){
         PageRequest pageable =  null;
-        pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.LESSON_CREATE_DATE).descending());
+        pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.LESSON_CREATED_DATE).descending());
         Page<Object> rawData = this.lessonRepository.findAllByOwner(pageable,name,userId);
         return this.fillDataToPagination(rawData);
     }
@@ -157,22 +157,22 @@ public class LessonService {
         return false;
     }
 
-    public void removeLesson(long lessonId){
-        Lesson lesson = this.lessonRepository.getOne(lessonId);
+    public void removeLesson(Lesson lesson){
+        //remove all learning log
+        this.learningLogService.deleteAllByLessonId(lesson.getLessonId());
         if(lesson.getInteractiveLesson() != null){
             //remove all steps
             this.stepService.deleteAllByILessonId(lesson.getInteractiveLesson().getInteractiveLessonId());
         }
 
-        if(lesson.getUninteractiveLesson() != null){
-            //remove all resourse link
-            this.resourseLinkService.deleteAllByUILesson(lesson.getUninteractiveLesson().getUninteractiveLessonId());
-        }
-
         //delete mapping with course
-        this.courseHasLessonService.deleteByLessonId(lessonId);
+        this.courseHasLessonService.deleteAllByLessonId(lesson.getLessonId());
         //delete lesson
         this.lessonRepository.delete(lesson);
+    }
+
+    public boolean isExist(long lessonId){
+        return this.lessonRepository.existsById(lessonId);
     }
     //END PUBLIC METHOD DEFINED
 

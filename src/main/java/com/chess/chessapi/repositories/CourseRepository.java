@@ -22,4 +22,7 @@ public interface CourseRepository extends JpaRepository<Course,Long> {
     @Modifying
     @Transactional
     void updateCourse(long courseId,String name,String description,Float point,long statusId,String image);
+
+    @Query(value = "Select c.owner From course c where id = ?1",nativeQuery = true)
+    Long findAuthorIdByCourseId(long courseId);
 }

@@ -51,7 +51,7 @@ public class UserService {
         try{
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             user = (UserPrincipal) authentication.getPrincipal();
-        }catch (ClassCastException ex){
+        }catch (NullPointerException ex){
 
         }
         return user;
@@ -147,6 +147,15 @@ public class UserService {
         return ManualCastUtils.castListObjectToUserDetailsFromGetUsersByCourseid(query.getResultList());
     }
 
+    public void updatePoint(long userId,float point){
+        this.userRepository.updatePoint(userId,point);
+    }
+    public float getPointByUserId(long userId){
+        return this.userRepository.findPointByUserId(userId);
+    }
+    public boolean isExist(long userId){
+        return this.userRepository.existsById(userId);
+    }
     // private method
     private void setUserRoleAuthentication(User user){
         List<GrantedAuthority> authorities = Collections.

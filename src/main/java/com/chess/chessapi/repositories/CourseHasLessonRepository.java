@@ -22,8 +22,11 @@ public interface CourseHasLessonRepository extends JpaRepository<CourseHasLesson
     @Query(value = "Delete from course_has_lesson where lesson_id = ?1",nativeQuery = true)
     @Modifying
     @Transactional
-    void deleteByLessonId(long lessonId);
+    void deleteAllByLessonId(long lessonId);
 
-    @Query(value = "Select lesson_ordered from course_has_lesson where course_id = ?1 LIMIT 1",nativeQuery = true)
+    @Query(value = "Select lesson_ordered from course_has_lesson where course_id = ?1 Order by lesson_ordered Desc LIMIT 1",nativeQuery = true)
     Integer findLastestLessonOrderedByCourseId(long courseId);
+
+    @Query(value = "Select count(id) From course_has_lesson where course_id = ?1",nativeQuery = true)
+    Integer countLessonByCourseId(long courseId);
 }

@@ -35,12 +35,6 @@ public class CategoryService {
         return this.categoryRepository.findById(categoryId);
     }
 
-    public void getCategoryDetails(Category category){
-        if(category != null){
-            category.setCourseDetailViewModels(this.courseService.getCourseDetailsByCategoryId(category.getCategoryId()));
-        }
-    }
-
     public List<Long> getListCategoryIdsByCourseId(long courseId){
         //getting category by courseid
         StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getCategoryByCourseid");
@@ -51,8 +45,11 @@ public class CategoryService {
         return ManualCastUtils.castListObjectToCategoryIdFromGetCategoryByCourseId(query.getResultList());
     }
 
-    public void create(CategoryViewModel category){
-        this.categoryRepository.create(category.getName());
+    public long create(CategoryViewModel categoryViewModel){
+        Category category = new Category();
+        category.setName(categoryViewModel.getName());
+        Category savedCategory = this.categoryRepository.save(category);
+        return savedCategory.getCategoryId();
     }
 
     public void removeCategory(Category category){
@@ -62,6 +59,10 @@ public class CategoryService {
 
     public void update(CategoryViewModel category){
         this.categoryRepository.update(category.getCategoryId(),category.getName());
+    }
+
+    public boolean isExist(long categoryId){
+        return this.categoryRepository.existsById(categoryId);
     }
     //end public method
 }

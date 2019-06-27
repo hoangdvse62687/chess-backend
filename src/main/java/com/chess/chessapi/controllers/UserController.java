@@ -17,6 +17,7 @@ import com.chess.chessapi.viewmodels.UserUpdateStatusViewModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -66,7 +67,7 @@ public class UserController {
                 //gain redirect uri base on role
                 message = this.userService.register(user,redirectUri);
 
-            }catch (Exception ex){
+            }catch (DataIntegrityViolationException ex){
                 message = ex.getMessage();
                 isSuccess = false;
             }
@@ -81,6 +82,11 @@ public class UserController {
         if(!this.userService.checkPermissionModify(user.getUserId())){
             throw new AccessDeniedException(AppMessage.PERMISSION_MESSAGE);
         }
+
+        if(!this.userService.isExist(user.getUserId())){
+            new ResourceNotFoundException("User","id",user.getUserId());
+        }
+
         String message = "";
         boolean isSuccess = true;
         if(bindingResult.hasErrors()){
@@ -92,7 +98,7 @@ public class UserController {
                 this.userService.updateProfile(user);
 
                 message =  AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.PROFILE);
-            }catch (Exception ex){
+            }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.PROFILE);
                 isSuccess = false;
             }
@@ -147,7 +153,7 @@ public class UserController {
                     .orElseThrow(() -> new ResourceNotFoundException("User","id",userUpdateStatusViewModel.getUserId()));
             this.userService.updateStatus(user,userUpdateStatusViewModel.getUserId(),userUpdateStatusViewModel.isActive());
             message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.USER);
-        }catch (Exception ex){
+        }catch (DataIntegrityViolationException ex){
             isSuccess = false;
             message =  AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.USER);
         }

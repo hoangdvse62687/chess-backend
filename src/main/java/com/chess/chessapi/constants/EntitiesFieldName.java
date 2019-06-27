@@ -11,5 +11,7 @@ public class EntitiesFieldName {
     public static final String NOTIFICATION_IS_VIEWED = "is_viewed";
     public static final String NOTIFICATION_CREATED_DATE = "created_date";
 
-    public static final String LESSON_CREATE_DATE = "created_date";
+    public static final String LESSON_CREATED_DATE = "created_date";
+
+    public static final String GAME_HISTORY_START_TIME = "start_time";
 }

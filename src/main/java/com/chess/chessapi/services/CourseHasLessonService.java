@@ -31,11 +31,20 @@ public class CourseHasLessonService {
     }
 
     public int getLastestLessonOrder(long courseId){
-        return this.courseHasLessonRepository.findLastestLessonOrderedByCourseId(courseId);
+        try{
+            return this.courseHasLessonRepository.findLastestLessonOrderedByCourseId(courseId);
+        }catch (NullPointerException ex){
+            return 0;
+        }
+
     }
 
-    public void deleteByLessonId(long lessonId){
-        this.courseHasLessonRepository.deleteByLessonId(lessonId);
+    public void deleteAllByLessonId(long lessonId){
+        this.courseHasLessonRepository.deleteAllByLessonId(lessonId);
+    }
+
+    public int countLessonByCourseId(long courseId){
+        return this.courseHasLessonRepository.countLessonByCourseId(courseId);
     }
     //END PUBLIC METHOD DEFINED
 }

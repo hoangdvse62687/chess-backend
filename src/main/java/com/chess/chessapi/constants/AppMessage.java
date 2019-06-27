@@ -18,6 +18,11 @@ public class AppMessage implements Serializable {
     public static final String INTERACTIVE_LESSON = "interactive lesson";
     public static final String UNINTERACTIVE_LESSON = "uninteractive lesson";
     public static final String LEARNING_LOG = "learning log";
+    public static final String EXERCISE = "exercise";
+    public static final String ENROLL = "enroll";
+    public static final String RESOURCE_LINK = "resource link";
+    public static final String REVIEW = "review";
+    public static final String GAME_HISTORY = "game history";
     //END SPECIAL DEFINE
 
     //STATUS MESSAGE DEFINE
@@ -26,7 +31,8 @@ public class AppMessage implements Serializable {
     //END STATUS MESSAGE DEFINE
 
     //PERMISSION DEFINE
-    public static final String PERMISSION_MESSAGE = "you don't have permission to this action";
+    public static final String PERMISSION_MESSAGE = "you don't have permission to do this action";
+    public static final String ENROLLMENT_DENY_MESSAGE = "your point currently don't have enough to do this action";
     //END PERMISION DEFINE
 
     //NOTIFICATION DEFINE
@@ -36,6 +42,7 @@ public class AppMessage implements Serializable {
     public static final String CREATE_NEW_COURSE = " is waitting for you to accept";
     public static final String UPDATE_COURSE_STATUS_PUBLISHED = " is published";
     public static final String UPDATE_COURSE_STATUS_REJECTED = " is rejected";
+    public static final String NOTIFICATION_REVIEW = " has reviewed your course";
     //END NOTIFICATION DEFINE
 
     public static String getMessageSuccess(String action,String table){

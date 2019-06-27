@@ -66,6 +66,10 @@ public class User {
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
     @JsonIgnore
+    private List<ResourceLink> resourceLinks;
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
+    @JsonIgnore
     private List<UserHasCourse> userHasCourses;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
@@ -79,6 +83,14 @@ public class User {
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
     @JsonIgnore
     private List<LearningLog> learningLogs;
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
+    @JsonIgnore
+    private List<Review> reviews;
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
+    @JsonIgnore
+    private List<GameHistory> gameHistories;
 
     @Transient
     private List<CourseDetailViewModel> courseDetailViewModels;
@@ -226,5 +238,29 @@ public class User {
 
     public void setLearningLogs(List<LearningLog> learningLogs) {
         this.learningLogs = learningLogs;
+    }
+
+    public List<ResourceLink> getResourceLinks() {
+        return resourceLinks;
+    }
+
+    public void setResourceLinks(List<ResourceLink> resourceLinks) {
+        this.resourceLinks = resourceLinks;
+    }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
+    }
+
+    public List<GameHistory> getGameHistories() {
+        return gameHistories;
+    }
+
+    public void setGameHistories(List<GameHistory> gameHistories) {
+        this.gameHistories = gameHistories;
     }
 }
