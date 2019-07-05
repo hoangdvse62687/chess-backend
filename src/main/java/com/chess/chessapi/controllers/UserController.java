@@ -80,7 +80,7 @@ public class UserController {
     @PreAuthorize("isAuthenticated()")
     public @ResponseBody JsonResult updateProfile(@Valid @RequestBody User user, BindingResult bindingResult){
         if(!this.userService.checkPermissionModify(user.getUserId())){
-            throw new AccessDeniedException(AppMessage.PERMISSION_MESSAGE);
+            throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
         }
 
         if(!this.userService.isExist(user.getUserId())){

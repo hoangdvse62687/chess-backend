@@ -10,8 +10,8 @@ import javax.transaction.Transactional;
 
 @Repository
 public interface InteractiveLessonRepository extends JpaRepository<InteractiveLesson,Long> {
-    @Query(value = "Update interactive_lesson Set init_code = ?2  where id = ?1",nativeQuery = true)
+    @Query(value = "Update interactive_lesson Set init_code = ?2,content = ?3  where id = ?1",nativeQuery = true)
     @Modifying
     @Transactional
-    void update(long iLessonId,String initCode);
+    void update(long iLessonId,String initCode,String content);
 }

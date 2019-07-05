@@ -10,7 +10,7 @@ public class LessonViewModel {
     private Timestamp createdDate;
     @NotNull(message = "Lesson order must not be null")
     private int lessonOrdered;
-
+    private int lessonType;
     public long getLessonId() {
         return lessonId;
     }
@@ -41,5 +41,13 @@ public class LessonViewModel {
 
     public void setLessonOrdered(int lessonOrdered) {
         this.lessonOrdered = lessonOrdered;
+    }
+
+    public int getLessonType() {
+        return lessonType;
+    }
+
+    public void setLessonType(int lessonType) {
+        this.lessonType = lessonType;
     }
 }

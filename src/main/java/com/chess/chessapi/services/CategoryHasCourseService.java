@@ -2,6 +2,7 @@ package com.chess.chessapi.services;
 
 import com.chess.chessapi.entities.CategoryHasCourse;
 import com.chess.chessapi.repositories.CategoryHasCourseRepository;
+import com.chess.chessapi.viewmodels.CategoryViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,20 +22,20 @@ public class CategoryHasCourseService {
         return this.categoryHasCourseRepository.findAllByCourseId(courseId);
     }
 
-    public void UpdateCategoryHasCourse(List<CategoryHasCourse> oldCategoryHasCourses,List<Long> newCategoryHasCourses,long courseId){
+    public void UpdateCategoryHasCourse(List<CategoryHasCourse> oldCategoryHasCourses, List<CategoryViewModel> newCategoryHasCourses, long courseId){
         if(oldCategoryHasCourses == null || oldCategoryHasCourses.isEmpty()){
-            for (Long newCategoryHasCourse:
+            for (CategoryViewModel newCategoryHasCourse:
                  newCategoryHasCourses) {
-                this.categoryHasCourseRepository.create(newCategoryHasCourse,courseId);
+                this.categoryHasCourseRepository.create(newCategoryHasCourse.getCategoryId(),courseId);
             }
         }else if(newCategoryHasCourses != null && !newCategoryHasCourses.isEmpty()){
-            for (Long newCategoryHasCourse:
+            for (CategoryViewModel newCategoryHasCourse:
                     newCategoryHasCourses) {
                 boolean isExist = false;
 
                 for (CategoryHasCourse oldCategoryHasCourse:
                         oldCategoryHasCourses) {
-                    if(newCategoryHasCourse == oldCategoryHasCourse.getCategory().getCategoryId()) {
+                    if(newCategoryHasCourse.getCategoryId() == oldCategoryHasCourse.getCategory().getCategoryId()) {
                         isExist = true;
                         oldCategoryHasCourses.remove(oldCategoryHasCourse);
                         break;
@@ -42,7 +43,7 @@ public class CategoryHasCourseService {
                 }
 
                 if(!isExist){
-                    this.create(newCategoryHasCourse,courseId);
+                    this.create(newCategoryHasCourse.getCategoryId(),courseId);
                 }
             }
 

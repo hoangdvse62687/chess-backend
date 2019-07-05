@@ -3,6 +3,7 @@ package com.chess.chessapi.entities;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -17,9 +18,11 @@ public class Exercise {
     private long exerciseId;
 
     @NotNull(message = "Question must not be null")
+    @Length(max = 1000,message = "Question is required not larger than 1000 characters")
     private String question;
 
     @NotNull(message = "Answer must not be null")
+    @Length(max = 1000,message = "Answer is required not larger than 1000 characters")
     private String answer;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -31,8 +31,8 @@ public class AppMessage implements Serializable {
     //END STATUS MESSAGE DEFINE
 
     //PERMISSION DEFINE
-    public static final String PERMISSION_MESSAGE = "you don't have permission to do this action";
-    public static final String ENROLLMENT_DENY_MESSAGE = "your point currently don't have enough to do this action";
+    public static final String PERMISSION_DENY_MESSAGE = "you don't have permission to do this action";
+    public static final String POINT_DENY_MESSAGE = "your point currently don't have enough to do this action";
     //END PERMISION DEFINE
 
     //NOTIFICATION DEFINE

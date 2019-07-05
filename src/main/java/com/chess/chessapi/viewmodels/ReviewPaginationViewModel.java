@@ -1,7 +1,7 @@
 package com.chess.chessapi.viewmodels;
 
 public class ReviewPaginationViewModel {
-    private float rating;
+    private int rating;
 
     private String content;
 
@@ -11,12 +11,12 @@ public class ReviewPaginationViewModel {
 
     private String userEmail;
 
-    public float getRating() {
-        return rating;
+    public void setRating(int rating) {
+        this.rating = rating;
     }
 
-    public void setRating(float rating) {
-        this.rating = rating;
+    public float getRating() {
+        return rating;
     }
 
     public String getContent() {

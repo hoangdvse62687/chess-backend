@@ -21,6 +21,13 @@ import java.sql.Timestamp;
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseId",type = Long.class),
                         @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalElements",type = Long.class)
                 }
+        ),
+        @NamedStoredProcedureQuery(
+                name = "getOverviewByCourseid",
+                procedureName = "get_overview_by_courseid",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseId",type = Long.class)
+                }
         )
 })
 public class Review {
@@ -30,7 +37,7 @@ public class Review {
     private long reviewId;
 
     @NotNull(message = "Rating must not be null")
-    private float rating;
+    private int rating;
 
     @Length(max = 1000,message = "name is required not large than 1000 characters")
     @NotNull(message = "Content must not be null")
@@ -55,12 +62,12 @@ public class Review {
         this.reviewId = reviewId;
     }
 
-    public float getRating() {
-        return rating;
+    public void setRating(int rating) {
+        this.rating = rating;
     }
 
-    public void setRating(float rating) {
-        this.rating = rating;
+    public float getRating() {
+        return rating;
     }
 
     public String getContent() {

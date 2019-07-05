@@ -1,9 +1,8 @@
 package com.chess.chessapi.utils;
 
-import com.chess.chessapi.entities.Course;
-import com.chess.chessapi.entities.InteractiveLesson;
-import com.chess.chessapi.entities.Step;
-import com.chess.chessapi.entities.User;
+import com.chess.chessapi.constants.Status;
+import com.chess.chessapi.entities.*;
+import com.chess.chessapi.models.Step;
 import com.chess.chessapi.viewmodels.*;
 import org.springframework.data.domain.Page;
 
@@ -41,7 +40,8 @@ public class ManualCastUtils implements Serializable {
     private static final int LESSON_ID_INDEX = 0;
     private static final int LESSON_NAME_INDEX = 1;
     private static final int LESSON_CREATED_DATE_INDEX = 2;
-    private static final int LESSON_ORDER_LESSON_INDEX = 3;
+    private static final int LESSON_TYPE_INDEX = 3;
+    private static final int LESSON_ORDER_LESSON_INDEX = 4;
     //END LESSON DEFINED
 
     //NULL VALUE DEFINED
@@ -60,13 +60,24 @@ public class ManualCastUtils implements Serializable {
     //END COURSE VIEW MODEL DEFINED
 
     //REVIEW VIEW MODEL DEFINED
-    private static final int REVIEW_VIEW_MODEL_RATING = 0;
-    private static final int REVIEW_VIEW_MODEL_CONTENT = 1;
-    private static final int REVIEW_VIEW_MODEL_USER_ID = 2;
-    private static final int REVIEW_VIEW_MODEL_USER_FULLNAME = 3;
-    private static final int REVIEW_VIEW_MODEL_EMAIL = 4;
+    private static final int REVIEW_VIEW_MODEL_RATING_INDEX = 0;
+    private static final int REVIEW_VIEW_MODEL_CONTENT_INDEX = 1;
+    private static final int REVIEW_VIEW_MODEL_USER_ID_INDEX = 2;
+    private static final int REVIEW_VIEW_MODEL_USER_FULLNAME_INDEX = 3;
+    private static final int REVIEW_VIEW_MODEL_EMAIL_INDEX = 4;
     //END REVIEW VIEW MODEL DEFINED
-    //CAST STORED PROCEDURE DEFINED
+
+    //CATEGORY VIEW MODEL DEFINED
+    private static final int CATEGORY_VIEW_MODEL_ID_INDEX = 0;
+    private static final int CATEGORY_VIEW_MODEL_NAME_INDEX = 1;
+    //END CATEGORY VIEW MODEL DEFINED
+
+    //STEP JSON PARSER DEFINED
+    private static final String STEP_JSON_PARSER_CONTENT = "content";
+    private static final String STEP_JSON_PARSER_STEPCODE = "stepCode";
+    private static final String STEP_JSON_PARSER_RIGHTRESPONSE = "rightResponse";
+    private static final String STEP_JSON_PARSER_WRONGRRESPONSE = "wrongResponse";
+    //END STEP JSON PARSER DEFINED
     public static User castObjectToUserByFindCustom(Object object)
             throws NumberFormatException{
         if(object == null){
@@ -79,6 +90,29 @@ public class ManualCastUtils implements Serializable {
         user.setRoleId(Long.parseLong(data[USER_ROLE_INDEX].toString()));
         user.setActive(Boolean.parseBoolean(data[USER_ISACTIVE_INDEX].toString()));
         return user;
+    }
+
+    public static CourseOverviewViewModel castObjectToCourseOverviewViewModel(List<Object> objects)
+    throws NumberFormatException{
+        if(objects == null){
+            return null;
+        }
+        CourseOverviewViewModel courseOverviewViewModel = new CourseOverviewViewModel();
+        Object[] data = (Object[]) objects.get(0);
+
+        courseOverviewViewModel.setTotalQuantityRatings(Double.parseDouble(data[data.length - 2].toString()));
+
+        for(int i = 0; i < data.length - 2;i++){
+            OverviewRatingDetailsViewModel overviewRatingDetailsViewModel = new OverviewRatingDetailsViewModel();
+            overviewRatingDetailsViewModel.setQuantity(Double.parseDouble(data[i].toString()));
+            if(courseOverviewViewModel.getTotalQuantityRatings() != 0){
+                overviewRatingDetailsViewModel.setRatio(overviewRatingDetailsViewModel.getQuantity()
+                        / courseOverviewViewModel.getTotalQuantityRatings());
+            }
+            courseOverviewViewModel.getListRatings().add(overviewRatingDetailsViewModel);
+        }
+        courseOverviewViewModel.setTotalRatings(Float.parseFloat(handleNullValueObject(data[data.length - 1],Float.class)));
+        return courseOverviewViewModel;
     }
 
     public static List<UserPaginationViewModel> castPageObjectsToUser(Page<Object> objects)
@@ -167,12 +201,15 @@ public class ManualCastUtils implements Serializable {
         return data;
     }
 
-    public static List<Long> castListObjectToCategoryIdFromGetCategoryByCourseId(List<Object[]> objects)
+    public static List<CategoryViewModel> castListObjectToCategoryIdFromGetCategoryByCourseId(List<Object[]> objects)
     throws NumberFormatException{
-        List<Long> data = new ArrayList<>();
+        List<CategoryViewModel> data = new ArrayList<>();
         for (Object[] object:
              objects) {
-            data.add(Long.parseLong(object[0].toString()));
+            CategoryViewModel categoryViewModel = new CategoryViewModel();
+            categoryViewModel.setCategoryId(Long.parseLong(object[CATEGORY_VIEW_MODEL_ID_INDEX].toString()));
+            categoryViewModel.setName(object[CATEGORY_VIEW_MODEL_NAME_INDEX].toString());
+            data.add(categoryViewModel);
         }
         return data;
     }
@@ -187,6 +224,7 @@ public class ManualCastUtils implements Serializable {
             lessonViewModel.setName(object[LESSON_NAME_INDEX].toString());
             lessonViewModel.setCreatedDate(Timestamp.valueOf(object[LESSON_CREATED_DATE_INDEX].toString()));
             lessonViewModel.setLessonOrdered(Integer.parseInt(object[LESSON_ORDER_LESSON_INDEX].toString()));
+            lessonViewModel.setLessonType(Integer.parseInt(object[LESSON_TYPE_INDEX].toString()));
             data.add(lessonViewModel);
         }
         return data;
@@ -202,11 +240,11 @@ public class ManualCastUtils implements Serializable {
             lessonViewModel.setLessonId(Long.parseLong(data[LESSON_ID_INDEX].toString()));
             lessonViewModel.setName(data[LESSON_NAME_INDEX].toString());
             lessonViewModel.setCreatedDate(Timestamp.valueOf(data[LESSON_CREATED_DATE_INDEX].toString()));
+            lessonViewModel.setLessonType(Integer.parseInt(data[LESSON_TYPE_INDEX].toString()));
             result.add(lessonViewModel);
         }
         return result;
     }
-    //END CAST STORED PROCEDURE DEFINED
 
     //CAST OBJECT TO OBJECT DEFINED
     public static Course castCourseCreateViewModelToCourse(CourseCreateViewModel courseCreateViewModel){
@@ -215,7 +253,7 @@ public class ManualCastUtils implements Serializable {
             course.setName(courseCreateViewModel.getName());
             course.setDescription(courseCreateViewModel.getDescription());
             course.setPoint(courseCreateViewModel.getPoint());
-            course.setStatusId(courseCreateViewModel.getStatusId());
+            course.setStatusId(Status.COURSE_STATUS_DRAFTED);
             course.setImage(courseCreateViewModel.getImage());
         }
         return course;
@@ -231,7 +269,7 @@ public class ManualCastUtils implements Serializable {
         courseDetailsViewModel.setStatusId(course.getStatusId());
         courseDetailsViewModel.setImage(course.getImage());
         courseDetailsViewModel.setUserDetailViewModels(course.getUserDetailViewModels());
-        courseDetailsViewModel.setListCategoryIds(course.getListCategoryIds());
+        courseDetailsViewModel.setListCategorys(course.getListCategorys());
         courseDetailsViewModel.setLessonViewModels(course.getLessonViewModels());
         courseDetailsViewModel.setListLearningLogLessonIds(course.getListLearningLogLessonIds());
         courseDetailsViewModel.setAuthorId(course.getUser().getUserId());
@@ -247,16 +285,34 @@ public class ManualCastUtils implements Serializable {
         for (Object[] object:
                 objects) {
             ReviewPaginationViewModel reviewPaginationViewModel = new ReviewPaginationViewModel();
-            reviewPaginationViewModel.setRating(Float.parseFloat(object[REVIEW_VIEW_MODEL_RATING].toString()));
-            reviewPaginationViewModel.setContent(object[REVIEW_VIEW_MODEL_CONTENT].toString());
-            reviewPaginationViewModel.setUserId(Long.parseLong(object[REVIEW_VIEW_MODEL_USER_ID].toString()));
-            reviewPaginationViewModel.setUserFullName(object[REVIEW_VIEW_MODEL_USER_FULLNAME].toString());
-            reviewPaginationViewModel.setUserEmail(object[REVIEW_VIEW_MODEL_EMAIL].toString());
+            reviewPaginationViewModel.setRating(Integer.parseInt(object[REVIEW_VIEW_MODEL_RATING_INDEX].toString()));
+            reviewPaginationViewModel.setContent(object[REVIEW_VIEW_MODEL_CONTENT_INDEX].toString());
+            reviewPaginationViewModel.setUserId(Long.parseLong(object[REVIEW_VIEW_MODEL_USER_ID_INDEX].toString()));
+            reviewPaginationViewModel.setUserFullName(object[REVIEW_VIEW_MODEL_USER_FULLNAME_INDEX].toString());
+            reviewPaginationViewModel.setUserEmail(object[REVIEW_VIEW_MODEL_EMAIL_INDEX].toString());
             data.add(reviewPaginationViewModel);
         }
         return data;
     }
     //END CAST OBJECT TO OBJECT DEFINED
+
+    //CASTE OBJECT TO JSON DEFINED
+    public static String castListStepToJson(List<Step> steps){
+        if(steps == null || steps.size() == 0){
+            return "[]";
+        }
+        String result = "";
+        for (Step step:
+             steps) {
+            result += "{" + '"'  + STEP_JSON_PARSER_CONTENT + '"' + ':' + '"' +step.getContent() + '"'
+                    + ',' + '"' + STEP_JSON_PARSER_STEPCODE + '"' + ':' + '"' +step.getStepCode() + '"'
+                    + ',' +'"' + STEP_JSON_PARSER_RIGHTRESPONSE + '"' + ':' + '"' +step.getRightResponse() + '"'
+                    + ',' +'"' + STEP_JSON_PARSER_WRONGRRESPONSE + '"' + ':' + '"' +step.getWrongResponse() + '"' + "},";
+        }
+
+        return "[" + result.substring(0,result.length() - 1) +"]";
+    }
+    //END CASTE OBJECT TO JSON DEFINED
     //PRIVATE DEFINED
     private static String handleNullValueObject(Object object,Class clazz){
         if(object != null){

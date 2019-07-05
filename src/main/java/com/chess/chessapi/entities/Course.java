@@ -1,5 +1,6 @@
 package com.chess.chessapi.entities;
 
+import com.chess.chessapi.viewmodels.CategoryViewModel;
 import com.chess.chessapi.viewmodels.LessonViewModel;
 import com.chess.chessapi.viewmodels.UserDetailViewModel;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -9,6 +10,7 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -61,7 +63,18 @@ import java.util.List;
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseId",type = Long.class),
                         @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "hasPermission",type = Boolean.class)
                 }
-        )
+        ),
+        @NamedStoredProcedureQuery(
+                name = "getCoursePaginationsByUserid",
+                procedureName = "get_course_paginations_by_userid",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseName",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageIndex",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageSize",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "userId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalElements",type = Long.class)
+                }
+        ),
 })
 public class Course {
     @Id
@@ -70,19 +83,22 @@ public class Course {
     private long courseId;
 
     @NotNull(message = "Name must not be null")
-    @Length(max = 1000,message = "name is required not large than 1000 characters")
+    @Length(max = 1000,message = "name is required not larger than 1000 characters")
     private String name;
 
+    @Length(max = 1000,message = "Description is required not larger than 1000 characters")
     private String description;
 
     @Column(name = "created_date")
     private Timestamp createdDate;
 
+    @Size(min = 0,message = "Point should equal or larger than 0")
     private Float point;
 
     @Column(name = "status_id")
     private Long statusId;
 
+    @Length(max = 255,message = "Image must not be larger than 255 characters")
     private String image;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "course")
@@ -113,7 +129,7 @@ public class Course {
     private List<UserDetailViewModel> userDetailViewModels;
 
     @Transient
-    private List<Long> listCategoryIds;
+    private List<CategoryViewModel> listCategorys;
 
     @Transient
     private List<Long> listLearningLogLessonIds;
@@ -209,12 +225,12 @@ public class Course {
         this.userDetailViewModels = userDetailViewModels;
     }
 
-    public List<Long> getListCategoryIds() {
-        return listCategoryIds;
+    public List<CategoryViewModel> getListCategorys() {
+        return listCategorys;
     }
 
-    public void setListCategoryIds(List<Long> listCategoryIds) {
-        this.listCategoryIds = listCategoryIds;
+    public void setListCategorys(List<CategoryViewModel> listCategorys) {
+        this.listCategorys = listCategorys;
     }
 
     public List<CourseHasLesson> getCourseHasLessons() {

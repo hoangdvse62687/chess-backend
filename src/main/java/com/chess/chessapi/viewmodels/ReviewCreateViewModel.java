@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 
 public class ReviewCreateViewModel {
     @NotNull(message = "Rating must not be null")
-    private float rating;
+    private int rating;
 
     @Length(max = 1000,message = "name is required not large than 1000 characters")
     @NotNull(message = "Content must not be null")
@@ -15,11 +15,11 @@ public class ReviewCreateViewModel {
     @NotNull(message = "Course id must not be null")
     private long courseId;
 
-    public float getRating() {
+    public int getRating() {
         return rating;
     }
 
-    public void setRating(float rating) {
+    public void setRating(int rating) {
         this.rating = rating;
     }
 

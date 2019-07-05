@@ -15,7 +15,7 @@ public class CourseDetailsViewModel {
     private String authorName;
     private String authorAvatar;
     private List<UserDetailViewModel> userDetailViewModels;
-    private List<Long> listCategoryIds;
+    private List<CategoryViewModel> listCategorys;
     private List<Long> listLearningLogLessonIds;
     private List<LessonViewModel> lessonViewModels;
     private int totalLesson;
@@ -85,12 +85,12 @@ public class CourseDetailsViewModel {
         this.userDetailViewModels = userDetailViewModels;
     }
 
-    public List<Long> getListCategoryIds() {
-        return listCategoryIds;
+    public List<CategoryViewModel> getListCategorys() {
+        return listCategorys;
     }
 
-    public void setListCategoryIds(List<Long> listCategoryIds) {
-        this.listCategoryIds = listCategoryIds;
+    public void setListCategorys(List<CategoryViewModel> listCategorys) {
+        this.listCategorys = listCategorys;
     }
 
     public List<LessonViewModel> getLessonViewModels() {

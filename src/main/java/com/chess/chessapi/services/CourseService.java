@@ -4,14 +4,12 @@ import com.chess.chessapi.constants.*;
 import com.chess.chessapi.entities.*;
 import com.chess.chessapi.models.PagedList;
 import com.chess.chessapi.repositories.CourseRepository;
-import com.chess.chessapi.repositories.NotificationRepository;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.utils.ManualCastUtils;
 import com.chess.chessapi.utils.TimeUtils;
 import com.chess.chessapi.viewmodels.CourseCreateViewModel;
 import com.chess.chessapi.viewmodels.CourseDetailViewModel;
 import com.chess.chessapi.viewmodels.CoursePaginationViewModel;
-import com.chess.chessapi.viewmodels.UserDetailViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +41,6 @@ public class CourseService {
     //Public method
     public Course create(CourseCreateViewModel courseCreateViewModel, long userId){
         //default setting when created course is inactive
-        courseCreateViewModel.setStatusId(Status.COURSE_STATUS_DRAFTED);
         Course course = ManualCastUtils.castCourseCreateViewModelToCourse(courseCreateViewModel);
         course.setCreatedDate(TimeUtils.getCurrentTime());
         //manual mapping author
@@ -138,7 +135,14 @@ public class CourseService {
         //it's only used instructor authentication => check for modifying course
         return this.callStoreProcedureCheckPermission(courseId,userPrincipal.getId());
     }
-
+    public boolean checkPermissionUpdateStatusCourse(long courseId){
+        UserPrincipal userPrincipal = this.userService.getCurrentUser();
+        long authorId = this.getAuthorIdByCourseId(courseId);
+        if(authorId == userPrincipal.getId()){
+            return true;
+        }
+        return false;
+    }
     public void updateCourse(Course course){
          this.courseRepository.updateCourse(course.getCourseId(),course.getName(),course.getDescription(),
                  course.getPoint(),course.getStatusId(),course.getImage());
@@ -150,7 +154,7 @@ public class CourseService {
         //update category list id
         List<CategoryHasCourse> oldCategoryHasCourses = this.categoryHasCourseService
                 .getAllByCourseId(course.getCourseId());
-        this.categoryHasCourseService.UpdateCategoryHasCourse(oldCategoryHasCourses,course.getListCategoryIds(),course.getCourseId());
+        this.categoryHasCourseService.UpdateCategoryHasCourse(oldCategoryHasCourses,course.getListCategorys(),course.getCourseId());
     }
 
     public boolean isExist(long courseId){
@@ -158,6 +162,21 @@ public class CourseService {
     }
     public long getAuthorIdByCourseId(long courseId){
         return this.courseRepository.findAuthorIdByCourseId(courseId);
+    }
+
+    public PagedList<CoursePaginationViewModel>  getCoursePaginationsByUserId(String courseName,int pageIndex, int pageSize,long userId){
+        StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getCoursePaginationsByUserid");
+        query.setParameter("courseName",courseName);
+        query.setParameter("pageIndex",(pageIndex - 1) * pageSize);
+        query.setParameter("pageSize",pageSize);
+        query.setParameter("userId",userId);
+        query.setParameter("totalElements",Long.parseLong("0"));
+
+        query.execute();
+
+        List<Object[]> rawData = query.getResultList();
+        final long totalElements = Long.parseLong(query.getOutputParameterValue("totalElements").toString());
+        return this.fillDataToPaginationCustom(rawData,totalElements,pageSize);
     }
     //End Pulbic method
 

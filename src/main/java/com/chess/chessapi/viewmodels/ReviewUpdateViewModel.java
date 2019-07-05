@@ -9,7 +9,7 @@ public class ReviewUpdateViewModel {
     @NotNull(message = "Content must not be null")
     private String content;
 
-    private float rating;
+    private int rating;
 
     @NotNull(message = "Course id must not be null")
     private long courseId;
@@ -38,11 +38,11 @@ public class ReviewUpdateViewModel {
         this.courseId = courseId;
     }
 
-    public float getRating() {
+    public int getRating() {
         return rating;
     }
 
-    public void setRating(float rating) {
+    public void setRating(int rating) {
         this.rating = rating;
     }
 }

@@ -1,19 +1,26 @@
 package com.chess.chessapi.entities;
 
-import com.chess.chessapi.viewmodels.CourseDetailViewModel;
+import com.chess.chessapi.models.Step;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.vladmihalcea.hibernate.type.json.JsonStringType;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "interactive_lesson")
 @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="interactiveLessonId",scope = InteractiveLesson.class)
+@TypeDefs({
+        @TypeDef(name = "json", typeClass = JsonStringType.class)
+})
 public class InteractiveLesson {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -21,10 +28,14 @@ public class InteractiveLesson {
     private long interactiveLessonId;
 
     @Column(name = "init_code")
+    @NotNull(message = "Init code must not be null")
+    @Length(max = 1000,message = "InitCode is required not larger than 1000 characters")
     private String initCode;
 
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "interactiveLesson")
-    private List<Step> steps;
+    @Type(type = "json")
+    @Column(name = "content",columnDefinition = "json")
+    @NotNull(message = "Steps must not be null")
+    private List<Step> steps = new ArrayList<Step>();
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="lesson_id")

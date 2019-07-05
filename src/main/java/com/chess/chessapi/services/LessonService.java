@@ -1,6 +1,7 @@
 package com.chess.chessapi.services;
 
 import com.chess.chessapi.constants.EntitiesFieldName;
+import com.chess.chessapi.constants.ObjectType;
 import com.chess.chessapi.entities.*;
 import com.chess.chessapi.models.PagedList;
 import com.chess.chessapi.repositories.LessonRepository;
@@ -9,6 +10,7 @@ import com.chess.chessapi.utils.ManualCastUtils;
 import com.chess.chessapi.utils.TimeUtils;
 import com.chess.chessapi.viewmodels.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JsonParser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -24,9 +26,6 @@ import java.util.Optional;
 public class LessonService {
     @Autowired
     private LessonRepository lessonRepository;
-
-    @Autowired
-    private StepService stepService;
 
     @Autowired
     private InteractiveLessonService interactiveLessonService;
@@ -68,19 +67,12 @@ public class LessonService {
 
     public long createInteractiveLesson(InteractiveLessonCreateViewModel lessonViewModel, long userId){
         //Create Lesson
-        Lesson savedLesson = this.createLesson(lessonViewModel.getName(),userId);
+        Lesson savedLesson = this.createLesson(lessonViewModel.getName(),userId,ObjectType.INTERACTIVE_LESSON);
         //create interactive lesson
         InteractiveLesson interactiveLesson = lessonViewModel.getInteractiveLesson();
         interactiveLesson.setLesson(savedLesson);
         InteractiveLesson savedInteractiveLesson = this.interactiveLessonService.create(interactiveLesson);
-        //create steps in interactive lesson
-        int counter = 0;
-        for (Step step:
-                lessonViewModel.getInteractiveLesson().getSteps()) {
-            step.setOrderStep(counter);
-            this.stepService.create(step,savedInteractiveLesson.getInteractiveLessonId());
-            counter++;
-        }
+
         //create mapping course has lesson in case has course id
         if(lessonViewModel.getCourseId() != 0){
             //calculate next lesson ordered
@@ -94,7 +86,7 @@ public class LessonService {
 
     public long createUninteractiveLesson(UninteractiveLessonCreateViewModel uninteractiveLessonCreateViewModel,long userId){
         //Create Lesson
-        Lesson savedLesson = this.createLesson(uninteractiveLessonCreateViewModel.getName(),userId);
+        Lesson savedLesson = this.createLesson(uninteractiveLessonCreateViewModel.getName(),userId, ObjectType.UNINTERACTIVE_LESSON);
         //create uninteractive lesson
         UninteractiveLesson uninteractiveLesson = new UninteractiveLesson();
         uninteractiveLesson.setContent(uninteractiveLessonCreateViewModel.getContent());
@@ -118,11 +110,8 @@ public class LessonService {
 
         //update interactive lesson info
         this.interactiveLessonService.update(lessonViewModel.getInteractiveLesson().getInteractiveLessonId()
-                ,lessonViewModel.getInteractiveLesson().getInitCode());
+                ,lessonViewModel.getInteractiveLesson().getInitCode(),ManualCastUtils.castListStepToJson(lessonViewModel.getInteractiveLesson().getSteps()));
 
-        //update steps
-        List<Step> oldSteps = this.stepService.getAllByILessonId(lessonViewModel.getInteractiveLesson().getInteractiveLessonId());
-        this.stepService.updateSteps(oldSteps,lessonViewModel.getInteractiveLesson().getSteps(),lessonViewModel.getInteractiveLesson().getInteractiveLessonId());
     }
 
     public void updateUninteractiveLesson(UninteractiveLessonUpdateViewModel uninteractiveLessonUpdateViewModel){
@@ -154,16 +143,13 @@ public class LessonService {
                 return true;
             }
         }
+
         return false;
     }
 
     public void removeLesson(Lesson lesson){
         //remove all learning log
         this.learningLogService.deleteAllByLessonId(lesson.getLessonId());
-        if(lesson.getInteractiveLesson() != null){
-            //remove all steps
-            this.stepService.deleteAllByILessonId(lesson.getInteractiveLesson().getInteractiveLessonId());
-        }
 
         //delete mapping with course
         this.courseHasLessonService.deleteAllByLessonId(lesson.getLessonId());
@@ -184,10 +170,11 @@ public class LessonService {
         return new PagedList<LessonViewModel>(totalPages,totalElements,content);
     }
 
-    private Lesson createLesson(String name,long userId){
+    private Lesson createLesson(String name,long userId,int type){
         Lesson lesson = new Lesson();
         lesson.setName(name);
         lesson.setCreatedDate(TimeUtils.getCurrentTime());
+        lesson.setLessonType(type);
         User user = new User();
         user.setUserId(userId);
         lesson.setUser(user);

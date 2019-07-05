@@ -2,6 +2,7 @@ package com.chess.chessapi.controllers;
 
 import com.chess.chessapi.constants.AppMessage;
 import com.chess.chessapi.constants.AppRole;
+import com.chess.chessapi.constants.ObjectType;
 import com.chess.chessapi.entities.Lesson;
 import com.chess.chessapi.entities.User;
 import com.chess.chessapi.exceptions.AccessDeniedException;
@@ -60,7 +61,7 @@ public class LessonController {
         //if courseId are default => check permission create lesson on course
         if(lessonViewModel.getCourseId() != 0){
             if(!this.courseService.checkPermissionModifyCourse(lessonViewModel.getCourseId())){
-                throw new AccessDeniedException(AppMessage.PERMISSION_MESSAGE);
+                throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
             }
         }
 
@@ -93,7 +94,7 @@ public class LessonController {
     public @ResponseBody JsonResult updateInteractiveLesson(@Valid @RequestBody InteractiveLessonUpdateViewModel interactiveLessonUpdateViewModel, BindingResult bindingResult){
 
         if(!this.lessonService.checkPermissionModifyLesson(interactiveLessonUpdateViewModel.getLessonId())){
-            throw new AccessDeniedException(AppMessage.PERMISSION_MESSAGE);
+            throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
         }
 
 
@@ -126,7 +127,7 @@ public class LessonController {
         //if courseId are default => check permission create lesson on course
         if(lessonViewModel.getCourseId() != 0){
             if(!this.courseService.checkPermissionModifyCourse(lessonViewModel.getCourseId())){
-                throw new AccessDeniedException(AppMessage.PERMISSION_MESSAGE);
+                throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
             }
         }
 
@@ -159,7 +160,7 @@ public class LessonController {
     public @ResponseBody JsonResult updateUninteractiveLesson(@Valid @RequestBody UninteractiveLessonUpdateViewModel uninteractiveLessonUpdateViewModel, BindingResult bindingResult){
 
         if(!this.lessonService.checkPermissionModifyLesson(uninteractiveLessonUpdateViewModel.getLessonId())){
-            throw new AccessDeniedException(AppMessage.PERMISSION_MESSAGE);
+            throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
         }
 
         if(!this.lessonService.isExist(uninteractiveLessonUpdateViewModel.getLessonId())){
@@ -207,7 +208,7 @@ public class LessonController {
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult removeLessonFromCourse(@RequestBody LessonCourseRemoveViewModel lessonCourseRemoveViewModel){
         if(!this.courseService.checkPermissionModifyCourse(lessonCourseRemoveViewModel.getCourseId())){
-            throw new AccessDeniedException(AppMessage.PERMISSION_MESSAGE);
+            throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
         }
 
         Boolean isSuccess = true;
@@ -227,7 +228,7 @@ public class LessonController {
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult removeLesson(@RequestBody LessonRemoveViewModel lessonRemoveViewModel){
         if(!this.lessonService.checkPermissionModifyLesson(lessonRemoveViewModel.getLessonId())){
-            throw new AccessDeniedException(AppMessage.PERMISSION_MESSAGE);
+            throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
         }
 
         Lesson lesson = this.lessonService.getById(lessonRemoveViewModel.getLessonId())
@@ -247,13 +248,13 @@ public class LessonController {
     @ApiOperation(value = "mapping lesson to course")
     @PutMapping(value = "/mapping-lesson-course")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
-    public @ResponseBody JsonResult removeLesson(@RequestBody MappingLessonCourseViewModel mappingLessonCourseViewModel){
+    public @ResponseBody JsonResult mappingLessonCourse(@RequestBody MappingLessonCourseViewModel mappingLessonCourseViewModel){
         if(!this.courseService.checkPermissionModifyCourse(mappingLessonCourseViewModel.getCourseId())){
-            throw new AccessDeniedException(AppMessage.PERMISSION_MESSAGE);
+            throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
         }
 
         if(!this.lessonService.checkPermissionModifyLesson(mappingLessonCourseViewModel.getLessonId())){
-            throw new AccessDeniedException(AppMessage.PERMISSION_MESSAGE);
+            throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
         }
 
         if(!this.lessonService.isExist(mappingLessonCourseViewModel.getLessonId())){

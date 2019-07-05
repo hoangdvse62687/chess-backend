@@ -20,7 +20,8 @@ public interface LessonRepository extends JpaRepository<Lesson,Long> {
     @Transactional
     void update(long lessonId,String name);
 
-    @Query(value = "Select l.id,l.name,l.created_date From lesson l where l.owner = ?2 and l.name like ?1"
+    @Query(value = "Select l.id,l.name,l.created_date,l.type" +
+            " From lesson l where l.owner = ?2 and l.name like ?1"
             ,countQuery = "Select count(l.id) From lesson l where l.owner = ?2 and l.name like ?1"
             ,nativeQuery = true)
     Page<Object> findAllByOwner(Pageable pageable,String name, long userId);

@@ -35,7 +35,7 @@ public class CategoryService {
         return this.categoryRepository.findById(categoryId);
     }
 
-    public List<Long> getListCategoryIdsByCourseId(long courseId){
+    public List<CategoryViewModel> getListCategoryIdsByCourseId(long courseId){
         //getting category by courseid
         StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getCategoryByCourseid");
         query.setParameter("courseId",courseId);

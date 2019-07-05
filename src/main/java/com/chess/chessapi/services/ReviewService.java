@@ -4,13 +4,13 @@ import com.chess.chessapi.constants.AppMessage;
 import com.chess.chessapi.constants.AppRole;
 import com.chess.chessapi.constants.ObjectType;
 import com.chess.chessapi.entities.Course;
-import com.chess.chessapi.entities.Notification;
 import com.chess.chessapi.entities.Review;
 import com.chess.chessapi.entities.User;
 import com.chess.chessapi.models.PagedList;
 import com.chess.chessapi.repositories.ReviewRepository;
 import com.chess.chessapi.utils.ManualCastUtils;
 import com.chess.chessapi.utils.TimeUtils;
+import com.chess.chessapi.viewmodels.CourseOverviewViewModel;
 import com.chess.chessapi.viewmodels.ReviewCreateViewModel;
 import com.chess.chessapi.viewmodels.ReviewPaginationViewModel;
 import com.chess.chessapi.viewmodels.ReviewUpdateViewModel;
@@ -35,6 +35,7 @@ public class ReviewService {
 
     @Autowired
     private NotificationService notificationService;
+
     //PUBLIC DEFINED
     public PagedList<ReviewPaginationViewModel> getReviewPaginationByCourse(int pageIndex,int pageSize,long courseId)
     throws NumberFormatException{
@@ -67,8 +68,8 @@ public class ReviewService {
         Review savedReview = this.reviewRepository.save(review);
 
         long authorId = this.courseService.getAuthorIdByCourseId(reviewCreateViewModel.getCourseId());
-        this.sendNotificationToCourseAuthor(AppMessage.NOTIFICATION_REVIEW,savedReview,authorId,userName);
-
+        this.notificationService.sendNotificationToUser(AppMessage.NOTIFICATION_REVIEW,userName,ObjectType.REVIEW,
+                savedReview.getReviewId(),authorId,AppRole.ROLE_INSTRUCTOR);
         return savedReview.getReviewId();
     }
 
@@ -91,6 +92,14 @@ public class ReviewService {
         return false;
     }
 
+    public CourseOverviewViewModel getCourseOverview(long courseId){
+        StoredProcedureQuery storedProcedureQuery = this.em.createNamedStoredProcedureQuery("getOverviewByCourseid");
+        storedProcedureQuery.setParameter("courseId",courseId);
+
+        storedProcedureQuery.execute();
+        return ManualCastUtils.castObjectToCourseOverviewViewModel(storedProcedureQuery.getResultList());
+    }
+
     public boolean isExist(long reviewId){
         return this.reviewRepository.existsById(reviewId);
     }
@@ -101,21 +110,6 @@ public class ReviewService {
         long totalPages = (totalElements / pageSize) + 1;
         List<ReviewPaginationViewModel> data = ManualCastUtils.castListObjectToReviewFromGetReview(rawData);
         return new PagedList<ReviewPaginationViewModel>(Math.toIntExact(totalPages),totalElements,data);
-    }
-
-    public void sendNotificationToCourseAuthor(String messageNotification, Review review
-            ,long authorId,String userName){
-        //Send notification to author
-        Notification notification = new Notification();
-        notification.setObjectTypeId(ObjectType.REVIEW);
-        notification.setCreateDate(TimeUtils.getCurrentTime());
-        notification.setContent(messageNotification);
-        notification.setViewed(false);
-        notification.setObjectId(review.getReviewId());
-        notification.setUserId(authorId);
-        notification.setRoleTarget(AppRole.ROLE_INSTRUCTOR);
-        notification.setObjectName(userName);
-        this.notificationService.create(notification);
     }
     //PRIVATE DEFINED END
 }

@@ -54,6 +54,9 @@ public class Lesson {
     @JsonIgnore
     private User user;
 
+    @Column(name = "type")
+    private int lessonType;
+
     public long getLessonId() {
         return lessonId;
     }
@@ -116,5 +119,13 @@ public class Lesson {
 
     public void setLearningLogs(List<LearningLog> learningLogs) {
         this.learningLogs = learningLogs;
+    }
+
+    public int getLessonType() {
+        return lessonType;
+    }
+
+    public void setLessonType(int lessonType) {
+        this.lessonType = lessonType;
     }
 }

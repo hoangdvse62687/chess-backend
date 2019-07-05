@@ -35,7 +35,7 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private NotificationRepository notificationRepository;
+    private NotificationService notificationService;
 
     @Autowired
     private CertificatesService certificatesService;
@@ -52,6 +52,8 @@ public class UserService {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             user = (UserPrincipal) authentication.getPrincipal();
         }catch (NullPointerException ex){
+
+        }catch (ClassCastException ex){
 
         }
         return user;
@@ -109,16 +111,8 @@ public class UserService {
 
     public void updateStatus(User user,long userId,boolean isActive){
         //notification send to user
-        Notification notification = new Notification();
-        notification.setUserId(userId);
-        notification.setViewed(false);
-        notification.setObjectTypeId(ObjectType.USER);
-        notification.setContent(isActive ? AppMessage.UPDATE_USER_STATUS_ACTIVE : AppMessage.UPDATE_USER_STATUS_INACTIVE);
-        notification.setCreateDate(TimeUtils.getCurrentTime());
-        notification.setObjectId(userId);
-        notification.setRoleTarget(user.getRoleId());
-        notification.setObjectName(user.getEmail());
-        this.notificationRepository.save(notification);
+        this.notificationService.sendNotificationToUser(isActive ? AppMessage.UPDATE_USER_STATUS_ACTIVE : AppMessage.UPDATE_USER_STATUS_INACTIVE,
+                user.getEmail(),ObjectType.USER,userId,userId,user.getRoleId());
         this.userRepository.updateStatus(userId,isActive);
     }
 
@@ -147,15 +141,17 @@ public class UserService {
         return ManualCastUtils.castListObjectToUserDetailsFromGetUsersByCourseid(query.getResultList());
     }
 
-    public void updatePoint(long userId,float point){
-        this.userRepository.updatePoint(userId,point);
+    public void increasePoint(long userId,float point){
+        this.userRepository.increasePoint(userId,point);
     }
+
     public float getPointByUserId(long userId){
         return this.userRepository.findPointByUserId(userId);
     }
     public boolean isExist(long userId){
         return this.userRepository.existsById(userId);
     }
+
     // private method
     private void setUserRoleAuthentication(User user){
         List<GrantedAuthority> authorities = Collections.
@@ -171,21 +167,16 @@ public class UserService {
     private void registerLearner(User user){
         user.setActive(Status.ACTIVE);
         user.setRoleId(AppRole.ROLE_LEARNER);
+        user.setPoint(Common.DEFAULT_POINT_LEARNER);
     }
 
     private void registerInstructor(User user){
         user.setActive(Status.INACTIVE);
         user.setRoleId(AppRole.ROLE_INSTRUCTOR);
+        user.setPoint(0);
         // create notification for admin
-        Notification notification = new Notification();
-        notification.setObjectTypeId(ObjectType.USER);
-        notification.setObjectName(user.getEmail());
-        notification.setObjectId(user.getUserId());
-        notification.setContent(AppMessage.CREATE_NEW_USER_AS_INSTRUCTOR);
-        notification.setCreateDate(TimeUtils.getCurrentTime());
-        notification.setViewed(false);
-        notification.setRoleTarget(AppRole.ROLE_ADMIN);
-        this.notificationRepository.save(notification);
+        this.notificationService.sendNotificationToAdmin(AppMessage.CREATE_NEW_USER_AS_INSTRUCTOR,user.getEmail()
+                ,ObjectType.USER,user.getUserId());
     }
 
     private PagedList<UserPaginationViewModel> fillDataToPaginationCustom(Page<Object> rawData){

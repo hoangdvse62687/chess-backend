@@ -52,7 +52,7 @@ public class ExerciseController {
                     savedId = this.exerciseService.create(exerciseCreateViewModel);
                     message =  AppMessage.getMessageSuccess(AppMessage.CREATE,AppMessage.EXERCISE);
                 }else{
-                    throw new AccessDeniedException(AppMessage.PERMISSION_MESSAGE);
+                    throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
                 }
             }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.CREATE,AppMessage.EXERCISE);
@@ -107,7 +107,7 @@ public class ExerciseController {
                     this.exerciseService.save(exercise);
                     message =  AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.EXERCISE);
                 }else{
-                    throw new AccessDeniedException(AppMessage.PERMISSION_MESSAGE);
+                    throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
                 }
             }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.EXERCISE);
@@ -137,7 +137,7 @@ public class ExerciseController {
                     this.exerciseService.deleteById(exercise.getExerciseId());
                     message =  AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.EXERCISE);
                 }else{
-                    throw new AccessDeniedException(AppMessage.PERMISSION_MESSAGE);
+                    throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
                 }
             }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.EXERCISE);

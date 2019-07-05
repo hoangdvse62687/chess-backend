@@ -16,6 +16,9 @@ public class GameHistoryService {
     @Autowired
     private GameHistoryRepository gameHistoryRepository;
 
+    @Autowired
+    private UserService userService;
+
     public long create(GameHistoryCreateViewModel gameHistoryCreateViewModel,long userId){
         GameHistory gameHistory = new GameHistory();
         gameHistory.setColor(gameHistory.getColor());
@@ -27,6 +30,9 @@ public class GameHistoryService {
         User user = new User();
         user.setUserId(userId);
         gameHistory.setUser(user);
+
+        //update point user
+        this.userService.increasePoint(userId,gameHistoryCreateViewModel.getPoint());
 
         GameHistory savedGameHistory = this.gameHistoryRepository.save(gameHistory);
         return savedGameHistory.getGamehistoryId();

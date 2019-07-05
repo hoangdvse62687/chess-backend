@@ -48,6 +48,13 @@ public class GameHistoryController {
         }else{
             try{
                 UserPrincipal userPrincipal = this.userService.getCurrentUser();
+                if(gameHistoryCreateViewModel.getPoint() < 0){
+                    //check point has enough to decrease
+                    float userPoint = this.userService.getPointByUserId(userPrincipal.getId());
+                    if(userPoint < -gameHistoryCreateViewModel.getPoint()){
+                        throw new AccessDeniedException(AppMessage.POINT_DENY_MESSAGE);
+                    }
+                }
                 savedId = this.gameHistoryService.create(gameHistoryCreateViewModel,userPrincipal.getId());
                 message = AppMessage.getMessageSuccess(AppMessage.CREATE,AppMessage.GAME_HISTORY);
             }catch (DataIntegrityViolationException ex){

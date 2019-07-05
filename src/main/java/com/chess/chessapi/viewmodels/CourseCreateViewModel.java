@@ -3,6 +3,7 @@ package com.chess.chessapi.viewmodels;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -12,11 +13,14 @@ public class CourseCreateViewModel {
     @Length(max = 1000,message = "name is required not large than 1000 characters")
     private String name;
 
+    @Length(max = 1000,message = "Description is required not larger than 1000 characters")
     private String description;
 
+    @Size(min = 0,message = "Point should equal or larger than 0")
     private Float point;
-    private Long statusId;
 
+    @NotNull(message = "Image must not be null")
+    @Length(max = 255,message = "Image must not be larger than 255 characters")
     private String image;
 
     @NotNull(message = "List category must not be null")
@@ -44,14 +48,6 @@ public class CourseCreateViewModel {
 
     public void setPoint(Float point) {
         this.point = point;
-    }
-
-    public Long getStatusId() {
-        return statusId;
-    }
-
-    public void setStatusId(Long statusId) {
-        this.statusId = statusId;
     }
 
     public String getImage() {

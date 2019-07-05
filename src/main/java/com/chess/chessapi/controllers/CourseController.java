@@ -125,7 +125,7 @@ public class CourseController {
     @PreAuthorize("hasAuthority("+AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult removeCourse(@RequestBody CourseRemoveViewModel courseRemoveViewModel){
 
-        boolean hasPermissionModify = this.courseService.checkPermissionModifyCourse(courseRemoveViewModel.getCourseId());
+        boolean hasPermissionModify = this.courseService.checkPermissionUpdateStatusCourse(courseRemoveViewModel.getCourseId());
 
         String message = "";
         Boolean isSuccess = true;
@@ -138,7 +138,7 @@ public class CourseController {
                     throw new ResourceNotFoundException("Course","id",courseRemoveViewModel.getCourseId());
                 }
             }else {
-                throw new AccessDeniedException(AppMessage.PERMISSION_MESSAGE);
+                throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
             }
         }catch (DataIntegrityViolationException ex){
             message = AppMessage.getMessageFail(AppMessage.DELETE,AppMessage.COURSE);
@@ -171,16 +171,8 @@ public class CourseController {
             }
 
             //Send notification to author
-            Notification notification = new Notification();
-            notification.setObjectTypeId(ObjectType.COURSE);
-            notification.setCreateDate(TimeUtils.getCurrentTime());
-            notification.setContent(messageNotification);
-            notification.setViewed(false);
-            notification.setObjectId(course.getCourseId());
-            notification.setUserId(course.getUser().getUserId());
-            notification.setRoleTarget(AppRole.ROLE_INSTRUCTOR);
-            notification.setObjectName(course.getName());
-            this.notificationService.create(notification);
+            this.notificationService.sendNotificationToUser(messageNotification,course.getName(),ObjectType.COURSE,
+                    course.getCourseId(),course.getUser().getUserId(),AppRole.ROLE_INSTRUCTOR);
 
             this.courseService.updateStatus(courseUpdateStatusViewModel.getCourseId(),courseUpdateStatusViewModel.getStatusId());
             message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.COURSE);
@@ -199,7 +191,7 @@ public class CourseController {
                 .orElseThrow(() -> new ResourceNotFoundException("Course","id",courseId));
         //get detail
         course.setUserDetailViewModels(this.userService.getUserDetailsByCourseId(course.getCourseId()));
-        course.setListCategoryIds(this.categoryService.getListCategoryIdsByCourseId(course.getCourseId()));
+        course.setListCategorys(this.categoryService.getListCategoryIdsByCourseId(course.getCourseId()));
         //check permission to get lesson and learning log
         UserPrincipal userPrincipal = this.userService.getCurrentUser();
         boolean permission = this.courseService.checkPermissionViewCourseDetail(courseId,userPrincipal);
@@ -234,7 +226,7 @@ public class CourseController {
                     this.courseService.updateCourse(course);
                     message =  AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.COURSE);
                 }else{
-                    throw new AccessDeniedException(AppMessage.PERMISSION_MESSAGE);
+                    throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
                 }
             }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.COURSE);
@@ -252,7 +244,7 @@ public class CourseController {
         UserPrincipal userPrincipal = this.userService.getCurrentUser();
         long authorLesson = this.lessonService.getAuthorLessonByLessonId(lessonId);
         if(userPrincipal.getId() != authorLesson){
-            throw new AccessDeniedException(AppMessage.PERMISSION_MESSAGE);
+            throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
         }
         return new JsonResult("",this.courseService.getCourseDetailsByLessonId(lessonId));
     }
@@ -263,7 +255,7 @@ public class CourseController {
     public @ResponseBody JsonResult publishCourse(@RequestBody CoursePublishViewModel coursePublishViewModel){
         String message = "";
         Boolean isSuccess = true;
-
+        boolean hasPermissionModify = this.courseService.checkPermissionUpdateStatusCourse(coursePublishViewModel.getCourseId());
         try{
 
             //Get course modify
@@ -271,23 +263,15 @@ public class CourseController {
                     .orElseThrow(() -> new ResourceNotFoundException("Course","id",coursePublishViewModel.getCourseId()));
             UserPrincipal userPrincipal = this.userService.getCurrentUser();
             //check only author can update status
-            if(course.getUser().getUserId() == userPrincipal.getId()){
+            if(hasPermissionModify){
                 //Send notification to author
                 //Send notification to Admin
-                Notification notification = new Notification();
-                notification.setObjectTypeId(ObjectType.COURSE);
-                notification.setObjectName(course.getName());
-                notification.setObjectId(course.getCourseId());
-                notification.setContent(AppMessage.CREATE_NEW_COURSE);
-                notification.setCreateDate(TimeUtils.getCurrentTime());
-                notification.setViewed(false);
-                notification.setRoleTarget(AppRole.ROLE_ADMIN);
-                this.notificationService.create(notification);
-
+                this.notificationService.sendNotificationToAdmin(AppMessage.CREATE_NEW_COURSE,course.getName(),
+                        ObjectType.COURSE,course.getCourseId());
                 this.courseService.updateStatus(coursePublishViewModel.getCourseId(),Status.COURSE_STATUS_WAITING);
                 message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.COURSE);
             }else {
-                throw new AccessDeniedException(AppMessage.PERMISSION_MESSAGE);
+                throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
             }
         }catch (DataIntegrityViolationException ex){
             message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.COURSE);
@@ -313,15 +297,14 @@ public class CourseController {
             UserPrincipal userPrincipal = this.userService.getCurrentUser();
             float calculatePointUpdate = this.userService.getPointByUserId(userPrincipal.getId());
             if(calculatePointUpdate < course.getPoint()){
-                throw new AccessDeniedException(AppMessage.ENROLLMENT_DENY_MESSAGE);
-            }else{
-                calculatePointUpdate = calculatePointUpdate - course.getPoint();
+                throw new AccessDeniedException(AppMessage.POINT_DENY_MESSAGE);
             }
+
             if(course.getStatusId() == Status.COURSE_STATUS_PUBLISHED){
                 try {
                     this.userHasCourseService.create(userPrincipal.getId(),course.getCourseId()
                             , TimeUtils.getCurrentTime(),Status.USER_HAS_COURSE_STATUS_IN_PROCESS);
-                    this.userService.updatePoint(userPrincipal.getId(),calculatePointUpdate);
+                    this.userService.increasePoint(userPrincipal.getId(),-course.getPoint());
                     message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.ENROLL);
                 }catch (DataIntegrityViolationException ex){
                     message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.ENROLL);
@@ -359,6 +342,12 @@ public class CourseController {
     public @ResponseBody JsonResult getReviewPagination(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
             ,@RequestParam("courseId") long courseId){
         return new JsonResult(null,this.reviewService.getReviewPaginationByCourse(page,pageSize,courseId));
+    }
+
+    @ApiOperation(value = "Get course overview")
+    @GetMapping("/get-course-overview")
+    public @ResponseBody JsonResult getCourseOverView(@RequestParam("courseId") long courseId){
+        return new JsonResult(null,this.reviewService.getCourseOverview(courseId));
     }
 
     @ApiOperation(value = "Review on course")
@@ -413,7 +402,7 @@ public class CourseController {
                 UserPrincipal userPrincipal = this.userService.getCurrentUser();
                 if(!this.reviewService.checkPermissionModifyReview(reviewUpdateViewModel.getReviewId()
                         ,userPrincipal.getId(),reviewUpdateViewModel.getCourseId())){
-                    throw new AccessDeniedException(AppMessage.PERMISSION_MESSAGE);
+                    throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
                 }
                 this.reviewService.update(reviewUpdateViewModel);
                 message =  AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.REVIEW);
@@ -445,7 +434,7 @@ public class CourseController {
                 UserPrincipal userPrincipal = this.userService.getCurrentUser();
                 if(!this.reviewService.checkPermissionModifyReview(reviewRemoveViewModel.getReviewId()
                         ,userPrincipal.getId(),reviewRemoveViewModel.getCourseId())){
-                    throw new AccessDeniedException(AppMessage.PERMISSION_MESSAGE);
+                    throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
                 }
                 this.reviewService.remove(reviewRemoveViewModel.getReviewId());
                 message =  AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.REVIEW);
@@ -455,5 +444,24 @@ public class CourseController {
             }
         }
         return new JsonResult(message,isSuccess);
+    }
+
+    @ApiOperation(value = "Get course by current instructor")
+    @GetMapping("/get-course-paginations-current-instructor")
+    @PreAuthorize("hasAuthority("+AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
+    public @ResponseBody JsonResult getCoursePaginationsByUserId(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
+            ,String nameCourse){
+        if(nameCourse == null){
+            nameCourse = "";
+        }
+        PagedList<CoursePaginationViewModel> data = null;
+        try{
+            UserPrincipal userPrincipal = this.userService.getCurrentUser();
+            data = this.courseService.getCoursePaginationsByUserId(nameCourse,page,pageSize,userPrincipal.getId());
+        }catch (IllegalArgumentException ex){
+            throw new ResourceNotFoundException("Page","number",page);
+        }
+
+        return new JsonResult(null,data);
     }
 }

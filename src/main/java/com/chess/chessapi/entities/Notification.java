@@ -1,5 +1,7 @@
 package com.chess.chessapi.entities;
 
+import org.hibernate.validator.constraints.Length;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -18,12 +20,14 @@ public class Notification {
 
     @NotNull(message = "Object name must not be null")
     @Column(name = "object_name")
+    @Length(max = 255,message = "ObjectName is required not larger than 255 characters")
     private String objectName;
 
     @NotNull(message = "Object Type must not be null")
     @Column(name = "object_type_id")
     private long objectTypeId;
 
+    @Length(max = 500,message = "Content is required not larger than 255 characters")
     private String content;
 
     @Column(name = "is_viewed")
