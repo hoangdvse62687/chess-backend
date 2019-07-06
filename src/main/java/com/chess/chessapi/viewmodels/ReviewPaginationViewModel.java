@@ -1,15 +1,15 @@
 package com.chess.chessapi.viewmodels;
 
+import java.sql.Timestamp;
+
 public class ReviewPaginationViewModel {
     private int rating;
 
     private String content;
 
-    private long userId;
+    public UserDetailViewModel reviewer;
 
-    private String userFullName;
-
-    private String userEmail;
+    private Timestamp createdDate;
 
     public void setRating(int rating) {
         this.rating = rating;
@@ -27,27 +27,19 @@ public class ReviewPaginationViewModel {
         this.content = content;
     }
 
-    public long getUserId() {
-        return userId;
+    public UserDetailViewModel getReviewer() {
+        return reviewer;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
+    public void setReviewer(UserDetailViewModel reviewer) {
+        this.reviewer = reviewer;
     }
 
-    public String getUserFullName() {
-        return userFullName;
+    public Timestamp getCreatedDate() {
+        return createdDate;
     }
 
-    public void setUserFullName(String userFullName) {
-        this.userFullName = userFullName;
-    }
-
-    public String getUserEmail() {
-        return userEmail;
-    }
-
-    public void setUserEmail(String userEmail) {
-        this.userEmail = userEmail;
+    public void setCreatedDate(Timestamp createdDate) {
+        this.createdDate = createdDate;
     }
 }

@@ -5,6 +5,7 @@ public class UserDetailViewModel {
     private String email;
     private String fullName;
     private long roleId;
+    private String avatar;
 
     public long getUserId() {
         return userId;
@@ -36,5 +37,13 @@ public class UserDetailViewModel {
 
     public void setRoleId(long roleId) {
         this.roleId = roleId;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }

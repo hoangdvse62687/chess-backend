@@ -37,7 +37,7 @@ public class GameHistory {
     private int gameTime;
 
     @NotNull(message = "Point must not be null")
-    private int point;
+    private float point;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -92,11 +92,11 @@ public class GameHistory {
         this.gameTime = gameTime;
     }
 
-    public int getPoint() {
+    public float getPoint() {
         return point;
     }
 
-    public void setPoint(int point) {
+    public void setPoint(float point) {
         this.point = point;
     }
 

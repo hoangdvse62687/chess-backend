@@ -141,6 +141,28 @@ public class UserService {
         return ManualCastUtils.castListObjectToUserDetailsFromGetUsersByCourseid(query.getResultList());
     }
 
+    public List<UserDetailViewModel> getUserEnrolls(List<UserDetailViewModel> userDetailViewModels){
+        List<UserDetailViewModel> userEnrolls = new ArrayList<>();
+        for (UserDetailViewModel user:
+             userDetailViewModels) {
+            if(user.getRoleId() == AppRole.ROLE_LEARNER){
+                userEnrolls.add(user);
+            }
+        }
+        return userEnrolls;
+    }
+
+    public List<UserDetailViewModel> getTutors(List<UserDetailViewModel> userDetailViewModels){
+        List<UserDetailViewModel> tutors = new ArrayList<>();
+        for (UserDetailViewModel user:
+                userDetailViewModels) {
+            if(user.getRoleId() == AppRole.ROLE_INSTRUCTOR){
+                tutors.add(user);
+            }
+        }
+        return tutors;
+    }
+
     public void increasePoint(long userId,float point){
         this.userRepository.increasePoint(userId,point);
     }

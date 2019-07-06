@@ -25,6 +25,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/course")
@@ -190,7 +191,9 @@ public class CourseController {
         Course course = this.courseService.getCourseById(courseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Course","id",courseId));
         //get detail
-        course.setUserDetailViewModels(this.userService.getUserDetailsByCourseId(course.getCourseId()));
+        List<UserDetailViewModel> userDetailViewModels = this.userService.getUserDetailsByCourseId(course.getCourseId());
+        course.setUserEnrolleds(this.userService.getUserEnrolls(userDetailViewModels));
+        course.setTutors(this.userService.getTutors(userDetailViewModels));
         course.setListCategorys(this.categoryService.getListCategoryIdsByCourseId(course.getCourseId()));
         //check permission to get lesson and learning log
         UserPrincipal userPrincipal = this.userService.getCurrentUser();

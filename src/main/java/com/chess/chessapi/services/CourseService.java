@@ -10,12 +10,14 @@ import com.chess.chessapi.utils.TimeUtils;
 import com.chess.chessapi.viewmodels.CourseCreateViewModel;
 import com.chess.chessapi.viewmodels.CourseDetailViewModel;
 import com.chess.chessapi.viewmodels.CoursePaginationViewModel;
+import com.chess.chessapi.viewmodels.UserDetailViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.StoredProcedureQuery;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -150,7 +152,10 @@ public class CourseService {
         List<UserHasCourse> oldUserHasCourses = this.userHasCourseService
                 .getAllByCourseIdAndStatusId(course.getCourseId(),Status.USER_HAS_COURSE_STATUS_IN_PROCESS);
         //update user has course
-        this.userHasCourseService.updateUserHasCourse(oldUserHasCourses,course.getUserDetailViewModels(),course.getCourseId());
+        List<UserDetailViewModel> totalUsers = new ArrayList<>();
+        totalUsers.addAll(course.getTutors());
+        totalUsers.addAll(course.getUserEnrolleds());
+        this.userHasCourseService.updateUserHasCourse(oldUserHasCourses,totalUsers,course.getCourseId());
         //update category list id
         List<CategoryHasCourse> oldCategoryHasCourses = this.categoryHasCourseService
                 .getAllByCourseId(course.getCourseId());

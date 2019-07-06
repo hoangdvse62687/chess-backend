@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
@@ -92,8 +93,8 @@ public class Course {
     @Column(name = "created_date")
     private Timestamp createdDate;
 
-    @Size(min = 0,message = "Point should equal or larger than 0")
-    private Float point;
+    @Min(value =0,message = "Point should equal or larger than 0")
+    private float point;
 
     @Column(name = "status_id")
     private Long statusId;
@@ -126,7 +127,10 @@ public class Course {
     private List<Review> reviews;
 
     @Transient
-    private List<UserDetailViewModel> userDetailViewModels;
+    private List<UserDetailViewModel> userEnrolleds;
+
+    @Transient
+    private List<UserDetailViewModel> tutors;
 
     @Transient
     private List<CategoryViewModel> listCategorys;
@@ -217,14 +221,6 @@ public class Course {
         this.categoryHasCourses = categoryHasCourses;
     }
 
-    public List<UserDetailViewModel> getUserDetailViewModels() {
-        return userDetailViewModels;
-    }
-
-    public void setUserDetailViewModels(List<UserDetailViewModel> userDetailViewModels) {
-        this.userDetailViewModels = userDetailViewModels;
-    }
-
     public List<CategoryViewModel> getListCategorys() {
         return listCategorys;
     }
@@ -287,5 +283,21 @@ public class Course {
 
     public void setReviews(List<Review> reviews) {
         this.reviews = reviews;
+    }
+
+    public List<UserDetailViewModel> getUserEnrolleds() {
+        return userEnrolleds;
+    }
+
+    public void setUserEnrolleds(List<UserDetailViewModel> userEnrolleds) {
+        this.userEnrolleds = userEnrolleds;
+    }
+
+    public List<UserDetailViewModel> getTutors() {
+        return tutors;
+    }
+
+    public void setTutors(List<UserDetailViewModel> tutors) {
+        this.tutors = tutors;
     }
 }

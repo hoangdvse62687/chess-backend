@@ -10,9 +10,7 @@ public class CoursePaginationViewModel {
     private Timestamp courseCreatedDate;
     private Float point;
     private long statusId;
-    private long authorId;
-    private String authorName;
-    private String authorAvatar;
+    private UserDetailViewModel author;
     private boolean isEnrolled;
 
     public CoursePaginationViewModel() {
@@ -67,22 +65,6 @@ public class CoursePaginationViewModel {
         this.statusId = statusId;
     }
 
-    public long getAuthorId() {
-        return authorId;
-    }
-
-    public void setAuthorId(long authorId) {
-        this.authorId = authorId;
-    }
-
-    public String getAuthorName() {
-        return authorName;
-    }
-
-    public void setAuthorName(String authorName) {
-        this.authorName = authorName;
-    }
-
     public String getCourseImage() {
         return courseImage;
     }
@@ -91,12 +73,12 @@ public class CoursePaginationViewModel {
         this.courseImage = courseImage;
     }
 
-    public String getAuthorAvatar() {
-        return authorAvatar;
+    public UserDetailViewModel getAuthor() {
+        return author;
     }
 
-    public void setAuthorAvatar(String authorAvatar) {
-        this.authorAvatar = authorAvatar;
+    public void setAuthor(UserDetailViewModel author) {
+        this.author = author;
     }
 
     public boolean isEnrolled() {

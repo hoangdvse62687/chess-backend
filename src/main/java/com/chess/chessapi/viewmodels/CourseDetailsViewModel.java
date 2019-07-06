@@ -11,10 +11,9 @@ public class CourseDetailsViewModel {
     private Float point;
     private Long statusId;
     private String image;
-    private long authorId;
-    private String authorName;
-    private String authorAvatar;
-    private List<UserDetailViewModel> userDetailViewModels;
+    private UserDetailViewModel author;
+    private List<UserDetailViewModel> userEnrolleds;
+    private List<UserDetailViewModel> tutors;
     private List<CategoryViewModel> listCategorys;
     private List<Long> listLearningLogLessonIds;
     private List<LessonViewModel> lessonViewModels;
@@ -77,14 +76,6 @@ public class CourseDetailsViewModel {
         this.image = image;
     }
 
-    public List<UserDetailViewModel> getUserDetailViewModels() {
-        return userDetailViewModels;
-    }
-
-    public void setUserDetailViewModels(List<UserDetailViewModel> userDetailViewModels) {
-        this.userDetailViewModels = userDetailViewModels;
-    }
-
     public List<CategoryViewModel> getListCategorys() {
         return listCategorys;
     }
@@ -117,28 +108,12 @@ public class CourseDetailsViewModel {
         this.listLearningLogLessonIds = listLearningLogLessonIds;
     }
 
-    public long getAuthorId() {
-        return authorId;
+    public UserDetailViewModel getAuthor() {
+        return author;
     }
 
-    public void setAuthorId(long authorId) {
-        this.authorId = authorId;
-    }
-
-    public String getAuthorName() {
-        return authorName;
-    }
-
-    public void setAuthorName(String authorName) {
-        this.authorName = authorName;
-    }
-
-    public String getAuthorAvatar() {
-        return authorAvatar;
-    }
-
-    public void setAuthorAvatar(String authorAvatar) {
-        this.authorAvatar = authorAvatar;
+    public void setAuthor(UserDetailViewModel author) {
+        this.author = author;
     }
 
     public int getTotalLesson() {
@@ -147,5 +122,21 @@ public class CourseDetailsViewModel {
 
     public void setTotalLesson(int totalLesson) {
         this.totalLesson = totalLesson;
+    }
+
+    public List<UserDetailViewModel> getUserEnrolleds() {
+        return userEnrolleds;
+    }
+
+    public void setUserEnrolleds(List<UserDetailViewModel> userEnrolleds) {
+        this.userEnrolleds = userEnrolleds;
+    }
+
+    public List<UserDetailViewModel> getTutors() {
+        return tutors;
+    }
+
+    public void setTutors(List<UserDetailViewModel> tutors) {
+        this.tutors = tutors;
     }
 }

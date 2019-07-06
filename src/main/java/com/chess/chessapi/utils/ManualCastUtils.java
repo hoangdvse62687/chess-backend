@@ -63,8 +63,10 @@ public class ManualCastUtils implements Serializable {
     private static final int REVIEW_VIEW_MODEL_RATING_INDEX = 0;
     private static final int REVIEW_VIEW_MODEL_CONTENT_INDEX = 1;
     private static final int REVIEW_VIEW_MODEL_USER_ID_INDEX = 2;
-    private static final int REVIEW_VIEW_MODEL_USER_FULLNAME_INDEX = 3;
-    private static final int REVIEW_VIEW_MODEL_EMAIL_INDEX = 4;
+    private static final int REVIEW_VIEW_MODEL_CREATED_DATE_INDEX = 3;
+    private static final int REVIEW_VIEW_MODEL_USER_FULLNAME_INDEX = 4;
+    private static final int REVIEW_VIEW_MODEL_EMAIL_INDEX = 5;
+    private static final int REVIEW_VIEW_MODEL_USER_AVATAR_INDEX = 6;
     //END REVIEW VIEW MODEL DEFINED
 
     //CATEGORY VIEW MODEL DEFINED
@@ -72,12 +74,23 @@ public class ManualCastUtils implements Serializable {
     private static final int CATEGORY_VIEW_MODEL_NAME_INDEX = 1;
     //END CATEGORY VIEW MODEL DEFINED
 
+    //JSON PARSER CHARACTER DEFINED
+    private static final char COLON = ':';
+    private static final char LEFT_SQUARE_BRACKET = '[';
+    private static final char RIGHT_SQUARE_BRACKET = ']';
+    private static final String LEFT_ANGLE_BRACKET = "{";
+    private static final char RIGHT_ANGLE_BRACKET = '}';
+    private static final char D_QUOT = '"';
+    private static final char COMMA = ',';
+    //END JSON PARSER CHARACTER DEFINED
     //STEP JSON PARSER DEFINED
     private static final String STEP_JSON_PARSER_CONTENT = "content";
     private static final String STEP_JSON_PARSER_STEPCODE = "stepCode";
     private static final String STEP_JSON_PARSER_RIGHTRESPONSE = "rightResponse";
     private static final String STEP_JSON_PARSER_WRONGRRESPONSE = "wrongResponse";
     //END STEP JSON PARSER DEFINED
+
+
     public static User castObjectToUserByFindCustom(Object object)
             throws NumberFormatException{
         if(object == null){
@@ -147,9 +160,13 @@ public class ManualCastUtils implements Serializable {
             coursePaginationViewModel.setCourseDescription(handleNullValueObject(object[COURSE_DESCRIPTION_INDEX],String.class));
             coursePaginationViewModel.setCourseCreatedDate(Timestamp.valueOf(object[COURSE_CREATED_DATE_INDEX].toString()));
             coursePaginationViewModel.setPoint(Float.parseFloat(object[COURSE_POINT_INDEX].toString()));
-            coursePaginationViewModel.setAuthorId(Long.parseLong(object[COURSE_USERID_INDEX].toString()));
-            coursePaginationViewModel.setAuthorName(object[COURSE_USER_FULLNAME_INDEX].toString());
-            coursePaginationViewModel.setAuthorAvatar(handleNullValueObject(object[COURSE_USER_AVATAR_INDEX],String.class));
+
+            UserDetailViewModel author = new UserDetailViewModel();
+            author.setUserId(Long.parseLong(object[COURSE_USERID_INDEX].toString()));
+            author.setFullName(object[COURSE_USER_FULLNAME_INDEX].toString());
+            author.setAvatar(handleNullValueObject(object[COURSE_USER_AVATAR_INDEX],String.class));
+
+            coursePaginationViewModel.setAuthor(author);
             coursePaginationViewModel.setEnrolled(parseBoolean(object[COURSE_USER_IS_ENROLLED].toString()));
             data.add(coursePaginationViewModel);
         }
@@ -268,13 +285,17 @@ public class ManualCastUtils implements Serializable {
         courseDetailsViewModel.setPoint(course.getPoint());
         courseDetailsViewModel.setStatusId(course.getStatusId());
         courseDetailsViewModel.setImage(course.getImage());
-        courseDetailsViewModel.setUserDetailViewModels(course.getUserDetailViewModels());
+        courseDetailsViewModel.setUserEnrolleds(course.getUserEnrolleds());
+        courseDetailsViewModel.setTutors(course.getTutors());
         courseDetailsViewModel.setListCategorys(course.getListCategorys());
         courseDetailsViewModel.setLessonViewModels(course.getLessonViewModels());
         courseDetailsViewModel.setListLearningLogLessonIds(course.getListLearningLogLessonIds());
-        courseDetailsViewModel.setAuthorId(course.getUser().getUserId());
-        courseDetailsViewModel.setAuthorName(course.getUser().getFullName());
-        courseDetailsViewModel.setAuthorAvatar(course.getUser().getAvatar());
+        UserDetailViewModel author = new UserDetailViewModel();
+        author.setUserId(course.getUser().getUserId());
+        author.setFullName(course.getUser().getFullName());
+        author.setAvatar(course.getUser().getAvatar());
+
+        courseDetailsViewModel.setAuthor(author);
         courseDetailsViewModel.setTotalLesson(totalLesson);
         return courseDetailsViewModel;
     }
@@ -287,9 +308,15 @@ public class ManualCastUtils implements Serializable {
             ReviewPaginationViewModel reviewPaginationViewModel = new ReviewPaginationViewModel();
             reviewPaginationViewModel.setRating(Integer.parseInt(object[REVIEW_VIEW_MODEL_RATING_INDEX].toString()));
             reviewPaginationViewModel.setContent(object[REVIEW_VIEW_MODEL_CONTENT_INDEX].toString());
-            reviewPaginationViewModel.setUserId(Long.parseLong(object[REVIEW_VIEW_MODEL_USER_ID_INDEX].toString()));
-            reviewPaginationViewModel.setUserFullName(object[REVIEW_VIEW_MODEL_USER_FULLNAME_INDEX].toString());
-            reviewPaginationViewModel.setUserEmail(object[REVIEW_VIEW_MODEL_EMAIL_INDEX].toString());
+            reviewPaginationViewModel.setCreatedDate(Timestamp.valueOf(object[REVIEW_VIEW_MODEL_CREATED_DATE_INDEX].toString()));
+
+            UserDetailViewModel reviewer = new UserDetailViewModel();
+            reviewer.setUserId(Long.parseLong(object[REVIEW_VIEW_MODEL_USER_ID_INDEX].toString()));
+            reviewer.setEmail(object[REVIEW_VIEW_MODEL_EMAIL_INDEX].toString());
+            reviewer.setFullName(object[REVIEW_VIEW_MODEL_USER_FULLNAME_INDEX].toString());
+            reviewer.setAvatar(object[REVIEW_VIEW_MODEL_USER_AVATAR_INDEX].toString());
+            reviewPaginationViewModel.setReviewer(reviewer);
+
             data.add(reviewPaginationViewModel);
         }
         return data;
@@ -304,13 +331,13 @@ public class ManualCastUtils implements Serializable {
         String result = "";
         for (Step step:
              steps) {
-            result += "{" + '"'  + STEP_JSON_PARSER_CONTENT + '"' + ':' + '"' +step.getContent() + '"'
-                    + ',' + '"' + STEP_JSON_PARSER_STEPCODE + '"' + ':' + '"' +step.getStepCode() + '"'
-                    + ',' +'"' + STEP_JSON_PARSER_RIGHTRESPONSE + '"' + ':' + '"' +step.getRightResponse() + '"'
-                    + ',' +'"' + STEP_JSON_PARSER_WRONGRRESPONSE + '"' + ':' + '"' +step.getWrongResponse() + '"' + "},";
+            result += LEFT_ANGLE_BRACKET + D_QUOT  + STEP_JSON_PARSER_CONTENT + D_QUOT + COLON + D_QUOT +step.getContent() + D_QUOT
+                    + COMMA + D_QUOT + STEP_JSON_PARSER_STEPCODE + D_QUOT + COLON + D_QUOT +step.getStepCode() + D_QUOT
+                    + COMMA + D_QUOT + STEP_JSON_PARSER_RIGHTRESPONSE + D_QUOT + COLON + D_QUOT +step.getRightResponse() + D_QUOT
+                    + COMMA + D_QUOT + STEP_JSON_PARSER_WRONGRRESPONSE + D_QUOT + COLON + D_QUOT +step.getWrongResponse() + D_QUOT + RIGHT_ANGLE_BRACKET + COMMA;
         }
 
-        return "[" + result.substring(0,result.length() - 1) +"]";
+        return LEFT_SQUARE_BRACKET + result.substring(0,result.length() - 1) + RIGHT_SQUARE_BRACKET;
     }
     //END CASTE OBJECT TO JSON DEFINED
     //PRIVATE DEFINED
