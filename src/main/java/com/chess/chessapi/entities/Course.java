@@ -57,12 +57,12 @@ import java.util.List;
                 }
         ),
         @NamedStoredProcedureQuery(
-                name = "checkPermissionUserCourse",
-                procedureName = "check_permission_user_course",
+                name = "checkEnrollUserCourse",
+                procedureName = "check_enroll_user_course",
                 parameters = {
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "userId",type = Long.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseId",type = Long.class),
-                        @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "hasPermission",type = Boolean.class)
+                        @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "isEnrolled",type = Boolean.class)
                 }
         ),
         @NamedStoredProcedureQuery(

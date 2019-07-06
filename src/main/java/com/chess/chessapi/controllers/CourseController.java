@@ -368,6 +368,9 @@ public class CourseController {
         }else{
             try{
                 UserPrincipal userPrincipal = this.userService.getCurrentUser();
+                if(!this.courseService.checkPermissionReviewCourse(reviewCreateViewModel.getCourseId(),userPrincipal)){
+                    throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
+                }
                 savedId = this.reviewService.create(reviewCreateViewModel,userPrincipal.getId(),userPrincipal.getName());
                 message =  AppMessage.getMessageSuccess(AppMessage.CREATE,AppMessage.REVIEW);
             }catch (DataIntegrityViolationException ex){

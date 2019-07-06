@@ -116,6 +116,14 @@ public class CourseService {
         return ManualCastUtils.castListObjectToCourseDetails(query.getResultList());
     }
 
+    public boolean checkPermissionReviewCourse(long courseId,UserPrincipal userPrincipal){
+        if(userPrincipal == null){
+            return false;
+        }
+
+        return this.callStoreProcedureCheckEnroll(courseId,userPrincipal.getId());
+    }
+
     public boolean checkPermissionViewCourseDetail(long courseId,UserPrincipal userPrincipal){
         if(userPrincipal == null){
             return false;
@@ -126,7 +134,7 @@ public class CourseService {
             return true;
         }
 
-        return this.callStoreProcedureCheckPermission(courseId,userPrincipal.getId());
+        return this.callStoreProcedureCheckEnroll(courseId,userPrincipal.getId());
     }
 
     public boolean checkPermissionModifyCourse(long courseId){
@@ -135,7 +143,7 @@ public class CourseService {
         UserPrincipal userPrincipal = this.userService.getCurrentUser();
 
         //it's only used instructor authentication => check for modifying course
-        return this.callStoreProcedureCheckPermission(courseId,userPrincipal.getId());
+        return this.callStoreProcedureCheckEnroll(courseId,userPrincipal.getId());
     }
     public boolean checkPermissionUpdateStatusCourse(long courseId){
         UserPrincipal userPrincipal = this.userService.getCurrentUser();
@@ -192,15 +200,15 @@ public class CourseService {
         return new PagedList<CoursePaginationViewModel>(Math.toIntExact(totalPages),totalElements,data);
     }
 
-    private boolean callStoreProcedureCheckPermission(long courseId,long userId){
-        StoredProcedureQuery storedProcedureQuery = this.em.createNamedStoredProcedureQuery("checkPermissionUserCourse");
+    private boolean callStoreProcedureCheckEnroll(long courseId,long userId){
+        StoredProcedureQuery storedProcedureQuery = this.em.createNamedStoredProcedureQuery("checkEnrollUserCourse");
         storedProcedureQuery.setParameter("userId",userId);
         storedProcedureQuery.setParameter("courseId",courseId);
-        storedProcedureQuery.setParameter("hasPermission",true);
+        storedProcedureQuery.setParameter("isEnrolled",true);
 
         storedProcedureQuery.execute();
 
-        return Boolean.parseBoolean(storedProcedureQuery.getOutputParameterValue("hasPermission").toString());
+        return Boolean.parseBoolean(storedProcedureQuery.getOutputParameterValue("isEnrolled").toString());
     }
 
     //Public method
