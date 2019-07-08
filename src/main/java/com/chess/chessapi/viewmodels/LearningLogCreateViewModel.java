@@ -10,9 +10,6 @@ public class LearningLogCreateViewModel {
     @NotNull(message = "Lesson id must not be null")
     private long lessonId;
 
-    @NotNull(message = "Finished date must not be null")
-    private Timestamp finishedDate;
-
     public long getCourseId() {
         return courseId;
     }
@@ -27,13 +24,5 @@ public class LearningLogCreateViewModel {
 
     public void setLessonId(long lessonId) {
         this.lessonId = lessonId;
-    }
-
-    public Timestamp getFinishedDate() {
-        return finishedDate;
-    }
-
-    public void setFinishedDate(Timestamp finishedDate) {
-        this.finishedDate = finishedDate;
     }
 }

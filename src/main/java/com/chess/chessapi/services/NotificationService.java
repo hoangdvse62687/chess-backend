@@ -1,9 +1,7 @@
 package com.chess.chessapi.services;
 
-import com.chess.chessapi.constants.AppMessage;
 import com.chess.chessapi.constants.AppRole;
 import com.chess.chessapi.constants.EntitiesFieldName;
-import com.chess.chessapi.constants.ObjectType;
 import com.chess.chessapi.entities.Notification;
 import com.chess.chessapi.repositories.NotificationRepository;
 import com.chess.chessapi.utils.TimeUtils;
@@ -12,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class NotificationService {
@@ -68,6 +68,10 @@ public class NotificationService {
         notification.setRoleTarget(roleTarget);
         notification.setObjectName(objectName);
         this.create(notification);
+    }
+
+    public void updateIsView(List<Long> notificationIds){
+        this.notificationRepository.updateIsViewed(notificationIds);
     }
     //end public method
 }

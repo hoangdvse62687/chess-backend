@@ -3,6 +3,8 @@ package com.chess.chessapi.viewmodels;
 import java.sql.Timestamp;
 
 public class ReviewPaginationViewModel {
+    private long reviewId;
+
     private int rating;
 
     private String content;
@@ -41,5 +43,13 @@ public class ReviewPaginationViewModel {
 
     public void setCreatedDate(Timestamp createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public long getReviewId() {
+        return reviewId;
+    }
+
+    public void setReviewId(long reviewId) {
+        this.reviewId = reviewId;
     }
 }

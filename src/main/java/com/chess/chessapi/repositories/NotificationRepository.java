@@ -5,8 +5,12 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import javax.transaction.Transactional;
+import java.util.List;
 
 
 @Repository
@@ -22,4 +26,9 @@ public interface NotificationRepository extends JpaRepository<Notification,Long>
             nativeQuery = true)
     @Cacheable
     Page<Notification> findAllByRoleAndObjectIdWithPagination(Pageable pageable,long role,String userId);
+
+    @Query(value = "Update notification Set is_viewed = 1 where id in ?1",nativeQuery = true)
+    @Modifying
+    @Transactional
+    void updateIsViewed(List<Long> listIds);
 }

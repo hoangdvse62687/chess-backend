@@ -60,13 +60,14 @@ public class ManualCastUtils implements Serializable {
     //END COURSE VIEW MODEL DEFINED
 
     //REVIEW VIEW MODEL DEFINED
-    private static final int REVIEW_VIEW_MODEL_RATING_INDEX = 0;
-    private static final int REVIEW_VIEW_MODEL_CONTENT_INDEX = 1;
-    private static final int REVIEW_VIEW_MODEL_USER_ID_INDEX = 2;
-    private static final int REVIEW_VIEW_MODEL_CREATED_DATE_INDEX = 3;
-    private static final int REVIEW_VIEW_MODEL_USER_FULLNAME_INDEX = 4;
-    private static final int REVIEW_VIEW_MODEL_EMAIL_INDEX = 5;
-    private static final int REVIEW_VIEW_MODEL_USER_AVATAR_INDEX = 6;
+    private static final int REVIEW_VIEW_MODEL_ID_INDEX = 0;
+    private static final int REVIEW_VIEW_MODEL_RATING_INDEX = 1;
+    private static final int REVIEW_VIEW_MODEL_CONTENT_INDEX = 2;
+    private static final int REVIEW_VIEW_MODEL_USER_ID_INDEX = 3;
+    private static final int REVIEW_VIEW_MODEL_CREATED_DATE_INDEX = 4;
+    private static final int REVIEW_VIEW_MODEL_USER_FULLNAME_INDEX = 5;
+    private static final int REVIEW_VIEW_MODEL_EMAIL_INDEX = 6;
+    private static final int REVIEW_VIEW_MODEL_USER_AVATAR_INDEX = 7;
     //END REVIEW VIEW MODEL DEFINED
 
     //CATEGORY VIEW MODEL DEFINED
@@ -82,6 +83,8 @@ public class ManualCastUtils implements Serializable {
     private static final char RIGHT_ANGLE_BRACKET = '}';
     private static final char D_QUOT = '"';
     private static final char COMMA = ',';
+    private static final char LEFT_BRACKETS = '(';
+    private static final char RIGHT_BRACKETS = ')';
     //END JSON PARSER CHARACTER DEFINED
     //STEP JSON PARSER DEFINED
     private static final String STEP_JSON_PARSER_CONTENT = "content";
@@ -306,6 +309,7 @@ public class ManualCastUtils implements Serializable {
         for (Object[] object:
                 objects) {
             ReviewPaginationViewModel reviewPaginationViewModel = new ReviewPaginationViewModel();
+            reviewPaginationViewModel.setReviewId(Long.parseLong(object[REVIEW_VIEW_MODEL_ID_INDEX].toString()));
             reviewPaginationViewModel.setRating(Integer.parseInt(object[REVIEW_VIEW_MODEL_RATING_INDEX].toString()));
             reviewPaginationViewModel.setContent(object[REVIEW_VIEW_MODEL_CONTENT_INDEX].toString());
             reviewPaginationViewModel.setCreatedDate(Timestamp.valueOf(object[REVIEW_VIEW_MODEL_CREATED_DATE_INDEX].toString()));
@@ -325,8 +329,8 @@ public class ManualCastUtils implements Serializable {
 
     //CASTE OBJECT TO JSON DEFINED
     public static String castListStepToJson(List<Step> steps){
-        if(steps == null || steps.size() == 0){
-            return "[]";
+        if(steps == null || steps.isEmpty()){
+            return LEFT_SQUARE_BRACKET + " " + RIGHT_SQUARE_BRACKET;
         }
         String result = "";
         for (Step step:
@@ -340,6 +344,7 @@ public class ManualCastUtils implements Serializable {
         return LEFT_SQUARE_BRACKET + result.substring(0,result.length() - 1) + RIGHT_SQUARE_BRACKET;
     }
     //END CASTE OBJECT TO JSON DEFINED
+
     //PRIVATE DEFINED
     private static String handleNullValueObject(Object object,Class clazz){
         if(object != null){

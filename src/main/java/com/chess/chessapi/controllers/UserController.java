@@ -53,8 +53,7 @@ public class UserController {
     @ApiOperation(value = "Register an user")
     @PutMapping(value = "/register")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_REGISTRATION_AUTHENTICATIION +")")
-    public @ResponseBody JsonResult register(@Valid @RequestBody User user, @RequestParam("redirectUri") String redirectUri
-            , BindingResult bindingResult){
+    public @ResponseBody JsonResult register(@Valid @RequestBody User user,BindingResult bindingResult){
 
         String message = "";
         boolean isSuccess = true;
@@ -65,10 +64,10 @@ public class UserController {
         }else{
             try{
                 //gain redirect uri base on role
-                message = this.userService.register(user,redirectUri);
-
+                this.userService.register(user);
+                message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.USER);
             }catch (DataIntegrityViolationException ex){
-                message = ex.getMessage();
+                message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.USER);
                 isSuccess = false;
             }
         }

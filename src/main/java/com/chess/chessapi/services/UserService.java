@@ -65,7 +65,7 @@ public class UserService {
 
     public Optional<User> getUserByEmail(String email){return userRepository.findByEmail(email);}
 
-    public String register(User user, String redirectClient){
+    public void register(User user){
         String redirectUri = "";
         if(user.getRoleId() == AppRole.ROLE_INSTRUCTOR){
             this.registerInstructor(user);
@@ -73,13 +73,10 @@ public class UserService {
             this.registerLearner(user);
         }
 
-        redirectUri = redirectClient != null ? redirectClient : "/";
 
         this.setUserRoleAuthentication(user);
 
         this.userRepository.save(user);
-
-        return redirectUri;
     }
 
     public void updateProfile(User user){

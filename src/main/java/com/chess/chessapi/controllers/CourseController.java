@@ -392,9 +392,6 @@ public class CourseController {
     public @ResponseBody JsonResult updateReview(@RequestBody @Valid ReviewUpdateViewModel reviewUpdateViewModel,BindingResult bindingResult){
         String message = "";
         boolean isSuccess = true;
-        if(!this.courseService.isExist(reviewUpdateViewModel.getCourseId())){
-            throw new ResourceNotFoundException("Course","id",reviewUpdateViewModel.getCourseId());
-        }
 
         if(!this.reviewService.isExist(reviewUpdateViewModel.getReviewId())){
             throw new ResourceNotFoundException("Review","id",reviewUpdateViewModel.getReviewId());

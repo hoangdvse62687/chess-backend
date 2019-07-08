@@ -23,6 +23,7 @@ public class AppMessage implements Serializable {
     public static final String RESOURCE_LINK = "resource link";
     public static final String REVIEW = "review";
     public static final String GAME_HISTORY = "game history";
+    public static final String NOTIFICATION = "notification";
     //END SPECIAL DEFINE
 
     //STATUS MESSAGE DEFINE
