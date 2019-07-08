@@ -124,26 +124,33 @@ public class CourseController {
     @ApiOperation(value = "remove course")
     @PutMapping("/remove-course")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
-    public @ResponseBody JsonResult removeCourse(@RequestBody CourseRemoveViewModel courseRemoveViewModel){
+    public @ResponseBody JsonResult removeCourse(@Valid @RequestBody CourseRemoveViewModel courseRemoveViewModel
+            , BindingResult bindingResult){
 
         boolean hasPermissionModify = this.courseService.checkPermissionUpdateStatusCourse(courseRemoveViewModel.getCourseId());
 
         String message = "";
         Boolean isSuccess = true;
-        try{
-            if(hasPermissionModify){
-                if(this.courseService.isExist(courseRemoveViewModel.getCourseId())){
-                    this.courseService.updateStatus(courseRemoveViewModel.getCourseId(),Status.COURSE_STATUS_REMOVED);
-                    message = AppMessage.getMessageSuccess(AppMessage.DELETE,AppMessage.COURSE);
-                }else{
-                    throw new ResourceNotFoundException("Course","id",courseRemoveViewModel.getCourseId());
-                }
-            }else {
-                throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
-            }
-        }catch (DataIntegrityViolationException ex){
-            message = AppMessage.getMessageFail(AppMessage.DELETE,AppMessage.COURSE);
+        if(bindingResult.hasErrors()){
+            FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
+            message = fieldError.getDefaultMessage();
             isSuccess = false;
+        }else {
+            try{
+                if(hasPermissionModify){
+                    if(this.courseService.isExist(courseRemoveViewModel.getCourseId())){
+                        this.courseService.updateStatus(courseRemoveViewModel.getCourseId(),Status.COURSE_STATUS_REMOVED);
+                        message = AppMessage.getMessageSuccess(AppMessage.DELETE,AppMessage.COURSE);
+                    }else{
+                        throw new ResourceNotFoundException("Course","id",courseRemoveViewModel.getCourseId());
+                    }
+                }else {
+                    throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
+                }
+            }catch (DataIntegrityViolationException ex){
+                message = AppMessage.getMessageFail(AppMessage.DELETE,AppMessage.COURSE);
+                isSuccess = false;
+            }
         }
 
         return new JsonResult(message,isSuccess);
@@ -152,34 +159,41 @@ public class CourseController {
     @ApiOperation(value = "update course status")
     @PutMapping("/update-course-status")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_ADMIN_AUTHENTICATIION+")")
-    public @ResponseBody JsonResult updateCourseStatus(@RequestBody CourseUpdateStatusViewModel courseUpdateStatusViewModel){
+    public @ResponseBody JsonResult updateCourseStatus(@Valid @RequestBody CourseUpdateStatusViewModel courseUpdateStatusViewModel
+            , BindingResult bindingResult){
         String message = "";
         Boolean isSuccess = true;
 
-        try{
-            //Get course modify
-            Course course = this.courseService.getCourseById(courseUpdateStatusViewModel.getCourseId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Course","id",courseUpdateStatusViewModel.getCourseId()));
-
-            String messageNotification = "";
-
-            //handle status admin can change
-            if(courseUpdateStatusViewModel.getStatusId() == Status.COURSE_STATUS_PUBLISHED){
-                messageNotification = AppMessage.UPDATE_COURSE_STATUS_PUBLISHED;
-            }else{
-                messageNotification = AppMessage.UPDATE_COURSE_STATUS_REJECTED;
-                courseUpdateStatusViewModel.setStatusId(Status.COURSE_STATUS_REJECTED);
-            }
-
-            //Send notification to author
-            this.notificationService.sendNotificationToUser(messageNotification,course.getName(),ObjectType.COURSE,
-                    course.getCourseId(),course.getUser().getUserId(),AppRole.ROLE_INSTRUCTOR);
-
-            this.courseService.updateStatus(courseUpdateStatusViewModel.getCourseId(),courseUpdateStatusViewModel.getStatusId());
-            message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.COURSE);
-        }catch (DataIntegrityViolationException ex){
-            message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.COURSE);
+        if(bindingResult.hasErrors()){
+            FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
+            message = fieldError.getDefaultMessage();
             isSuccess = false;
+        }else {
+            try{
+                //Get course modify
+                Course course = this.courseService.getCourseById(courseUpdateStatusViewModel.getCourseId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Course","id",courseUpdateStatusViewModel.getCourseId()));
+
+                String messageNotification = "";
+
+                //handle status admin can change
+                if(courseUpdateStatusViewModel.getStatusId() == Status.COURSE_STATUS_PUBLISHED){
+                    messageNotification = AppMessage.UPDATE_COURSE_STATUS_PUBLISHED;
+                }else{
+                    messageNotification = AppMessage.UPDATE_COURSE_STATUS_REJECTED;
+                    courseUpdateStatusViewModel.setStatusId(Status.COURSE_STATUS_REJECTED);
+                }
+
+                //Send notification to author
+                this.notificationService.sendNotificationToUser(messageNotification,course.getName(),ObjectType.COURSE,
+                        course.getCourseId(),course.getUser().getUserId(),AppRole.ROLE_INSTRUCTOR);
+
+                this.courseService.updateStatus(courseUpdateStatusViewModel.getCourseId(),courseUpdateStatusViewModel.getStatusId());
+                message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.COURSE);
+            }catch (DataIntegrityViolationException ex){
+                message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.COURSE);
+                isSuccess = false;
+            }
         }
 
         return new JsonResult(message,isSuccess);
@@ -255,30 +269,37 @@ public class CourseController {
     @ApiOperation(value = "publish course")
     @PutMapping("/publish-course")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
-    public @ResponseBody JsonResult publishCourse(@RequestBody CoursePublishViewModel coursePublishViewModel){
+    public @ResponseBody JsonResult publishCourse(@Valid @RequestBody CoursePublishViewModel coursePublishViewModel
+            , BindingResult bindingResult){
         String message = "";
         Boolean isSuccess = true;
-        boolean hasPermissionModify = this.courseService.checkPermissionUpdateStatusCourse(coursePublishViewModel.getCourseId());
-        try{
-
-            //Get course modify
-            Course course = this.courseService.getCourseById(coursePublishViewModel.getCourseId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Course","id",coursePublishViewModel.getCourseId()));
-            UserPrincipal userPrincipal = this.userService.getCurrentUser();
-            //check only author can update status
-            if(hasPermissionModify){
-                //Send notification to author
-                //Send notification to Admin
-                this.notificationService.sendNotificationToAdmin(AppMessage.CREATE_NEW_COURSE,course.getName(),
-                        ObjectType.COURSE,course.getCourseId());
-                this.courseService.updateStatus(coursePublishViewModel.getCourseId(),Status.COURSE_STATUS_WAITING);
-                message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.COURSE);
-            }else {
-                throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
-            }
-        }catch (DataIntegrityViolationException ex){
-            message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.COURSE);
+        if(bindingResult.hasErrors()){
+            FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
+            message = fieldError.getDefaultMessage();
             isSuccess = false;
+        }else {
+            boolean hasPermissionModify = this.courseService.checkPermissionUpdateStatusCourse(coursePublishViewModel.getCourseId());
+            try{
+
+                //Get course modify
+                Course course = this.courseService.getCourseById(coursePublishViewModel.getCourseId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Course","id",coursePublishViewModel.getCourseId()));
+                UserPrincipal userPrincipal = this.userService.getCurrentUser();
+                //check only author can update status
+                if(hasPermissionModify){
+                    //Send notification to author
+                    //Send notification to Admin
+                    this.notificationService.sendNotificationToAdmin(AppMessage.CREATE_NEW_COURSE,course.getName(),
+                            ObjectType.COURSE,course.getCourseId());
+                    this.courseService.updateStatus(coursePublishViewModel.getCourseId(),Status.COURSE_STATUS_WAITING);
+                    message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.COURSE);
+                }else {
+                    throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
+                }
+            }catch (DataIntegrityViolationException ex){
+                message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.COURSE);
+                isSuccess = false;
+            }
         }
 
         return new JsonResult(message,isSuccess);

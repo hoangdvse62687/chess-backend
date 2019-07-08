@@ -2,12 +2,14 @@ package com.chess.chessapi.viewmodels;
 
 import com.chess.chessapi.entities.InteractiveLesson;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 public class InteractiveLessonCreateViewModel {
     @NotNull(message = "Name must not be null")
     private String name;
 
+    @Valid
     @NotNull(message = "Interactive Lesson must not be null")
     private InteractiveLesson interactiveLesson;
 

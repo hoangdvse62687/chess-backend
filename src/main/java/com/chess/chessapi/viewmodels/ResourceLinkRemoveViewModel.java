@@ -1,6 +1,9 @@
 package com.chess.chessapi.viewmodels;
 
+import javax.validation.constraints.NotNull;
+
 public class ResourceLinkRemoveViewModel {
+    @NotNull(message = "Resource link id must not be null")
     private long resourcelinkId;
 
     public long getResourcelinkId() {

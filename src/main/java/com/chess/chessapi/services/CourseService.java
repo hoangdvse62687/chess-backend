@@ -13,6 +13,8 @@ import com.chess.chessapi.viewmodels.CoursePaginationViewModel;
 import com.chess.chessapi.viewmodels.UserDetailViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -153,6 +155,7 @@ public class CourseService {
         }
         return false;
     }
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public void updateCourse(Course course){
          this.courseRepository.updateCourse(course.getCourseId(),course.getName(),course.getDescription(),
                  course.getPoint(),course.getStatusId(),course.getImage());

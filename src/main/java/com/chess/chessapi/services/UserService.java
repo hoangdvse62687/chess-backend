@@ -23,6 +23,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -65,6 +67,7 @@ public class UserService {
 
     public Optional<User> getUserByEmail(String email){return userRepository.findByEmail(email);}
 
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public void register(User user){
         String redirectUri = "";
         if(user.getRoleId() == AppRole.ROLE_INSTRUCTOR){
@@ -79,6 +82,7 @@ public class UserService {
         this.userRepository.save(user);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public void updateProfile(User user){
         this.userRepository.updateProfile(user.getUserId(),user.getFullName(),user.getAchievement());
 
@@ -106,6 +110,7 @@ public class UserService {
         return this.fillDataToPaginationCustom(rawData);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public void updateStatus(User user,long userId,boolean isActive){
         //notification send to user
         this.notificationService.sendNotificationToUser(isActive ? AppMessage.UPDATE_USER_STATUS_ACTIVE : AppMessage.UPDATE_USER_STATUS_INACTIVE,

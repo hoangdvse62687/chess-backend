@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class GameHistoryService {
@@ -19,6 +21,7 @@ public class GameHistoryService {
     @Autowired
     private UserService userService;
 
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public long create(GameHistoryCreateViewModel gameHistoryCreateViewModel,long userId){
         GameHistory gameHistory = new GameHistory();
         gameHistory.setColor(gameHistory.getColor());

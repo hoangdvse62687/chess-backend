@@ -15,7 +15,11 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = "/resource-link")
@@ -30,17 +34,24 @@ public class ResourceLinkController {
     @ApiOperation(value = "Create resource link")
     @PostMapping("/create-resource-link")
     @PreAuthorize("hasAnyAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
-    public @ResponseBody JsonResult createResourceLink(@RequestBody ResourceLinkCreateViewModel resourceLinkCreateViewModel){
+    public @ResponseBody JsonResult createResourceLink(@Valid @RequestBody ResourceLinkCreateViewModel resourceLinkCreateViewModel
+            , BindingResult bindingResult){
         String message = "";
         boolean isSuccess = true;
         long savedId = 0;
-        try{
-            UserPrincipal userPrincipal = this.userService.getCurrentUser();
-            savedId = this.resourceLinkService.create(resourceLinkCreateViewModel.getLink(),userPrincipal.getId());
-            message =  AppMessage.getMessageSuccess(AppMessage.CREATE,AppMessage.RESOURCE_LINK);
-        }catch (DataIntegrityViolationException ex){
-            message = AppMessage.getMessageFail(AppMessage.CREATE,AppMessage.RESOURCE_LINK);
+        if(bindingResult.hasErrors()){
+            FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
+            message = fieldError.getDefaultMessage();
             isSuccess = false;
+        }else {
+            try{
+                UserPrincipal userPrincipal = this.userService.getCurrentUser();
+                savedId = this.resourceLinkService.create(resourceLinkCreateViewModel.getLink(),userPrincipal.getId());
+                message =  AppMessage.getMessageSuccess(AppMessage.CREATE,AppMessage.RESOURCE_LINK);
+            }catch (DataIntegrityViolationException ex){
+                message = AppMessage.getMessageFail(AppMessage.CREATE,AppMessage.RESOURCE_LINK);
+                isSuccess = false;
+            }
         }
         CreateResponse createResponse = new CreateResponse();
         createResponse.setSuccess(isSuccess);
@@ -51,18 +62,25 @@ public class ResourceLinkController {
     @ApiOperation(value = "Remove resource link")
     @PutMapping("/remove-resource-link")
     @PreAuthorize("hasAnyAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
-    public @ResponseBody JsonResult removeResourceLink(@RequestBody ResourceLinkRemoveViewModel resourceLinkRemoveViewModel){
+    public @ResponseBody JsonResult removeResourceLink(@Valid @RequestBody ResourceLinkRemoveViewModel resourceLinkRemoveViewModel
+            , BindingResult bindingResult){
         String message = "";
         boolean isSuccess = true;
-        try{
-            if(!this.resourceLinkService.isExist(resourceLinkRemoveViewModel.getResourcelinkId())){
-                throw new ResourceNotFoundException("Resource link","id",resourceLinkRemoveViewModel.getResourcelinkId());
-            }
-            this.resourceLinkService.remove(resourceLinkRemoveViewModel.getResourcelinkId());
-            message =  AppMessage.getMessageSuccess(AppMessage.DELETE,AppMessage.RESOURCE_LINK);
-        }catch (DataIntegrityViolationException ex){
-            message = AppMessage.getMessageFail(AppMessage.DELETE,AppMessage.RESOURCE_LINK);
+        if(bindingResult.hasErrors()){
+            FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
+            message = fieldError.getDefaultMessage();
             isSuccess = false;
+        }else {
+            try{
+                if(!this.resourceLinkService.isExist(resourceLinkRemoveViewModel.getResourcelinkId())){
+                    throw new ResourceNotFoundException("Resource link","id",resourceLinkRemoveViewModel.getResourcelinkId());
+                }
+                this.resourceLinkService.remove(resourceLinkRemoveViewModel.getResourcelinkId());
+                message =  AppMessage.getMessageSuccess(AppMessage.DELETE,AppMessage.RESOURCE_LINK);
+            }catch (DataIntegrityViolationException ex){
+                message = AppMessage.getMessageFail(AppMessage.DELETE,AppMessage.RESOURCE_LINK);
+                isSuccess = false;
+            }
         }
         return new JsonResult(message,isSuccess);
     }

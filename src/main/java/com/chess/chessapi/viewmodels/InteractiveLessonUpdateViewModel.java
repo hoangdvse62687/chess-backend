@@ -2,6 +2,7 @@ package com.chess.chessapi.viewmodels;
 
 import com.chess.chessapi.entities.InteractiveLesson;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 
@@ -13,6 +14,7 @@ public class InteractiveLessonUpdateViewModel {
 
     private Timestamp createdDate;
 
+    @Valid
     @NotNull(message = "Interactive Lesson must not be null")
     private InteractiveLesson interactiveLesson;
 

@@ -16,6 +16,8 @@ import com.chess.chessapi.viewmodels.ReviewPaginationViewModel;
 import com.chess.chessapi.viewmodels.ReviewUpdateViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -52,6 +54,7 @@ public class ReviewService {
         return this.fillDataToPaginationCustom(rawData,totalElements,pageSize);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public long create(ReviewCreateViewModel reviewCreateViewModel,long userId,String userName){
         Review review = new Review();
         review.setContent(reviewCreateViewModel.getContent());

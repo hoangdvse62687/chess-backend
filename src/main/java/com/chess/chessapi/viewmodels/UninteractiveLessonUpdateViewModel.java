@@ -2,6 +2,7 @@ package com.chess.chessapi.viewmodels;
 
 import com.chess.chessapi.entities.UninteractiveLesson;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 
@@ -11,6 +12,7 @@ public class UninteractiveLessonUpdateViewModel {
     private String name;
 
     @NotNull(message = "Uninteractive Lesson must not be null")
+    @Valid
     private UninteractiveLesson uninteractiveLesson;
 
     public long getLessonId() {

@@ -1,14 +1,11 @@
 package com.chess.chessapi.viewmodels;
 
-import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 
 public class LessonViewModel {
     private long lessonId;
-    @NotNull(message = "Name must not be null")
     private String name;
     private Timestamp createdDate;
-    @NotNull(message = "Lesson order must not be null")
     private int lessonOrdered;
     private int lessonType;
     public long getLessonId() {

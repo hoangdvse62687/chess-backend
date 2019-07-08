@@ -15,6 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -65,11 +67,13 @@ public class LessonService {
         return this.lessonRepository.findLessonAuthorByLessonId(lessonId);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public long createInteractiveLesson(InteractiveLessonCreateViewModel lessonViewModel, long userId){
         //Create Lesson
         Lesson savedLesson = this.createLesson(lessonViewModel.getName(),userId,ObjectType.INTERACTIVE_LESSON);
         //create interactive lesson
         InteractiveLesson interactiveLesson = lessonViewModel.getInteractiveLesson();
+        interactiveLesson.setInteractiveLessonId(0);
         interactiveLesson.setLesson(savedLesson);
         InteractiveLesson savedInteractiveLesson = this.interactiveLessonService.create(interactiveLesson);
 
@@ -84,11 +88,13 @@ public class LessonService {
         return savedLesson.getLessonId();
     }
 
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public long createUninteractiveLesson(UninteractiveLessonCreateViewModel uninteractiveLessonCreateViewModel,long userId){
         //Create Lesson
         Lesson savedLesson = this.createLesson(uninteractiveLessonCreateViewModel.getName(),userId, ObjectType.UNINTERACTIVE_LESSON);
         //create uninteractive lesson
         UninteractiveLesson uninteractiveLesson = new UninteractiveLesson();
+        uninteractiveLesson.setUninteractiveLessonId(0);
         uninteractiveLesson.setContent(uninteractiveLessonCreateViewModel.getContent());
         uninteractiveLesson.setLesson(savedLesson);
         this.uninteractiveLessonService.create(uninteractiveLesson);
@@ -104,6 +110,7 @@ public class LessonService {
         return savedLesson.getLessonId();
     }
 
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public void updateInteractiveLesson(InteractiveLessonUpdateViewModel lessonViewModel){
         //update lesson
         this.updateLesson(lessonViewModel.getLessonId(),lessonViewModel.getName());
@@ -114,6 +121,7 @@ public class LessonService {
 
     }
 
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public void updateUninteractiveLesson(UninteractiveLessonUpdateViewModel uninteractiveLessonUpdateViewModel){
         //update lesson
         this.updateLesson(uninteractiveLessonUpdateViewModel.getLessonId(),uninteractiveLessonUpdateViewModel.getName());
@@ -147,6 +155,7 @@ public class LessonService {
         return false;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public void removeLesson(Lesson lesson){
         //remove all learning log
         this.learningLogService.deleteAllByLessonId(lesson.getLessonId());
