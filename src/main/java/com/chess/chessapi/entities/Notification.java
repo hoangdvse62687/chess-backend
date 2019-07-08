@@ -1,5 +1,6 @@
 package com.chess.chessapi.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
@@ -40,8 +41,10 @@ public class Notification {
     @Column(name = "role_target")
     private long roleTarget;
 
-    @Column(name = "user_id")
-    private long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id")
+    @JsonIgnore
+    private User user;
 
     public long getNotificationId() {
         return notificationId;
@@ -107,11 +110,11 @@ public class Notification {
         this.roleTarget = roleTarget;
     }
 
-    public long getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 }

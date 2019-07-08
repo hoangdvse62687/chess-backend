@@ -92,6 +92,10 @@ public class User {
     @JsonIgnore
     private List<GameHistory> gameHistories;
 
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
+    @JsonIgnore
+    private List<Notification> notifications;
+
     @Transient
     private List<CourseDetailViewModel> courseDetailViewModels;
 
@@ -262,5 +266,13 @@ public class User {
 
     public void setGameHistories(List<GameHistory> gameHistories) {
         this.gameHistories = gameHistories;
+    }
+
+    public List<Notification> getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(List<Notification> notifications) {
+        this.notifications = notifications;
     }
 }

@@ -3,6 +3,7 @@ package com.chess.chessapi.services;
 import com.chess.chessapi.constants.AppRole;
 import com.chess.chessapi.constants.EntitiesFieldName;
 import com.chess.chessapi.entities.Notification;
+import com.chess.chessapi.entities.User;
 import com.chess.chessapi.repositories.NotificationRepository;
 import com.chess.chessapi.utils.TimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +65,11 @@ public class NotificationService {
         notification.setContent(content);
         notification.setViewed(false);
         notification.setObjectId(objectId);
-        notification.setUserId(userId);
+
+        User user = new User();
+        user.setUserId(userId);
+        notification.setUser(user);
+
         notification.setRoleTarget(roleTarget);
         notification.setObjectName(objectName);
         this.create(notification);

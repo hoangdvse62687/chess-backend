@@ -5,35 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bf71be33-19e0-42a5-b1d1-432f8a4f6965" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/controllers/CourseController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/controllers/CourseController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/controllers/ResourceLinkController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/controllers/ResourceLinkController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/CategoryHasCourseRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/CategoryHasCourseRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/CategoryRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/CategoryRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/CourseHasLessonRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/CourseHasLessonRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/CourseRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/CourseRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/InteractiveLessonRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/InteractiveLessonRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/LearningLogRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/LearningLogRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/LessonRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/LessonRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/NotificationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/NotificationRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/ResourceLinkRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/ResourceLinkRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/ReviewRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/ReviewRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/UninteractiveLessonRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/UninteractiveLessonRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/UserHasCourseRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/UserHasCourseRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/CourseService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/CourseService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/GameHistoryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/GameHistoryService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/LessonService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/LessonService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/ReviewService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/ReviewService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/CoursePublishViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/CoursePublishViewModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/CourseRemoveViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/CourseRemoveViewModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/CourseUpdateStatusViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/CourseUpdateStatusViewModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/InteractiveLessonCreateViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/InteractiveLessonCreateViewModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/InteractiveLessonUpdateViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/InteractiveLessonUpdateViewModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/LessonViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/LessonViewModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/ResourceLinkCreateViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/ResourceLinkCreateViewModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/ResourceLinkRemoveViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/ResourceLinkRemoveViewModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/UninteractiveLessonUpdateViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/UninteractiveLessonUpdateViewModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/entities/Notification.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/entities/Notification.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/entities/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/entities/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/NotificationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/NotificationService.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/.gradle/" />
@@ -97,34 +71,12 @@
     </system>
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/LessonService.java">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/controllers/CourseController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="476">
-              <caret line="183" column="29" lean-forward="true" selection-start-line="183" selection-start-column="29" selection-end-line="183" selection-end-column="29" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/LearningLogService.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="266">
-              <caret line="41" column="42" lean-forward="true" selection-start-line="41" selection-start-column="42" selection-end-line="41" selection-end-column="42" />
-              <folding>
-                <element signature="e#1592#1593#0" expanded="true" />
-                <element signature="e#1664#1665#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/LearningLogRepository.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="340">
-              <caret line="20" column="1" lean-forward="true" selection-start-line="20" selection-start-column="1" selection-end-line="20" selection-end-column="1" />
+            <state relative-caret-position="569">
+              <caret line="190" column="56" selection-start-line="190" selection-start-column="56" selection-end-line="190" selection-end-column="56" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -133,10 +85,19 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/entities/Lesson.java">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/CourseUpdateStatusViewModel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="24" column="13" selection-start-line="24" selection-start-column="13" selection-end-line="24" selection-end-column="13" />
+            <state relative-caret-position="68">
+              <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/CoursePublishViewModel.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="68">
+              <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
             </state>
           </provider>
         </entry>
@@ -152,9 +113,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>get-course-pa</find>
-      <find>PermissionDeniedDataAccessException</find>
-      <find>checkPermissionViewCourseDetail</find>
       <find>AccessDeniedException</find>
       <find>checkPermissionUserCourse</find>
       <find>hasPermission</find>
@@ -182,6 +140,9 @@
       <find>UpdateCategoryHasCourse</find>
       <find>updateCertifications</find>
       <find>updateUserHasCourse</find>
+      <find>update-cour</find>
+      <find>ADMIN</find>
+      <find>ADMIN_</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -190,8 +151,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/entities/InteractiveLesson.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/UserDetailViewModel.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/CoursePaginationViewModel.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/CourseCreateViewModel.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/entities/GameHistory.java" />
@@ -206,7 +165,6 @@
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/UpdateIsViewedNotification.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/controllers/NotificationController.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/utils/ManualCastUtils.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/NotificationService.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/InteractiveLessonCreateViewModel.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/CourseDetailsViewModel.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/CoursePublishViewModel.java" />
@@ -241,6 +199,9 @@
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/ReviewService.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/LearningLogRepository.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/LessonService.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/entities/User.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/entities/Notification.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/NotificationService.java" />
       </list>
     </option>
   </component>
@@ -264,6 +225,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -313,6 +276,15 @@
               <item name="main" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
               <item name="java" type="462c0819:PsiDirectoryNode" />
               <item name="chessapi" type="462c0819:PsiDirectoryNode" />
+              <item name="entities" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="chessapi" type="b2602c69:ProjectViewProjectNode" />
+              <item name="chess-backend" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="chessapi" type="462c0819:PsiDirectoryNode" />
               <item name="services" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -326,8 +298,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -484,11 +454,12 @@
       <workItem from="1562509591763" duration="2066000" />
       <workItem from="1562572963807" duration="3513000" />
       <workItem from="1562592456270" duration="6372000" />
+      <workItem from="1562602633582" duration="1164000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="351708000" />
+    <option name="totallyTimeSpent" value="352872000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -501,8 +472,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.22844176" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2322239" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -650,43 +622,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/controllers/CategoryController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="65" column="33" lean-forward="true" selection-start-line="65" selection-start-column="33" selection-end-line="65" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/InteractiveLessonUpdateViewModel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="16" column="10" selection-start-line="16" selection-start-column="10" selection-end-line="16" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/ReviewCreateViewModel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="14" column="52" lean-forward="true" selection-start-line="14" selection-start-column="52" selection-end-line="14" selection-end-column="52" />
-          <folding>
-            <element signature="e#522#523#0" expanded="true" />
-            <element signature="e#551#552#0" expanded="true" />
-            <element signature="e#592#593#0" expanded="true" />
-            <element signature="e#628#629#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/ReviewPaginationViewModel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="527">
-          <caret line="47" column="31" selection-start-line="47" selection-start-column="31" selection-end-line="47" selection-end-column="31" />
-          <folding>
-            <element signature="e#974#975#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/ReviewRemoveViewModel.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="102">
@@ -767,23 +702,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="34">
           <caret line="2" column="38" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/CourseUpdateStatusViewModel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="6" column="25" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/controllers/CourseController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="190" column="35" selection-start-line="190" selection-start-column="35" selection-end-line="190" selection-end-column="35" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -994,13 +912,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/NotificationService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-556">
-          <caret line="16" column="13" selection-start-line="16" selection-start-column="13" selection-end-line="16" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/ResourceLinkService.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="85">
@@ -1043,27 +954,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/entities/Lesson.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/LessonService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="24" column="13" selection-start-line="24" selection-start-column="13" selection-end-line="24" selection-end-column="13" />
+        <state relative-caret-position="476">
+          <caret line="183" column="29" selection-start-line="183" selection-start-column="29" selection-end-line="183" selection-end-column="29" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/LearningLogRepository.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/entities/Lesson.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="20" column="1" lean-forward="true" selection-start-line="20" selection-start-column="1" selection-end-line="20" selection-end-column="1" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="272">
+          <caret line="24" column="13" selection-start-line="24" selection-start-column="13" selection-end-line="24" selection-end-column="13" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/LearningLogService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="266">
-          <caret line="41" column="42" lean-forward="true" selection-start-line="41" selection-start-column="42" selection-end-line="41" selection-end-column="42" />
+        <state relative-caret-position="410">
+          <caret line="41" column="42" selection-start-line="41" selection-start-column="42" selection-end-line="41" selection-end-column="42" />
           <folding>
             <element signature="e#1592#1593#0" expanded="true" />
             <element signature="e#1664#1665#0" expanded="true" />
@@ -1071,10 +979,76 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/LessonService.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/LearningLogRepository.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
-          <caret line="183" column="29" lean-forward="true" selection-start-line="183" selection-start-column="29" selection-end-line="183" selection-end-column="29" />
+        <state relative-caret-position="340">
+          <caret line="20" column="1" selection-start-line="20" selection-start-column="1" selection-end-line="20" selection-end-column="1" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/entities/User.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="461">
+          <caret line="270" column="50" selection-start-line="270" selection-start-column="50" selection-end-line="270" selection-end-column="50" />
+          <folding>
+            <element signature="e#6981#6982#0" expanded="true" />
+            <element signature="e#7051#7052#0" expanded="true" />
+            <element signature="e#7101#7102#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/NotificationService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="464">
+          <caret line="70" column="33" selection-start-line="70" selection-start-column="33" selection-end-line="70" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/entities/UserHasCourse.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="17" column="4" lean-forward="true" selection-start-line="17" selection-start-column="4" selection-end-line="19" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/entities/Notification.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="189">
+          <caret line="82" column="5" lean-forward="true" selection-start-line="82" selection-start-column="5" selection-end-line="82" selection-end-column="5" />
+          <folding>
+            <element signature="e#2688#2689#0" expanded="true" />
+            <element signature="e#2715#2716#0" expanded="true" />
+            <element signature="e#2753#2754#0" expanded="true" />
+            <element signature="e#2785#2786#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/CoursePublishViewModel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/viewmodels/CourseUpdateStatusViewModel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/controllers/CourseController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="569">
+          <caret line="190" column="56" selection-start-line="190" selection-start-column="56" selection-end-line="190" selection-end-column="56" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
