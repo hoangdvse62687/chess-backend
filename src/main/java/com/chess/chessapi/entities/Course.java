@@ -139,6 +139,12 @@ public class Course {
     private List<Long> listLearningLogLessonIds;
 
     @Transient
+    private List<Long> listLogExerciseIds;
+
+    @Transient
+    private List<Long> listExerciseIds;
+
+    @Transient
     private List<LessonViewModel> lessonViewModels;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -299,5 +305,25 @@ public class Course {
 
     public void setTutors(List<UserDetailViewModel> tutors) {
         this.tutors = tutors;
+    }
+
+    public void setPoint(float point) {
+        this.point = point;
+    }
+
+    public List<Long> getListLogExerciseIds() {
+        return listLogExerciseIds;
+    }
+
+    public void setListLogExerciseIds(List<Long> listLogExerciseIds) {
+        this.listLogExerciseIds = listLogExerciseIds;
+    }
+
+    public List<Long> getListExerciseIds() {
+        return listExerciseIds;
+    }
+
+    public void setListExerciseIds(List<Long> listExerciseIds) {
+        this.listExerciseIds = listExerciseIds;
     }
 }

@@ -13,4 +13,10 @@ import java.util.List;
 public interface ExerciseRepository extends JpaRepository<Exercise,Long> {
     @Query(value ="Select * From exercise where course_id = ?1" ,nativeQuery = true)
     List<Exercise> findByCourseId(long courseId);
+
+    @Query(value ="Select If(count(course_id) > 0, course_id,0) From exercise where id = ?1" ,nativeQuery = true)
+    Long findCourseIdByExerciseId(long exerciseId);
+
+    @Query(value ="Select id From exercise where course_id = ?1" ,nativeQuery = true)
+    List<Long> findExerciseIdsByCourseId(long courseId);
 }

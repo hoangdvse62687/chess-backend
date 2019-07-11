@@ -300,7 +300,38 @@ public class ManualCastUtils implements Serializable {
 
         courseDetailsViewModel.setAuthor(author);
         courseDetailsViewModel.setTotalLesson(totalLesson);
+        courseDetailsViewModel.setListLogExerciseIds(course.getListLogExerciseIds());
+        courseDetailsViewModel.setExerciseViewModels(course.getListExerciseIds());
         return courseDetailsViewModel;
+    }
+
+    public static User castUserUpdateToUser(UserUpdateViewModel userUpdateViewModel){
+        User user = new User();
+        if(userUpdateViewModel != null){
+            user.setUserId(userUpdateViewModel.getUserId());
+            user.setPoint(userUpdateViewModel.getPoint());
+            user.setEmail(userUpdateViewModel.getEmail());
+            user.setFullName(userUpdateViewModel.getFullName());
+            user.setAvatar(userUpdateViewModel.getAvatar());
+            user.setCreatedDate(userUpdateViewModel.getCreatedDate());
+            user.setActive(userUpdateViewModel.isActive());
+            user.setRoleId(userUpdateViewModel.getRoleId());
+            user.setAchievement(userUpdateViewModel.getAchievement());
+            user.setProvider(userUpdateViewModel.getProvider());
+            user.setProviderId(userUpdateViewModel.getProviderId());
+            List<Certificate> certificates = new ArrayList();
+            for (CertificateUpdateViewModel c:
+                 userUpdateViewModel.getCertificates()) {
+                Certificate certificate = new Certificate();
+                if(c.getCertificateId() != 0){
+                    certificate.setCertificateId(c.getCertificateId());
+                }
+                certificate.setCertificateLink(c.getCertificateLink());
+                certificates.add(certificate);
+            }
+            user.setCertificates(certificates);
+        }
+        return user;
     }
 
     public static List<ReviewPaginationViewModel> castListObjectToReviewFromGetReview(List<Object[]> objects)

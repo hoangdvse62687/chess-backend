@@ -9,9 +9,11 @@ import com.chess.chessapi.exceptions.AccessDeniedException;
 import com.chess.chessapi.exceptions.ResourceNotFoundException;
 import com.chess.chessapi.models.CreateResponse;
 import com.chess.chessapi.models.JsonResult;
+import com.chess.chessapi.models.Mail;
 import com.chess.chessapi.models.PagedList;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.services.*;
+import com.chess.chessapi.utils.MailContentBuilderUtils;
 import com.chess.chessapi.utils.ManualCastUtils;
 import com.chess.chessapi.utils.TimeUtils;
 import com.chess.chessapi.viewmodels.*;
@@ -60,6 +62,12 @@ public class CourseController {
 
     @Autowired
     private ReviewService reviewService;
+
+    @Autowired
+    private ExerciseLogService exerciseLogService;
+
+    @Autowired
+    private ExerciseService exerciseService;
 
     @ApiOperation(value = "Create course")
     @PostMapping("/create-course")
@@ -173,22 +181,8 @@ public class CourseController {
                 //Get course modify
                 Course course = this.courseService.getCourseById(courseUpdateStatusViewModel.getCourseId())
                         .orElseThrow(() -> new ResourceNotFoundException("Course","id",courseUpdateStatusViewModel.getCourseId()));
-
-                String messageNotification = "";
-
-                //handle status admin can change
-                if(courseUpdateStatusViewModel.getStatusId() == Status.COURSE_STATUS_PUBLISHED){
-                    messageNotification = AppMessage.UPDATE_COURSE_STATUS_PUBLISHED;
-                }else{
-                    messageNotification = AppMessage.UPDATE_COURSE_STATUS_REJECTED;
-                    courseUpdateStatusViewModel.setStatusId(Status.COURSE_STATUS_REJECTED);
-                }
-
-                //Send notification to author
-                this.notificationService.sendNotificationToUser(messageNotification,course.getName(),ObjectType.COURSE,
-                        course.getCourseId(),course.getUser().getUserId(),AppRole.ROLE_INSTRUCTOR);
-
-                this.courseService.updateStatus(courseUpdateStatusViewModel.getCourseId(),courseUpdateStatusViewModel.getStatusId());
+                User user = course.getUser();
+                this.courseService.updateCourseStatusByAdmin(course,courseUpdateStatusViewModel,user);
                 message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.COURSE);
             }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.COURSE);
@@ -209,19 +203,18 @@ public class CourseController {
         course.setUserEnrolleds(this.userService.getUserEnrolls(userDetailViewModels));
         course.setTutors(this.userService.getTutors(userDetailViewModels));
         course.setListCategorys(this.categoryService.getListCategoryIdsByCourseId(course.getCourseId()));
+        course.setLessonViewModels(this.lessonService.getLessonByCourseId(course.getCourseId()));
+        course.setListExerciseIds(this.exerciseService.getExerciseIdsByCourseId(courseId));
         //check permission to get lesson and learning log
         UserPrincipal userPrincipal = this.userService.getCurrentUser();
-        boolean permission = this.courseService.checkPermissionViewCourseDetail(courseId,userPrincipal);
-        int totalLesson = 0;
-        if(permission){
-            course.setLessonViewModels(this.lessonService.getLessonByCourseId(course.getCourseId()));
+        boolean isEnrolled = this.courseService.checkPermissionViewCourseDetail(courseId,userPrincipal);
+
+        if(isEnrolled){
             course.setListLearningLogLessonIds(this.learningLogService.getAllByCourseId(course.getCourseId(),userPrincipal.getId()));
-            totalLesson = course.getLessonViewModels().size();
-        }else{
-            totalLesson = this.courseHasLessonService.countLessonByCourseId(course.getCourseId());
+            course.setListLogExerciseIds(this.exerciseLogService.getAllExerciseIdsInLogByCourseIdAndUserId(userPrincipal.getId(),course.getCourseId()));
         }
-        CourseDetailsViewModel courseDetailsViewModel = ManualCastUtils.castCourseToCourseDetailsViewModel(course,totalLesson);
-        courseDetailsViewModel.setEnrolled(permission);
+        CourseDetailsViewModel courseDetailsViewModel = ManualCastUtils.castCourseToCourseDetailsViewModel(course,course.getLessonViewModels().size());
+        courseDetailsViewModel.setEnrolled(isEnrolled);
         return new JsonResult("", courseDetailsViewModel);
     }
 
@@ -284,7 +277,6 @@ public class CourseController {
                 //Get course modify
                 Course course = this.courseService.getCourseById(coursePublishViewModel.getCourseId())
                         .orElseThrow(() -> new ResourceNotFoundException("Course","id",coursePublishViewModel.getCourseId()));
-                UserPrincipal userPrincipal = this.userService.getCurrentUser();
                 //check only author can update status
                 if(hasPermissionModify){
                     //Send notification to author

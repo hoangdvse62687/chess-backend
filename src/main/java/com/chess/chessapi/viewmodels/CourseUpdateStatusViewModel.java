@@ -8,6 +8,8 @@ public class CourseUpdateStatusViewModel {
     @NotNull(message = "Status Id must not be null")
     private long statusId;
 
+    private String reasonReject;
+
     public long getCourseId() {
         return courseId;
     }
@@ -22,5 +24,13 @@ public class CourseUpdateStatusViewModel {
 
     public void setStatusId(long statusId) {
         this.statusId = statusId;
+    }
+
+    public String getReasonReject() {
+        return reasonReject;
+    }
+
+    public void setReasonReject(String reasonReject) {
+        this.reasonReject = reasonReject;
     }
 }

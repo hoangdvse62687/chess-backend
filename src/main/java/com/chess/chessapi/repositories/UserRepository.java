@@ -66,6 +66,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Modifying
     @Transactional
+    @Query(value = "Update users u Set u.full_name = ?2,u.achievement = ?3,u.point = ?4" +
+            ",u.role_id = ?5,u.is_active = ?6 Where u.id = ?1"
+            ,nativeQuery = true)
+    void updateRegister(long id,String name,String achievement,float point,long role,boolean isActive);
+
+    @Modifying
+    @Transactional
     @Query(value = "Update users u Set u.point = u.point + ?2 Where u.id = ?1"
             ,nativeQuery = true)
     void increasePoint(long id,float point);

@@ -2,15 +2,13 @@ package com.chess.chessapi.services;
 
 import com.chess.chessapi.constants.*;
 import com.chess.chessapi.entities.Certificate;
-import com.chess.chessapi.entities.Notification;
 import com.chess.chessapi.entities.User;
+import com.chess.chessapi.models.Mail;
 import com.chess.chessapi.models.PagedList;
-import com.chess.chessapi.repositories.NotificationRepository;
 import com.chess.chessapi.repositories.UserRepository;
 import com.chess.chessapi.security.UserPrincipal;
+import com.chess.chessapi.utils.MailContentBuilderUtils;
 import com.chess.chessapi.utils.ManualCastUtils;
-import com.chess.chessapi.utils.TimeUtils;
-import com.chess.chessapi.viewmodels.CourseDetailViewModel;
 import com.chess.chessapi.viewmodels.UserDetailViewModel;
 import com.chess.chessapi.viewmodels.UserPaginationViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.StoredProcedureQuery;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.*;
 
 @Service
@@ -47,6 +47,12 @@ public class UserService {
 
     @Autowired
     private CourseService courseService;
+
+    @Autowired
+    private MailService mailService;
+
+    @Autowired
+    private MailContentBuilderUtils mailContentBuilderUtils;
 
     public UserPrincipal getCurrentUser(){
         UserPrincipal user = null;
@@ -68,18 +74,21 @@ public class UserService {
     public Optional<User> getUserByEmail(String email){return userRepository.findByEmail(email);}
 
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
-    public void register(User user){
-        String redirectUri = "";
+    public void register(User user,HttpServletRequest request){
         if(user.getRoleId() == AppRole.ROLE_INSTRUCTOR){
             this.registerInstructor(user);
         }else {
             this.registerLearner(user);
         }
+        for (Certificate c:
+             user.getCertificates()) {
+            this.certificatesService.create(c.getCertificateLink(),user.getUserId());
+        }
 
+        this.userRepository.updateRegister(user.getUserId(),user.getFullName(),user.getAchievement(),user.getPoint(),
+                user.getRoleId(),user.isActive());
 
-        this.setUserRoleAuthentication(user);
-
-        this.userRepository.save(user);
+        this.setUserRoleAuthentication(user,request);
     }
 
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
@@ -89,7 +98,7 @@ public class UserService {
         //handle cetificate update
         List<Certificate> oldCetificates = this.certificatesService.findAllByUserId(user.getUserId());
 
-        this.certificatesService.updateCertifications(oldCetificates,user.getCetificates());
+        this.certificatesService.updateCertifications(oldCetificates,user.getCertificates());
     }
 
     public PagedList<UserPaginationViewModel> getPagination(int page, int pageSize, String email, String role, String isActive){
@@ -116,6 +125,13 @@ public class UserService {
         this.notificationService.sendNotificationToUser(isActive ? AppMessage.UPDATE_USER_STATUS_ACTIVE : AppMessage.UPDATE_USER_STATUS_INACTIVE,
                 user.getEmail(),ObjectType.USER,userId,userId,user.getRoleId());
         this.userRepository.updateStatus(userId,isActive);
+
+        //send email
+        Mail mail = new Mail(AppMessage.ACCEPT_INSTRUCTOR_REQUEST_SUBJECT,user.getEmail(),
+                this.mailContentBuilderUtils.buildInstructorApprove(user.getFullName(),AppMessage.ACCEPT_INSTRUCTOR_REQUEST_CONTENT
+                ,MailContentBuilderUtils.SOURCE_LINK_GO_TO_PROFILE,MailContentBuilderUtils.SOURCE_NAME_GO_TO_PROFILE));
+
+        this.mailService.sendMessage(mail);
     }
 
     public void getUserDetails(User user){
@@ -177,15 +193,21 @@ public class UserService {
     }
 
     // private method
-    private void setUserRoleAuthentication(User user){
+    private void setUserRoleAuthentication(User user,HttpServletRequest request){
         List<GrantedAuthority> authorities = Collections.
                 singletonList(new SimpleGrantedAuthority(Long.toString(user.getRoleId())));
-        UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserPrincipal userDetails = UserPrincipal.create(user);
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
         authentication.setDetails(authentication);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        //
+
+        HttpSession session = request.getSession();
+
+        session.setAttribute(Long.toString(user.getUserId()),userDetails);
     }
 
     private void registerLearner(User user){

@@ -41,4 +41,12 @@ public class ExerciseService {
     public List<Exercise> getByCourseId(long courseId){
         return this.exerciseRepository.findByCourseId(courseId);
     }
+
+    public long getCourseIdByExerciseId(long exerciseId){
+        return this.exerciseRepository.findCourseIdByExerciseId(exerciseId);
+    }
+
+    public List<Long> getExerciseIdsByCourseId(long courseId){
+        return this.exerciseRepository.findExerciseIdsByCourseId(courseId);
+    }
 }

@@ -42,9 +42,5 @@ public class CourseHasLessonService {
     public void deleteAllByLessonId(long lessonId){
         this.courseHasLessonRepository.deleteAllByLessonId(lessonId);
     }
-
-    public int countLessonByCourseId(long courseId){
-        return this.courseHasLessonRepository.countLessonByCourseId(courseId);
-    }
     //END PUBLIC METHOD DEFINED
 }

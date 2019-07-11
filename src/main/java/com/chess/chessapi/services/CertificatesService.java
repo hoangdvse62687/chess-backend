@@ -57,5 +57,9 @@ public class CertificatesService {
             }
         }
     }
+
+    public void create(String link,long userId){
+        this.certificatesRepository.create(link,userId);
+    }
     //end public method
 }

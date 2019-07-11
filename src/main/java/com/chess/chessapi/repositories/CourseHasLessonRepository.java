@@ -26,7 +26,4 @@ public interface CourseHasLessonRepository extends JpaRepository<CourseHasLesson
 
     @Query(value = "Select lesson_ordered from course_has_lesson where course_id = ?1 Order by lesson_ordered Desc LIMIT 1",nativeQuery = true)
     Integer findLastestLessonOrderedByCourseId(long courseId);
-
-    @Query(value = "Select count(id) From course_has_lesson where course_id = ?1",nativeQuery = true)
-    Integer countLessonByCourseId(long courseId);
 }

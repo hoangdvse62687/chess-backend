@@ -24,6 +24,7 @@ public class AppMessage implements Serializable {
     public static final String REVIEW = "review";
     public static final String GAME_HISTORY = "game history";
     public static final String NOTIFICATION = "notification";
+    public static final String EXERCISE_LOG = "excercise log";
     //END SPECIAL DEFINE
 
     //STATUS MESSAGE DEFINE
@@ -45,6 +46,15 @@ public class AppMessage implements Serializable {
     public static final String UPDATE_COURSE_STATUS_REJECTED = " is rejected";
     public static final String NOTIFICATION_REVIEW = " has reviewed your course";
     //END NOTIFICATION DEFINE
+
+    //MAIL DEFINED
+    public static final String ACCEPT_INSTRUCTOR_REQUEST_SUBJECT = "Instructor Approved";
+    public static final String ACCEPT_INSTRUCTOR_REQUEST_CONTENT = "Chúc Mừng. Tài khoản của bạn đã được duyệt trở thành giảng viên!";
+    public static final String PUBLISH_COURSE_REQUEST_SUBJECT  = " Course Published";
+    public static final String PUBLISH_COURSE_REQUEST_CONTENT_PUBLISH = " đã được publish trên trang chủ.";
+    public static final String PUBLISH_COURSE_REQUEST_CONTENT_REJECT = " đã bị từ chối publish trên trang chủ." +
+            "<br/><strong>Lí do:</strong>";
+    //END MAIL DEFINED
 
     public static String getMessageSuccess(String action,String table){
         return action + " " + table  + " " + SUCCESSFUL_MESSAGE;

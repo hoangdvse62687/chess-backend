@@ -166,6 +166,17 @@ public class LessonService {
         this.lessonRepository.delete(lesson);
     }
 
+    public boolean checkPermissionViewLesson(long userId,long lessonId){
+        StoredProcedureQuery storedProcedureQuery = this.em.createNamedStoredProcedureQuery("checkPermssionToViewLesson");
+        storedProcedureQuery.setParameter("userId",userId);
+        storedProcedureQuery.setParameter("lessonId",lessonId);
+        storedProcedureQuery.setParameter("hasPermission",true);
+
+        storedProcedureQuery.execute();
+
+        return Boolean.parseBoolean(storedProcedureQuery.getOutputParameterValue("hasPermission").toString());
+    }
+
     public boolean isExist(long lessonId){
         return this.lessonRepository.existsById(lessonId);
     }

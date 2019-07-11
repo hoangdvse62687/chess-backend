@@ -49,8 +49,11 @@ public class LessonController {
             + AppRole.ROLE_ADMIN_AUTHENTICATIION+","
             + AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult getLessonDetailById(@RequestParam("lessonId") long lessonId){
-        Lesson lesson = this.lessonService.getById(lessonId)
-                .orElseThrow(() -> new ResourceNotFoundException("Lesson","id",lessonId));
+        UserPrincipal userPrincipal = this.userService.getCurrentUser();
+        if(!this.lessonService.checkPermissionViewLesson(userPrincipal.getId(),lessonId)){
+            throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
+        }
+        Lesson lesson = this.lessonService.getById(lessonId).get();
         return new JsonResult("",lesson);
     }
 

@@ -11,6 +11,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -61,8 +62,8 @@ public class User {
     @Length(max = 255, message = "Achievement shouldn't larger than 255 characters")
     private String achievement;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user")
-    private List<Certificate> cetificates;
+    @OneToMany( fetch = FetchType.LAZY,mappedBy = "user")
+    private List<Certificate> certificates;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
     @JsonIgnore
@@ -95,6 +96,10 @@ public class User {
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
     @JsonIgnore
     private List<Notification> notifications;
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
+    @JsonIgnore
+    private List<ExerciseLog> exerciseLogs;
 
     @Transient
     private List<CourseDetailViewModel> courseDetailViewModels;
@@ -179,12 +184,12 @@ public class User {
         this.providerId = providerId;
     }
 
-    public List<Certificate> getCetificates() {
-        return cetificates;
+    public List<Certificate> getCertificates() {
+        return certificates;
     }
 
-    public void setCetificates(List<Certificate> cetificates) {
-        this.cetificates = cetificates;
+    public void setCertificates(List<Certificate> certificates) {
+        this.certificates = certificates;
     }
 
     public float getPoint() {
@@ -274,5 +279,13 @@ public class User {
 
     public void setNotifications(List<Notification> notifications) {
         this.notifications = notifications;
+    }
+
+    public List<ExerciseLog> getExerciseLogs() {
+        return exerciseLogs;
+    }
+
+    public void setExerciseLogs(List<ExerciseLog> exerciseLogs) {
+        this.exerciseLogs = exerciseLogs;
     }
 }

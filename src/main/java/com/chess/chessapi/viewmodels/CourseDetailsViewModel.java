@@ -1,5 +1,7 @@
 package com.chess.chessapi.viewmodels;
 
+import com.chess.chessapi.entities.Exercise;
+
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -19,6 +21,8 @@ public class CourseDetailsViewModel {
     private List<LessonViewModel> lessonViewModels;
     private int totalLesson;
     private boolean isEnrolled;
+    private List<Long> listLogExerciseIds;
+    private List<Long> exerciseViewModels;
 
     public long getCourseId() {
         return courseId;
@@ -138,5 +142,21 @@ public class CourseDetailsViewModel {
 
     public void setTutors(List<UserDetailViewModel> tutors) {
         this.tutors = tutors;
+    }
+
+    public List<Long> getListLogExerciseIds() {
+        return listLogExerciseIds;
+    }
+
+    public void setListLogExerciseIds(List<Long> listLogExerciseIds) {
+        this.listLogExerciseIds = listLogExerciseIds;
+    }
+
+    public List<Long> getExerciseViewModels() {
+        return exerciseViewModels;
+    }
+
+    public void setExerciseViewModels(List<Long> exerciseViewModels) {
+        this.exerciseViewModels = exerciseViewModels;
     }
 }

@@ -2,15 +2,14 @@ package com.chess.chessapi.services;
 
 import com.chess.chessapi.constants.*;
 import com.chess.chessapi.entities.*;
+import com.chess.chessapi.models.Mail;
 import com.chess.chessapi.models.PagedList;
 import com.chess.chessapi.repositories.CourseRepository;
 import com.chess.chessapi.security.UserPrincipal;
+import com.chess.chessapi.utils.MailContentBuilderUtils;
 import com.chess.chessapi.utils.ManualCastUtils;
 import com.chess.chessapi.utils.TimeUtils;
-import com.chess.chessapi.viewmodels.CourseCreateViewModel;
-import com.chess.chessapi.viewmodels.CourseDetailViewModel;
-import com.chess.chessapi.viewmodels.CoursePaginationViewModel;
-import com.chess.chessapi.viewmodels.UserDetailViewModel;
+import com.chess.chessapi.viewmodels.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -41,7 +40,14 @@ public class CourseService {
     @Autowired
     private CategoryHasCourseService categoryHasCourseService;
 
+    @Autowired
+    private MailService mailService;
 
+    @Autowired
+    private MailContentBuilderUtils mailContentBuilderUtils;
+
+    @Autowired
+    private NotificationService notificationService;
     //Public method
     public Course create(CourseCreateViewModel courseCreateViewModel, long userId){
         //default setting when created course is inactive
@@ -193,6 +199,33 @@ public class CourseService {
         List<Object[]> rawData = query.getResultList();
         final long totalElements = Long.parseLong(query.getOutputParameterValue("totalElements").toString());
         return this.fillDataToPaginationCustom(rawData,totalElements,pageSize);
+    }
+
+    public void updateCourseStatusByAdmin(Course course, CourseUpdateStatusViewModel courseUpdateStatusViewModel,User user){
+        String messageNotification = "";
+
+        //handle status admin can change
+        String mailContent = course.getName();
+        if(courseUpdateStatusViewModel.getStatusId() == Status.COURSE_STATUS_PUBLISHED){
+            messageNotification = AppMessage.UPDATE_COURSE_STATUS_PUBLISHED;
+            mailContent += AppMessage.PUBLISH_COURSE_REQUEST_CONTENT_PUBLISH;
+        }else{
+            messageNotification = AppMessage.UPDATE_COURSE_STATUS_REJECTED;
+            courseUpdateStatusViewModel.setStatusId(Status.COURSE_STATUS_REJECTED);
+            mailContent += AppMessage.PUBLISH_COURSE_REQUEST_CONTENT_REJECT + courseUpdateStatusViewModel.getReasonReject();
+        }
+
+        //Send notification to author
+        this.notificationService.sendNotificationToUser(messageNotification,course.getName(),ObjectType.COURSE,
+                course.getCourseId(),course.getUser().getUserId(),AppRole.ROLE_INSTRUCTOR);
+
+        this.updateStatus(courseUpdateStatusViewModel.getCourseId(),courseUpdateStatusViewModel.getStatusId());
+        //send email
+        Mail mail = new Mail(AppMessage.PUBLISH_COURSE_REQUEST_SUBJECT,user.getEmail(),
+                this.mailContentBuilderUtils.buildInstructorApprove(user.getFullName(),mailContent
+                        , MailContentBuilderUtils.SOURCE_LINK_GO_TO_COURSE + course.getCourseId(),MailContentBuilderUtils.SOURCE_NAME_GO_TO_COURSE));
+
+        this.mailService.sendMessage(mail);
     }
     //End Pulbic method
 

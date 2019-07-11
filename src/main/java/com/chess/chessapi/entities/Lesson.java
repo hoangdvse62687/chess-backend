@@ -20,6 +20,15 @@ import java.util.List;
                 parameters = {
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseId",type = Long.class)
                 }
+        ),
+        @NamedStoredProcedureQuery(
+                name = "checkPermssionToViewLesson",
+                procedureName = "check_permssion_to_view_lesson",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "userId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "lessonId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "hasPermission",type = Boolean.class)
+                }
         )
 })
 public class Lesson {

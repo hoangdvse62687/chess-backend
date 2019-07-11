@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Entity
 @Table(name = "exercise")
@@ -29,6 +30,10 @@ public class Exercise {
     @JoinColumn(name="course_id")
     @JsonIgnore
     private Course course;
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "exercise")
+    @JsonIgnore
+    private List<ExerciseLog> exerciseLogs;
 
     public long getExerciseId() {
         return exerciseId;
@@ -60,5 +65,13 @@ public class Exercise {
 
     public void setCourse(Course course) {
         this.course = course;
+    }
+
+    public List<ExerciseLog> getExerciseLogs() {
+        return exerciseLogs;
+    }
+
+    public void setExerciseLogs(List<ExerciseLog> exerciseLogs) {
+        this.exerciseLogs = exerciseLogs;
     }
 }
