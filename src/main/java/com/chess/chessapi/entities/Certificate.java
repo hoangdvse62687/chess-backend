@@ -6,8 +6,8 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "certificates")
-@JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="certificateId",scope = Certificates.class)
-public class Certificates {
+@JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="certificateId",scope = Certificate.class)
+public class Certificate {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
@@ -16,8 +16,9 @@ public class Certificates {
     @Column(name = "certificate_link")
     private String certificateLink;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
 

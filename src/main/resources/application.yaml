@@ -5,7 +5,20 @@ spring:
     url: jdbc:mysql://chess.cuaqcqteh5y3.ap-southeast-1.rds.amazonaws.com:3306/chessdb?useUnicode=yes&characterEncoding=UTF-8
     username: admin
     password: chesscapstone1005
-
+  mail:
+    default-encoding: UTF-8
+    host: smtp.gmail.com
+    username: chesslearningsystem@gmail.com
+    password: noragamiyato
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    protocol: smtp
+    test-connection: false
   jpa:
     show-sql: true
     hibernate:

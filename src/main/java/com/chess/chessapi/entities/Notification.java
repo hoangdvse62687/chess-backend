@@ -1,5 +1,8 @@
 package com.chess.chessapi.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.validator.constraints.Length;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -12,18 +15,20 @@ public class Notification {
     @Column(name = "id")
     private long notificationId;
 
-    @NotNull
+    @NotNull(message = "Object id must not be null")
     @Column(name = "object_id")
     private long objectId;
 
-    @NotNull
+    @NotNull(message = "Object name must not be null")
     @Column(name = "object_name")
+    @Length(max = 255,message = "ObjectName is required not larger than 255 characters")
     private String objectName;
 
-    @NotNull
+    @NotNull(message = "Object Type must not be null")
     @Column(name = "object_type_id")
     private long objectTypeId;
 
+    @Length(max = 500,message = "Content is required not larger than 255 characters")
     private String content;
 
     @Column(name = "is_viewed")
@@ -32,12 +37,14 @@ public class Notification {
     @Column(name = "created_date")
     private java.sql.Timestamp createDate;
 
-    @NotNull
+    @NotNull(message = "Role target must not be null")
     @Column(name = "role_target")
     private long roleTarget;
 
-    @Column(name = "user_id")
-    private long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id")
+    @JsonIgnore
+    private User user;
 
     public long getNotificationId() {
         return notificationId;
@@ -103,11 +110,11 @@ public class Notification {
         this.roleTarget = roleTarget;
     }
 
-    public long getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 }

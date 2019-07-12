@@ -1,6 +1,8 @@
 package com.chess.chessapi.security.oauth2;
 
 import com.chess.chessapi.security.TokenProvider;
+import com.chess.chessapi.security.UserPrincipal;
+import com.chess.chessapi.services.UserService;
 import com.chess.chessapi.utils.CookieUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +27,17 @@ public class OAuth2AuthenticationSuccessHandler extends SavedRequestAwareAuthent
 
     private HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
+    private UserService userService;
 
     @Autowired
     OAuth2AuthenticationSuccessHandler(TokenProvider tokenProvider,
                                        HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository,
-                                       ObjectMapper mapper) {
+                                       ObjectMapper mapper,
+                                       UserService userService) {
         this.tokenProvider = tokenProvider;
         this.httpCookieOAuth2AuthorizationRequestRepository = httpCookieOAuth2AuthorizationRequestRepository;
         this.mapper = mapper;
+        this.userService = userService;
     }
 
     @Override
@@ -61,10 +66,11 @@ public class OAuth2AuthenticationSuccessHandler extends SavedRequestAwareAuthent
 
 
         String token = tokenProvider.createToken(authentication);
-
+        UserPrincipal  userPrincipal = userService.getCurrentUser();
         return UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("token", token)
-                .build().toUriString();
+                .queryParam("role",userPrincipal.getRole())
+                 .build().toUriString();
     }
 
     protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {

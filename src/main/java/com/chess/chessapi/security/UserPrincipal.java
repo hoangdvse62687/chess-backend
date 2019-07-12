@@ -106,4 +106,11 @@ public class UserPrincipal implements OAuth2User, UserDetails {
     public String getName() {
         return String.valueOf(email);
     }
+
+    public String getRole(){
+        if(this.authorities != null){
+            return this.authorities.toString().replace("[","").replace("]","");
+        }
+        return "";
+    }
 }

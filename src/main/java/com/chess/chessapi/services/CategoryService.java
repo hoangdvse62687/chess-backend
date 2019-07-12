@@ -1,8 +1,10 @@
 package com.chess.chessapi.services;
 
+import com.chess.chessapi.constants.AppRole;
 import com.chess.chessapi.entities.Category;
 import com.chess.chessapi.repositories.CategoryRepository;
 import com.chess.chessapi.utils.ManualCastUtils;
+import com.chess.chessapi.viewmodels.CategoryViewModel;
 import com.chess.chessapi.viewmodels.CourseDetailViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,9 +20,13 @@ public class CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @Autowired
+    private CourseService courseService;
+
     @PersistenceContext
     private EntityManager em;
 
+    //public method
     public List<Category> getAllCategory(){
         return this.categoryRepository.findAll();
     }
@@ -29,17 +35,34 @@ public class CategoryService {
         return this.categoryRepository.findById(categoryId);
     }
 
-    public void getCategoryDetails(Category category){
-        if(category != null){
-            category.setCourseDetailViewModels(this.getCourseDetails(category.getCategoryId()));
-        }
-    }
-
-    public List<CourseDetailViewModel> getCourseDetails(long categoryId){
-        StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getCourseByCategoryId");
-        query.setParameter("categoryId",categoryId);
+    public List<CategoryViewModel> getListCategoryIdsByCourseId(long courseId){
+        //getting category by courseid
+        StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getCategoryByCourseid");
+        query.setParameter("courseId",courseId);
 
         query.execute();
-        return ManualCastUtils.castListObjectToCourseDetails(query.getResultList());
+        //end getting category by courseid
+        return ManualCastUtils.castListObjectToCategoryIdFromGetCategoryByCourseId(query.getResultList());
     }
+
+    public long create(CategoryViewModel categoryViewModel){
+        Category category = new Category();
+        category.setName(categoryViewModel.getName());
+        Category savedCategory = this.categoryRepository.save(category);
+        return savedCategory.getCategoryId();
+    }
+
+    public void removeCategory(Category category){
+
+        this.categoryRepository.delete(category);
+    }
+
+    public void update(CategoryViewModel category){
+        this.categoryRepository.update(category.getCategoryId(),category.getName());
+    }
+
+    public boolean isExist(long categoryId){
+        return this.categoryRepository.existsById(categoryId);
+    }
+    //end public method
 }

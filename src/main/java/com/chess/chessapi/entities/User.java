@@ -11,6 +11,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,7 +22,8 @@ import java.util.List;
                 name = "getUsersByCourseid",
                 procedureName = "get_users_by_courseid",
                 parameters = {
-                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseId",type = Long.class)
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "userHasCourseStatusId",type = Long.class)
                 }
         )
 })
@@ -60,17 +62,49 @@ public class User {
     @Length(max = 255, message = "Achievement shouldn't larger than 255 characters")
     private String achievement;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user")
-    private List<Certificates> cetificates;
+    @OneToMany( fetch = FetchType.LAZY,mappedBy = "user")
+    private List<Certificate> certificates;
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
+    @JsonIgnore
+    private List<ResourceLink> resourceLinks;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
     @JsonIgnore
     private List<UserHasCourse> userHasCourses;
 
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
+    @JsonIgnore
+    private List<Lesson> lessons;
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
+    @JsonIgnore
+    private List<Course> courses;
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
+    @JsonIgnore
+    private List<LearningLog> learningLogs;
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
+    @JsonIgnore
+    private List<Review> reviews;
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
+    @JsonIgnore
+    private List<GameHistory> gameHistories;
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
+    @JsonIgnore
+    private List<Notification> notifications;
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
+    @JsonIgnore
+    private List<ExerciseLog> exerciseLogs;
+
     @Transient
     private List<CourseDetailViewModel> courseDetailViewModels;
 
-    @NotNull
+    @NotNull(message = "Provider mut not be null")
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;
 
@@ -150,12 +184,12 @@ public class User {
         this.providerId = providerId;
     }
 
-    public List<Certificates> getCetificates() {
-        return cetificates;
+    public List<Certificate> getCertificates() {
+        return certificates;
     }
 
-    public void setCetificates(List<Certificates> cetificates) {
-        this.cetificates = cetificates;
+    public void setCertificates(List<Certificate> certificates) {
+        this.certificates = certificates;
     }
 
     public float getPoint() {
@@ -189,5 +223,69 @@ public class User {
 
     public void setCourseDetailViewModels(List<CourseDetailViewModel> courseDetailViewModels) {
         this.courseDetailViewModels = courseDetailViewModels;
+    }
+
+    public List<Lesson> getLessons() {
+        return lessons;
+    }
+
+    public void setLessons(List<Lesson> lessons) {
+        this.lessons = lessons;
+    }
+
+    public List<Course> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(List<Course> courses) {
+        this.courses = courses;
+    }
+
+    public List<LearningLog> getLearningLogs() {
+        return learningLogs;
+    }
+
+    public void setLearningLogs(List<LearningLog> learningLogs) {
+        this.learningLogs = learningLogs;
+    }
+
+    public List<ResourceLink> getResourceLinks() {
+        return resourceLinks;
+    }
+
+    public void setResourceLinks(List<ResourceLink> resourceLinks) {
+        this.resourceLinks = resourceLinks;
+    }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
+    }
+
+    public List<GameHistory> getGameHistories() {
+        return gameHistories;
+    }
+
+    public void setGameHistories(List<GameHistory> gameHistories) {
+        this.gameHistories = gameHistories;
+    }
+
+    public List<Notification> getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(List<Notification> notifications) {
+        this.notifications = notifications;
+    }
+
+    public List<ExerciseLog> getExerciseLogs() {
+        return exerciseLogs;
+    }
+
+    public void setExerciseLogs(List<ExerciseLog> exerciseLogs) {
+        this.exerciseLogs = exerciseLogs;
     }
 }

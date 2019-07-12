@@ -1,6 +1,7 @@
 package com.chess.chessapi.entities;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
@@ -14,12 +15,14 @@ public class CategoryHasCourse {
     @Column(name = "id")
     private long categoryHasCourseId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="course_id")
+    @JsonIgnore
     private Course course;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="category_id")
+    @JsonIgnore
     private Category category;
 
     public long getCategoryHasCourseId() {

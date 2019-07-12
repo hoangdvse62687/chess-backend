@@ -12,15 +12,21 @@ import com.chess.chessapi.models.PagedList;
 import com.chess.chessapi.security.CurrentUser;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.services.UserService;
+import com.chess.chessapi.utils.ManualCastUtils;
 import com.chess.chessapi.viewmodels.UserPaginationViewModel;
+import com.chess.chessapi.viewmodels.UserUpdateStatusViewModel;
+import com.chess.chessapi.viewmodels.UserUpdateViewModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.mapstruct.Context;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 
@@ -51,8 +57,7 @@ public class UserController {
     @ApiOperation(value = "Register an user")
     @PutMapping(value = "/register")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_REGISTRATION_AUTHENTICATIION +")")
-    public @ResponseBody JsonResult register(@Valid @RequestBody User user, @RequestParam("redirectUri") String redirectUri
-            , BindingResult bindingResult){
+    public @ResponseBody JsonResult register(@Valid @RequestBody UserUpdateViewModel userUpdateViewModel, BindingResult bindingResult, @Context HttpServletRequest request){
 
         String message = "";
         boolean isSuccess = true;
@@ -63,10 +68,10 @@ public class UserController {
         }else{
             try{
                 //gain redirect uri base on role
-                message = this.userService.register(user,redirectUri);
-
-            }catch (Exception ex){
-                message = ex.getMessage();
+                this.userService.register(ManualCastUtils.castUserUpdateToUser(userUpdateViewModel),request);
+                message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.USER);
+            }catch (DataIntegrityViolationException ex){
+                message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.USER);
                 isSuccess = false;
             }
         }
@@ -76,11 +81,15 @@ public class UserController {
     @ApiOperation(value = "Update profile user ")
     @PutMapping(value = "/update-profile")
     @PreAuthorize("isAuthenticated()")
-    public @ResponseBody JsonResult updateProfile(@Valid @RequestBody User user, BindingResult bindingResult){
-        UserPrincipal currentUser = this.userService.getCurrentUser();
-        if(currentUser.getId() != user.getUserId()){
-            throw new AccessDeniedException(AppMessage.PERMISSION_MESSAGE);
+    public @ResponseBody JsonResult updateProfile(@Valid @RequestBody UserUpdateViewModel userUpdateViewModel, BindingResult bindingResult){
+        if(!this.userService.checkPermissionModify(userUpdateViewModel.getUserId())){
+            throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
         }
+
+        if(!this.userService.isExist(userUpdateViewModel.getUserId())){
+            new ResourceNotFoundException("User","id",userUpdateViewModel.getUserId());
+        }
+
         String message = "";
         boolean isSuccess = true;
         if(bindingResult.hasErrors()){
@@ -89,10 +98,10 @@ public class UserController {
             isSuccess = false;
         }else{
             try{
-                this.userService.updateProfile(user);
+                this.userService.updateProfile(ManualCastUtils.castUserUpdateToUser(userUpdateViewModel));
 
                 message =  AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.PROFILE);
-            }catch (Exception ex){
+            }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.PROFILE);
                 isSuccess = false;
             }
@@ -139,15 +148,15 @@ public class UserController {
     @ApiOperation(value = "Update user status")
     @PutMapping(value = "/update-status")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_ADMIN_AUTHENTICATIION+")")
-    public @ResponseBody JsonResult updateStatus(@RequestParam("userId") int userId,@RequestParam("isActive") boolean isActive ){
+    public @ResponseBody JsonResult updateStatus(@RequestBody UserUpdateStatusViewModel userUpdateStatusViewModel){
         Boolean isSuccess = true;
         String message = "";
         try{
-            User user = this.userService.getUserById(userId)
-                    .orElseThrow(() -> new ResourceNotFoundException("User","id",userId));
-            this.userService.updateStatus(user,userId,isActive);
+            User user = this.userService.getUserById(userUpdateStatusViewModel.getUserId())
+                    .orElseThrow(() -> new ResourceNotFoundException("User","id",userUpdateStatusViewModel.getUserId()));
+            this.userService.updateStatus(user,userUpdateStatusViewModel.getUserId(),userUpdateStatusViewModel.isActive());
             message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.USER);
-        }catch (Exception ex){
+        }catch (DataIntegrityViolationException ex){
             isSuccess = false;
             message =  AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.USER);
         }

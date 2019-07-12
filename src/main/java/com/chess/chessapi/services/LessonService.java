@@ -1,0 +1,204 @@
+package com.chess.chessapi.services;
+
+import com.chess.chessapi.constants.EntitiesFieldName;
+import com.chess.chessapi.constants.ObjectType;
+import com.chess.chessapi.entities.*;
+import com.chess.chessapi.models.PagedList;
+import com.chess.chessapi.repositories.LessonRepository;
+import com.chess.chessapi.security.UserPrincipal;
+import com.chess.chessapi.utils.ManualCastUtils;
+import com.chess.chessapi.utils.TimeUtils;
+import com.chess.chessapi.viewmodels.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JsonParser;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.StoredProcedureQuery;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class LessonService {
+    @Autowired
+    private LessonRepository lessonRepository;
+
+    @Autowired
+    private InteractiveLessonService interactiveLessonService;
+
+    @Autowired
+    private CourseHasLessonService courseHasLessonService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private UninteractiveLessonService uninteractiveLessonService;
+
+    @Autowired
+    private LearningLogService learningLogService;
+
+    @PersistenceContext
+    private EntityManager em;
+
+    //PUBLIC METHOD DEFINED
+    public Optional<Lesson> getById(long id){
+        return this.lessonRepository.findById(id);
+    }
+
+    public List<LessonViewModel> getLessonByCourseId(long courseId){
+        //getting courses by userId
+        StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getLessonByCourseId");
+        query.setParameter("courseId",courseId);
+
+        query.execute();
+        //end getting courses by userid
+
+        return ManualCastUtils.castListObjectToLessonViewModel(query.getResultList());
+    }
+
+    public long getAuthorLessonByLessonId(long lessonId){
+        return this.lessonRepository.findLessonAuthorByLessonId(lessonId);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+    public long createInteractiveLesson(InteractiveLessonCreateViewModel lessonViewModel, long userId){
+        //Create Lesson
+        Lesson savedLesson = this.createLesson(lessonViewModel.getName(),userId,ObjectType.INTERACTIVE_LESSON);
+        //create interactive lesson
+        InteractiveLesson interactiveLesson = lessonViewModel.getInteractiveLesson();
+        interactiveLesson.setInteractiveLessonId(0);
+        interactiveLesson.setLesson(savedLesson);
+        InteractiveLesson savedInteractiveLesson = this.interactiveLessonService.create(interactiveLesson);
+
+        //create mapping course has lesson in case has course id
+        if(lessonViewModel.getCourseId() != 0){
+            //calculate next lesson ordered
+            int lessonOrder = this.courseHasLessonService.getLastestLessonOrder(lessonViewModel.getCourseId());
+            lessonOrder++;
+            this.courseHasLessonService.create(savedLesson.getLessonId()
+                    ,lessonViewModel.getCourseId(),lessonOrder);
+        }
+        return savedLesson.getLessonId();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+    public long createUninteractiveLesson(UninteractiveLessonCreateViewModel uninteractiveLessonCreateViewModel,long userId){
+        //Create Lesson
+        Lesson savedLesson = this.createLesson(uninteractiveLessonCreateViewModel.getName(),userId, ObjectType.UNINTERACTIVE_LESSON);
+        //create uninteractive lesson
+        UninteractiveLesson uninteractiveLesson = new UninteractiveLesson();
+        uninteractiveLesson.setUninteractiveLessonId(0);
+        uninteractiveLesson.setContent(uninteractiveLessonCreateViewModel.getContent());
+        uninteractiveLesson.setLesson(savedLesson);
+        this.uninteractiveLessonService.create(uninteractiveLesson);
+
+        //create mapping course has lesson in case has course id
+        if(uninteractiveLessonCreateViewModel.getCourseId() != 0){
+            //calculate next lesson ordered
+            int lessonOrder = this.courseHasLessonService.getLastestLessonOrder(uninteractiveLessonCreateViewModel.getCourseId());
+            lessonOrder++;
+            this.courseHasLessonService.create(savedLesson.getLessonId()
+                    ,uninteractiveLessonCreateViewModel.getCourseId(),lessonOrder);
+        }
+        return savedLesson.getLessonId();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+    public void updateInteractiveLesson(InteractiveLessonUpdateViewModel lessonViewModel){
+        //update lesson
+        this.updateLesson(lessonViewModel.getLessonId(),lessonViewModel.getName());
+
+        //update interactive lesson info
+        this.interactiveLessonService.update(lessonViewModel.getInteractiveLesson().getInteractiveLessonId()
+                ,lessonViewModel.getInteractiveLesson().getInitCode(),ManualCastUtils.castListStepToJson(lessonViewModel.getInteractiveLesson().getSteps()));
+
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+    public void updateUninteractiveLesson(UninteractiveLessonUpdateViewModel uninteractiveLessonUpdateViewModel){
+        //update lesson
+        this.updateLesson(uninteractiveLessonUpdateViewModel.getLessonId(),uninteractiveLessonUpdateViewModel.getName());
+
+        //update uninteractive lesson info
+        this.uninteractiveLessonService.update(uninteractiveLessonUpdateViewModel.getUninteractiveLesson().getUninteractiveLessonId(),
+                uninteractiveLessonUpdateViewModel.getUninteractiveLesson().getContent());
+
+    }
+
+    public void updateLesson(long lessonId,String name){
+        this.lessonRepository.update(lessonId,name);
+    }
+
+    public PagedList<LessonViewModel> getAllByOwner(int page, int pageSize, String name, long userId){
+        PageRequest pageable =  null;
+        pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.LESSON_CREATED_DATE).descending());
+        Page<Object> rawData = this.lessonRepository.findAllByOwner(pageable,name,userId);
+        return this.fillDataToPagination(rawData);
+    }
+
+    public boolean checkPermissionModifyLesson(long lessonId){
+        UserPrincipal userPrincipal = this.userService.getCurrentUser();
+        if(userPrincipal != null){
+            long ownerLessonId = this.lessonRepository.findLessonAuthorByLessonId(lessonId);
+            if(ownerLessonId == userPrincipal.getId()){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+    public void removeLesson(Lesson lesson){
+        //remove all learning log
+        this.learningLogService.deleteAllByLessonId(lesson.getLessonId());
+
+        //delete mapping with course
+        this.courseHasLessonService.deleteAllByLessonId(lesson.getLessonId());
+        //delete lesson
+        this.lessonRepository.delete(lesson);
+    }
+
+    public boolean checkPermissionViewLesson(long userId,long lessonId){
+        StoredProcedureQuery storedProcedureQuery = this.em.createNamedStoredProcedureQuery("checkPermssionToViewLesson");
+        storedProcedureQuery.setParameter("userId",userId);
+        storedProcedureQuery.setParameter("lessonId",lessonId);
+        storedProcedureQuery.setParameter("hasPermission",true);
+
+        storedProcedureQuery.execute();
+
+        return Boolean.parseBoolean(storedProcedureQuery.getOutputParameterValue("hasPermission").toString());
+    }
+
+    public boolean isExist(long lessonId){
+        return this.lessonRepository.existsById(lessonId);
+    }
+    //END PUBLIC METHOD DEFINED
+
+    //PRIVATE METHOD DEFINED
+    private PagedList<LessonViewModel> fillDataToPagination(Page<Object> rawData){
+        final List<LessonViewModel> content = ManualCastUtils.castPageObjectToLessonViewModel(rawData);
+        final int totalPages = rawData.getTotalPages();
+        final long totalElements = rawData.getTotalElements();
+        return new PagedList<LessonViewModel>(totalPages,totalElements,content);
+    }
+
+    private Lesson createLesson(String name,long userId,int type){
+        Lesson lesson = new Lesson();
+        lesson.setName(name);
+        lesson.setCreatedDate(TimeUtils.getCurrentTime());
+        lesson.setLessonType(type);
+        User user = new User();
+        user.setUserId(userId);
+        lesson.setUser(user);
+        return this.lessonRepository.save(lesson);
+    }
+    //END PRIVATE METHOD DEFINED
+}

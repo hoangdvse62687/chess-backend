@@ -28,16 +28,13 @@ public class Category {
     @Column(name = "id")
     private long categoryId;
 
-    @NotNull
+    @NotNull(message = "Name must not be null")
     @Length(max = 1000,message = "name is required not large than 1000 characters")
     private String name;
 
     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,mappedBy = "category")
     @JsonIgnore
     private List<CategoryHasCourse> categoryHasCourses;
-
-    @Transient
-    private List<CourseDetailViewModel> courseDetailViewModels;
 
     public long getCategoryId() {
         return categoryId;
@@ -61,13 +58,5 @@ public class Category {
 
     public void setCategoryHasCourses(List<CategoryHasCourse> categoryHasCourses) {
         this.categoryHasCourses = categoryHasCourses;
-    }
-
-    public List<CourseDetailViewModel> getCourseDetailViewModels() {
-        return courseDetailViewModels;
-    }
-
-    public void setCourseDetailViewModels(List<CourseDetailViewModel> courseDetailViewModels) {
-        this.courseDetailViewModels = courseDetailViewModels;
     }
 }

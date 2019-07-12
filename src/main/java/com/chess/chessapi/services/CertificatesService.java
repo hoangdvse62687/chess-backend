@@ -1,11 +1,10 @@
 package com.chess.chessapi.services;
 
-import com.chess.chessapi.entities.Certificates;
+import com.chess.chessapi.entities.Certificate;
 import com.chess.chessapi.repositories.CertificatesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -14,24 +13,25 @@ public class CertificatesService {
     @Autowired
     private CertificatesRepository certificatesRepository;
 
-    public List<Certificates> findAllByUserId(long userId){
+    //public method
+    public List<Certificate> findAllByUserId(long userId){
         return this.certificatesRepository.findAllByUserId(userId);
     }
 
-    public void updateCertifications(List<Certificates> oldCetificates, List<Certificates> newCetificates){
-        if(oldCetificates.isEmpty()){
+    public void updateCertifications(List<Certificate> oldCetificates, List<Certificate> newCetificates){
+        if(oldCetificates == null || oldCetificates.isEmpty()){
             //add all
-            for (Certificates newCetificate:
+            for (Certificate newCetificate:
                     newCetificates) {
                 this.certificatesRepository.save(newCetificate);
             }
         }else if(newCetificates != null && !newCetificates.isEmpty()){
             //check if new cetificate has already or not, if it not yet c=> create
 
-            for (Certificates newCetificate:
+            for (Certificate newCetificate:
                     newCetificates) {
                 boolean isExist = false;
-                for (Certificates oldCetificate:
+                for (Certificate oldCetificate:
                         oldCetificates) {
                     if(newCetificate.getCertificateLink().equals(oldCetificate.getCertificateLink())){
                         isExist = true;
@@ -44,17 +44,22 @@ public class CertificatesService {
                 }
             }
             //check old records should be deleted
-            for (Certificates oldCetificate:
+            for (Certificate oldCetificate:
                     oldCetificates) {
                 this.certificatesRepository.delete(oldCetificate);
             }
         }
         else{
             //delete all
-            for (Certificates cetificate:
+            for (Certificate cetificate:
                     oldCetificates) {
                 this.certificatesRepository.delete(cetificate);
             }
         }
     }
+
+    public void create(String link,long userId){
+        this.certificatesRepository.create(link,userId);
+    }
+    //end public method
 }
