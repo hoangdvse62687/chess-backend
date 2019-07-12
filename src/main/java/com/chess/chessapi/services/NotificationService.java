@@ -19,7 +19,7 @@ public class NotificationService {
         return notificationRepository.save(notification);
     }
 
-    public Page<Notification> getPagination(int page,int pageSize,String role,String userId,boolean sortIsViewed){
+    public Page<Notification> getPagination(int page,int pageSize,long role_id,String userId,boolean sortIsViewed){
         PageRequest pageable =  null;
 
         if(sortIsViewed){
@@ -29,17 +29,14 @@ public class NotificationService {
         }
 
         Page<Notification> notificationPage;
-        switch (role){
-            case AppRole.ROLE_ADMIN:
-                notificationPage = notificationRepository.findAllByRoleWithPagination(pageable,AppRole.ROLE_ADMIN);
-                break;
-            case AppRole.ROLE_INSTRUCTOR:
-                notificationPage = notificationRepository.findAllByRoleAndObjectIdWithPagination(pageable,AppRole.ROLE_INSTRUCTOR,userId);
-                break;
-            default:
-                notificationPage = notificationRepository.findAllByRoleAndObjectIdWithPagination(pageable,AppRole.ROLE_LEARNER,userId);
-
+        if(role_id == AppRole.ROLE_ADMIN){
+            notificationPage = this.notificationRepository.findAllByRoleWithPagination(pageable,AppRole.ROLE_ADMIN);
+        }else if(role_id == AppRole.ROLE_INSTRUCTOR){
+            notificationPage = this.notificationRepository.findAllByRoleAndObjectIdWithPagination(pageable,AppRole.ROLE_INSTRUCTOR,userId);
+        }else{
+            notificationPage = this.notificationRepository.findAllByRoleAndObjectIdWithPagination(pageable,AppRole.ROLE_LEARNER,userId);
         }
+
         return notificationPage;
     }
 }

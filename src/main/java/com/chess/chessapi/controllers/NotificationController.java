@@ -31,25 +31,25 @@ public class NotificationController {
     @Autowired
     private NotificationService notificationService;
 
-    @ApiOperation(value = "Get notification pagings")
-    @GetMapping("/get-notifications-pagination")
+    @ApiOperation(value = "Get current user notification pagings")
+    @GetMapping("/get-current-user-notifications-pagination")
     @PreAuthorize("hasAnyAuthority("+AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+","+AppRole.ROLE_LEARNER_AUTHENTICATIION+"" +
             ","+AppRole.ROLE_ADMIN_AUTHENTICATIION+")")
     public JsonResult getNotifications(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize,
                                       boolean sortIsViewed){
-        UserPrincipal currentUser = userService.getCurrentUser();
+        UserPrincipal currentUser = this.userService.getCurrentUser();
 
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.addAll(currentUser.getAuthorities());
-        String role = AppRole.ROLE_LEARNER;
+        long role_id = AppRole.ROLE_LEARNER;
         for (GrantedAuthority authority:
              authorities) {
-            role = authority.toString();
+            role_id = Integer.parseInt(authority.toString());
         }
         Page<Notification> listNofication = null;
         try{
-            listNofication = notificationService
-                    .getPagination(page,pageSize, role,currentUser.getId().toString(),sortIsViewed);
+            listNofication = this.notificationService
+                    .getPagination(page,pageSize, role_id,currentUser.getId().toString(),sortIsViewed);
         }catch (IllegalArgumentException ex){
             throw new ResourceNotFoundException("Page","number",page);
         }
