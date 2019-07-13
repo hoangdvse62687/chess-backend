@@ -222,7 +222,7 @@ public class CourseService {
         this.updateStatus(courseUpdateStatusViewModel.getCourseId(),courseUpdateStatusViewModel.getStatusId());
         //send email
         Mail mail = new Mail(AppMessage.PUBLISH_COURSE_REQUEST_SUBJECT,user.getEmail(),
-                this.mailContentBuilderUtils.buildInstructorApprove(user.getFullName(),mailContent
+                this.mailContentBuilderUtils.build(user.getFullName(),mailContent
                         , MailContentBuilderUtils.SOURCE_LINK_GO_TO_COURSE + course.getCourseId(),MailContentBuilderUtils.SOURCE_NAME_GO_TO_COURSE));
 
         this.mailService.sendMessage(mail);

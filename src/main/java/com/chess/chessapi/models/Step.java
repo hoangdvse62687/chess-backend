@@ -12,15 +12,6 @@ public class Step {
     @Length(max = 255,message = "step_code is required not large than 255 characters")
     private String stepCode;
 
-    @NotNull(message = "Right response must not be null")
-    @Length(max = 255,message = "right_response is required not large than 255 characters")
-    private String rightResponse;
-
-    @NotNull(message = "Wrong response must not be null")
-    @Length(max = 255,message = "wrong_response is required not large than 255 characters")
-    private String wrongResponse;
-
-
     public String getContent() {
         return content;
     }
@@ -35,21 +26,5 @@ public class Step {
 
     public void setStepCode(String stepCode) {
         this.stepCode = stepCode;
-    }
-
-    public String getRightResponse() {
-        return rightResponse;
-    }
-
-    public void setRightResponse(String rightResponse) {
-        this.rightResponse = rightResponse;
-    }
-
-    public String getWrongResponse() {
-        return wrongResponse;
-    }
-
-    public void setWrongResponse(String wrongResponse) {
-        this.wrongResponse = wrongResponse;
     }
 }

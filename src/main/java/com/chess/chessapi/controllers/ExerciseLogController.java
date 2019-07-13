@@ -2,13 +2,14 @@ package com.chess.chessapi.controllers;
 
 import com.chess.chessapi.constants.AppMessage;
 import com.chess.chessapi.constants.AppRole;
+import com.chess.chessapi.exceptions.AccessDeniedException;
 import com.chess.chessapi.models.CreateResponse;
 import com.chess.chessapi.models.JsonResult;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.services.ExerciseLogService;
+import com.chess.chessapi.viewmodels.ExerciseLogUpdateViewModel;
 import com.chess.chessapi.services.UserService;
 import com.chess.chessapi.viewmodels.ExerciseLogCreateViewModel;
-import com.chess.chessapi.viewmodels.LearningLogCreateViewModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,5 +65,32 @@ public class ExerciseLogController {
     public @ResponseBody JsonResult getLearningLogByCourseId(@RequestParam("courseId") long courseId){
         UserPrincipal userPrincipal = this.userService.getCurrentUser();
         return new JsonResult(null,this.exerciseLogService.getAllExerciseIdsInLogByCourseIdAndUserId(userPrincipal.getId(),courseId));
+    }
+
+    @ApiOperation(value = "Update exercise log")
+    @PutMapping(value = "/update-exercise-log")
+    @PreAuthorize("hasAuthority("+ AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
+    public @ResponseBody
+    JsonResult updateLearningLog(@Valid @RequestBody ExerciseLogUpdateViewModel exerciseLogUpdateViewModel, BindingResult bindingResult){
+        String message = "";
+        boolean isSuccess = true;
+        if(bindingResult.hasErrors()){
+            FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
+            message = fieldError.getDefaultMessage();
+            isSuccess = false;
+        }else{
+            try{
+                UserPrincipal userPrincipal = this.userService.getCurrentUser();
+                if(userPrincipal.getId() != this.exerciseLogService.getUserIdById(exerciseLogUpdateViewModel.getExerciseLogId())){
+                    throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
+                }
+                this.exerciseLogService.update(exerciseLogUpdateViewModel);
+                message =  AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.EXERCISE_LOG);
+            }catch (DataIntegrityViolationException ex){
+                message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.EXERCISE_LOG);
+                isSuccess = false;
+            }
+        }
+        return new JsonResult(message,isSuccess);
     }
 }

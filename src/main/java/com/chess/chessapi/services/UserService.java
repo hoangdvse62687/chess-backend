@@ -86,14 +86,14 @@ public class UserService {
         }
 
         this.userRepository.updateRegister(user.getUserId(),user.getFullName(),user.getAchievement(),user.getPoint(),
-                user.getRoleId(),user.isActive());
+                user.getRoleId(),user.isActive(),user.getAvatar());
 
         this.setUserRoleAuthentication(user,request);
     }
 
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public void updateProfile(User user){
-        this.userRepository.updateProfile(user.getUserId(),user.getFullName(),user.getAchievement());
+        this.userRepository.updateProfile(user.getUserId(),user.getFullName(),user.getAchievement(),user.getAvatar());
 
         //handle cetificate update
         List<Certificate> oldCetificates = this.certificatesService.findAllByUserId(user.getUserId());
@@ -128,7 +128,7 @@ public class UserService {
 
         //send email
         Mail mail = new Mail(AppMessage.ACCEPT_INSTRUCTOR_REQUEST_SUBJECT,user.getEmail(),
-                this.mailContentBuilderUtils.buildInstructorApprove(user.getFullName(),AppMessage.ACCEPT_INSTRUCTOR_REQUEST_CONTENT
+                this.mailContentBuilderUtils.build(user.getFullName(),AppMessage.ACCEPT_INSTRUCTOR_REQUEST_CONTENT
                 ,MailContentBuilderUtils.SOURCE_LINK_GO_TO_PROFILE,MailContentBuilderUtils.SOURCE_NAME_GO_TO_PROFILE));
 
         this.mailService.sendMessage(mail);

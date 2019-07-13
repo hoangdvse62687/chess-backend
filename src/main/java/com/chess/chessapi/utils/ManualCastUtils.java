@@ -3,6 +3,7 @@ package com.chess.chessapi.utils;
 import com.chess.chessapi.constants.Status;
 import com.chess.chessapi.entities.*;
 import com.chess.chessapi.models.Step;
+import com.chess.chessapi.models.StepSuggest;
 import com.chess.chessapi.viewmodels.*;
 import org.springframework.data.domain.Page;
 
@@ -91,6 +92,7 @@ public class ManualCastUtils implements Serializable {
     private static final String STEP_JSON_PARSER_STEPCODE = "stepCode";
     private static final String STEP_JSON_PARSER_RIGHTRESPONSE = "rightResponse";
     private static final String STEP_JSON_PARSER_WRONGRRESPONSE = "wrongResponse";
+    private static final String STEP_JSON_PARSER_SUGGEST = "suggest";
     //END STEP JSON PARSER DEFINED
 
 
@@ -367,9 +369,24 @@ public class ManualCastUtils implements Serializable {
         for (Step step:
              steps) {
             result += LEFT_ANGLE_BRACKET + D_QUOT  + STEP_JSON_PARSER_CONTENT + D_QUOT + COLON + D_QUOT +step.getContent() + D_QUOT
+                    + COMMA + D_QUOT + STEP_JSON_PARSER_STEPCODE + D_QUOT + COLON + D_QUOT +step.getStepCode() + D_QUOT + RIGHT_ANGLE_BRACKET + COMMA;
+        }
+
+        return LEFT_SQUARE_BRACKET + result.substring(0,result.length() - 1) + RIGHT_SQUARE_BRACKET;
+    }
+
+    public static String castListStepSuggestToJson(List<StepSuggest> steps){
+        if(steps == null || steps.isEmpty()){
+            return LEFT_SQUARE_BRACKET + " " + RIGHT_SQUARE_BRACKET;
+        }
+        String result = "";
+        for (StepSuggest step:
+                steps) {
+            result += LEFT_ANGLE_BRACKET + D_QUOT  + STEP_JSON_PARSER_CONTENT + D_QUOT + COLON + D_QUOT +step.getContent() + D_QUOT
                     + COMMA + D_QUOT + STEP_JSON_PARSER_STEPCODE + D_QUOT + COLON + D_QUOT +step.getStepCode() + D_QUOT
                     + COMMA + D_QUOT + STEP_JSON_PARSER_RIGHTRESPONSE + D_QUOT + COLON + D_QUOT +step.getRightResponse() + D_QUOT
-                    + COMMA + D_QUOT + STEP_JSON_PARSER_WRONGRRESPONSE + D_QUOT + COLON + D_QUOT +step.getWrongResponse() + D_QUOT + RIGHT_ANGLE_BRACKET + COMMA;
+                    + COMMA + D_QUOT + STEP_JSON_PARSER_WRONGRRESPONSE + D_QUOT + COLON + D_QUOT +step.getWrongResponse() + D_QUOT
+                    + COMMA + D_QUOT + STEP_JSON_PARSER_SUGGEST + D_QUOT + COLON + D_QUOT +step.getSuggest() + D_QUOT  + RIGHT_ANGLE_BRACKET + COMMA;
         }
 
         return LEFT_SQUARE_BRACKET + result.substring(0,result.length() - 1) + RIGHT_SQUARE_BRACKET;

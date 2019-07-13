@@ -312,7 +312,7 @@ public class CourseController {
                     .orElseThrow(() -> new ResourceNotFoundException("Course","id",enrollCourseViewModel.getCourseId()));
             UserPrincipal userPrincipal = this.userService.getCurrentUser();
             float calculatePointUpdate = this.userService.getPointByUserId(userPrincipal.getId());
-            if(calculatePointUpdate < course.getPoint()){
+            if(calculatePointUpdate < -course.getPoint()){
                 throw new AccessDeniedException(AppMessage.POINT_DENY_MESSAGE);
             }
 
@@ -320,7 +320,9 @@ public class CourseController {
                 try {
                     this.userHasCourseService.create(userPrincipal.getId(),course.getCourseId()
                             , TimeUtils.getCurrentTime(),Status.USER_HAS_COURSE_STATUS_IN_PROCESS);
-                    this.userService.increasePoint(userPrincipal.getId(),-course.getPoint());
+                    if(course.getPoint() < 0){
+                        this.userService.increasePoint(userPrincipal.getId(),course.getPoint());
+                    }
                     message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.ENROLL);
                 }catch (DataIntegrityViolationException ex){
                     message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.ENROLL);

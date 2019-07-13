@@ -19,7 +19,7 @@ public class MailContentBuilderUtils {
         this.templateEngine = templateEngine;
     }
 
-    public String buildInstructorApprove(String username,String message,String source,String sourceName) {
+    public String build(String username,String message,String source,String sourceName) {
         Context context = new Context();
         context.setVariable("name",username);
         context.setVariable("message", message);

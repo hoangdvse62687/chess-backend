@@ -6,6 +6,7 @@ import com.chess.chessapi.entities.User;
 import com.chess.chessapi.repositories.ExerciseLogRepository;
 import com.chess.chessapi.utils.TimeUtils;
 import com.chess.chessapi.viewmodels.ExerciseLogCreateViewModel;
+import com.chess.chessapi.viewmodels.ExerciseLogUpdateViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,5 +52,13 @@ public class ExerciseLogService {
 
         ExerciseLog savedExcerciseLog = this.exerciseLogRepository.save(exerciseLog);
         return savedExcerciseLog.getExerciseLogId();
+    }
+
+    public void update(ExerciseLogUpdateViewModel exerciseLogUpdateViewModel){
+        this.exerciseLogRepository.update(exerciseLogUpdateViewModel.getExerciseLogId(),exerciseLogUpdateViewModel.isPassed());
+    }
+
+    public long getUserIdById(long id){
+        return this.exerciseLogRepository.findUserIdById(id);
     }
 }
