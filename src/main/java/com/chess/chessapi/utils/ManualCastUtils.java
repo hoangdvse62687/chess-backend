@@ -88,8 +88,12 @@ public class ManualCastUtils implements Serializable {
     private static final char RIGHT_BRACKETS = ')';
     //END JSON PARSER CHARACTER DEFINED
     //STEP JSON PARSER DEFINED
+    private static final String STEP_JSON_PARSER_ID = "id";
+    private static final String STEP_JSON_PARSER_MOVE = "move";
     private static final String STEP_JSON_PARSER_CONTENT = "content";
-    private static final String STEP_JSON_PARSER_STEPCODE = "stepCode";
+    private static final String STEP_JSON_PARSER_MOVE_DIRECTION = "moveDirection";
+    private static final String STEP_JSON_PARSER_FEN= "fen";
+    private static final String STEP_JSON_PARSER_PRE_ID= "preId";
     private static final String STEP_JSON_PARSER_RIGHTRESPONSE = "rightResponse";
     private static final String STEP_JSON_PARSER_WRONGRRESPONSE = "wrongResponse";
     private static final String STEP_JSON_PARSER_SUGGEST = "suggest";
@@ -368,25 +372,13 @@ public class ManualCastUtils implements Serializable {
         String result = "";
         for (Step step:
              steps) {
-            result += LEFT_ANGLE_BRACKET + D_QUOT  + STEP_JSON_PARSER_CONTENT + D_QUOT + COLON + D_QUOT +step.getContent() + D_QUOT
-                    + COMMA + D_QUOT + STEP_JSON_PARSER_STEPCODE + D_QUOT + COLON + D_QUOT +step.getStepCode() + D_QUOT + RIGHT_ANGLE_BRACKET + COMMA;
-        }
-
-        return LEFT_SQUARE_BRACKET + result.substring(0,result.length() - 1) + RIGHT_SQUARE_BRACKET;
-    }
-
-    public static String castListStepSuggestToJson(List<StepSuggest> steps){
-        if(steps == null || steps.isEmpty()){
-            return LEFT_SQUARE_BRACKET + " " + RIGHT_SQUARE_BRACKET;
-        }
-        String result = "";
-        for (StepSuggest step:
-                steps) {
-            result += LEFT_ANGLE_BRACKET + D_QUOT  + STEP_JSON_PARSER_CONTENT + D_QUOT + COLON + D_QUOT +step.getContent() + D_QUOT
-                    + COMMA + D_QUOT + STEP_JSON_PARSER_STEPCODE + D_QUOT + COLON + D_QUOT +step.getStepCode() + D_QUOT
-                    + COMMA + D_QUOT + STEP_JSON_PARSER_RIGHTRESPONSE + D_QUOT + COLON + D_QUOT +step.getRightResponse() + D_QUOT
-                    + COMMA + D_QUOT + STEP_JSON_PARSER_WRONGRRESPONSE + D_QUOT + COLON + D_QUOT +step.getWrongResponse() + D_QUOT
-                    + COMMA + D_QUOT + STEP_JSON_PARSER_SUGGEST + D_QUOT + COLON + D_QUOT +step.getSuggest() + D_QUOT  + RIGHT_ANGLE_BRACKET + COMMA;
+            result += LEFT_ANGLE_BRACKET + D_QUOT  + STEP_JSON_PARSER_ID + D_QUOT + COLON + D_QUOT +step.getId()+ D_QUOT
+                    + COMMA + D_QUOT + STEP_JSON_PARSER_MOVE + D_QUOT + COLON + D_QUOT +step.getMove() + D_QUOT
+                    + COMMA + D_QUOT + STEP_JSON_PARSER_CONTENT + D_QUOT + COLON + D_QUOT +step.getContent() + D_QUOT
+                    + COMMA + D_QUOT + STEP_JSON_PARSER_MOVE_DIRECTION + D_QUOT + COLON + D_QUOT +step.getMoveDirection() + D_QUOT
+                    + COMMA + D_QUOT + STEP_JSON_PARSER_FEN + D_QUOT + COLON + D_QUOT +step.getFen() + D_QUOT
+                    + COMMA + D_QUOT + STEP_JSON_PARSER_PRE_ID + D_QUOT + COLON + D_QUOT +step.getPreId() + D_QUOT
+                    + RIGHT_ANGLE_BRACKET + COMMA;
         }
 
         return LEFT_SQUARE_BRACKET + result.substring(0,result.length() - 1) + RIGHT_SQUARE_BRACKET;

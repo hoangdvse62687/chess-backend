@@ -106,12 +106,12 @@ public class UserService {
         pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.USER_CREATED_DATE).descending());
 
         Page<Object> rawData = null;
-        if(!role.isEmpty()){
-            rawData = this.userRepository.findAllByFullNameFilterRole(pageable,email,'%' + role + '%');
+        if(!role.isEmpty() && !isActive.isEmpty()){
+            rawData = this.userRepository.findAllByFullNameFilterRoleAndStatus(pageable,email,'%' + role + '%',Boolean.valueOf(isActive));
         }else if(!isActive.isEmpty()){
             rawData = this.userRepository.findAllByFullNameFilterStatus(pageable,email,Boolean.valueOf(isActive));
-        }else if(!role.isEmpty() && !isActive.isEmpty()){
-            rawData = this.userRepository.findAllByFullNameFilterRoleAndStatus(pageable,email,'%' + role + '%',Boolean.valueOf(isActive));
+        }else if(!role.isEmpty()){
+            rawData = this.userRepository.findAllByFullNameFilterRole(pageable,email,'%' + role + '%');
         }else{
             rawData = this.userRepository.findAllByFullNameCustom(pageable,email);
         }
