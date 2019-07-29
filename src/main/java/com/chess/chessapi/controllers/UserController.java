@@ -113,7 +113,7 @@ public class UserController {
     @GetMapping(value = "/get-users-pagination")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_ADMIN_AUTHENTICATIION+")")
     public @ResponseBody JsonResult getUsers(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
-            ,String email, String role, String isActive){
+            ,String email, String role, String isActive,String isReview){
 
         if(email == null){
             email = "";
@@ -124,11 +124,14 @@ public class UserController {
         if(isActive == null){
             isActive = "";
         }
+        if(isReview == null){
+            isReview = "";
+        }
         email = '%' + email + '%';
 
         PagedList<UserPaginationViewModel> data = null;
         try{
-            data = this.userService.getPagination(page,pageSize,email,role,isActive);
+            data = this.userService.getPagination(page,pageSize,email,role,isActive,isReview);
         }catch (IllegalArgumentException ex){
             throw new ResourceNotFoundException("Page","number",page);
         }

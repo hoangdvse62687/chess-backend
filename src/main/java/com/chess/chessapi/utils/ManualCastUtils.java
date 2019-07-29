@@ -31,10 +31,12 @@ public class ManualCastUtils implements Serializable {
     private static final int COURSE_DESCRIPTION_INDEX = 4;
     private static final int COURSE_CREATED_DATE_INDEX = 5;
     private static final int COURSE_POINT_INDEX = 6;
-    private static final int COURSE_USERID_INDEX = 7;
-    private static final int COURSE_USER_FULLNAME_INDEX = 8;
-    private static final int COURSE_USER_AVATAR_INDEX = 9;
-    private static final int COURSE_USER_IS_ENROLLED = 10;
+    private static final int COURSE_REQUIRED_POINT_INDEX = 7;
+    private static final int COURSE_USERID_INDEX = 8;
+    private static final int COURSE_USER_FULLNAME_INDEX = 9;
+    private static final int COURSE_USER_AVATAR_INDEX = 10;
+    private static final int COURSE_USER_IS_ENROLLED = 11;
+    private static final int COURSE_CATEGORY_IDS= 12;
     //END COURSE DEFINED
 
     //LESSON DEFINED
@@ -99,7 +101,26 @@ public class ManualCastUtils implements Serializable {
     private static final String STEP_JSON_PARSER_SUGGEST = "suggest";
     //END STEP JSON PARSER DEFINED
 
+    //LEARNER STATUS PUBLISH COURSE REPORT
+    private static final int LEARNER_STATUS_REPORT_COURSE_NAME_INDEX = 0;
+    private static final int LEARNER_STATUS_REPORT_COURSE_STATUS_INDEX = 1;
+    private static final int LEARNER_STATUS_REPORT_COURSE_IN_PROCESS = 2;
+    private static final int LEARNER_STATUS_REPORT_COURSE_PASSED = 3;
+    private static final int LEARNER_STATUS_REPORT_COURSE_NOT_PASSED = 4;
+    //END LEARNER STATUS PUBLISH COURSE REPORT
 
+    //NOTIFICATION DEFINED
+    private static final int NOTIFICATION_ID_INDEX = 0;
+    private static final int NOTIFICATION_OBJECT_ID_INDEX = 1;
+    private static final int NOTIFICATION_OBJECT_NAME_INDEX = 2;
+    private static final int NOTIFICATION_OBJECT_AVATAR_INDEX = 3;
+    private static final int NOTIFICATION_OBJECT_TYPE_ID_INDEX = 4;
+    private static final int NOTIFICATION_CONTENT_INDEX = 5;
+    private static final int NOTIFICATION_IS_VIEWED_INDEX = 6;
+    private static final int NOTIFICATION_CREATED_DATE_INDEX = 7;
+    private static final int NOTIFICATION_ROLE_TARGET_INDEX = 8;
+    private static final int NOTIFICATION_USER_ID_INDEX = 9;
+    //END NOTIFICATION DEFINED
     public static User castObjectToUserByFindCustom(Object object)
             throws NumberFormatException{
         if(object == null){
@@ -156,7 +177,7 @@ public class ManualCastUtils implements Serializable {
         return users;
     }
 
-    public static List<CoursePaginationViewModel> castListObjectToCourseFromGetCoursePaginations(List<Object[]> objects)
+    public static List<CoursePaginationViewModel> castListObjectToCourseFromGetCoursePaginations(List<Object[]> objects,List<Category> categories)
     throws NumberFormatException{
         List<CoursePaginationViewModel> data = new ArrayList<>();
         for (Object[] object:
@@ -169,6 +190,7 @@ public class ManualCastUtils implements Serializable {
             coursePaginationViewModel.setCourseDescription(handleNullValueObject(object[COURSE_DESCRIPTION_INDEX],String.class));
             coursePaginationViewModel.setCourseCreatedDate(Timestamp.valueOf(object[COURSE_CREATED_DATE_INDEX].toString()));
             coursePaginationViewModel.setPoint(Float.parseFloat(object[COURSE_POINT_INDEX].toString()));
+            coursePaginationViewModel.setRequiredPoint(Float.parseFloat(object[COURSE_REQUIRED_POINT_INDEX].toString()));
 
             UserDetailViewModel author = new UserDetailViewModel();
             author.setUserId(Long.parseLong(object[COURSE_USERID_INDEX].toString()));
@@ -177,6 +199,23 @@ public class ManualCastUtils implements Serializable {
 
             coursePaginationViewModel.setAuthor(author);
             coursePaginationViewModel.setEnrolled(parseBoolean(object[COURSE_USER_IS_ENROLLED].toString()));
+            List<CategoryViewModel> categoryViewModels = new ArrayList<>();
+            String[] categoryIds = handleNullValueObject(object[COURSE_CATEGORY_IDS],String.class).split(",");
+            for (String categoryId:
+                 categoryIds) {
+                if(!categoryId.isEmpty()){
+                    for (Category category:
+                         categories) {
+                        if(category.getCategoryId() == Long.parseLong(categoryId)){
+                            CategoryViewModel categoryViewModel = new CategoryViewModel();
+                            categoryViewModel.setCategoryId(category.getCategoryId());
+                            categoryViewModel.setName(category.getName());
+                            categoryViewModels.add(categoryViewModel);
+                        }
+                    }
+                }
+            }
+            coursePaginationViewModel.setListCategorys(categoryViewModels);
             data.add(coursePaginationViewModel);
         }
         return data;
@@ -227,6 +266,34 @@ public class ManualCastUtils implements Serializable {
         return data;
     }
 
+    public static List<LearnerStatusPublishCourseReportViewModel> castListObjectToLearnerStatusPublishCourseReport(List<Object[]> objects){
+        List<LearnerStatusPublishCourseReportViewModel> data = new ArrayList<>();
+        for (Object[] object:
+                objects) {
+            LearnerStatusPublishCourseReportViewModel learnerStatusPublishCourseReportViewModel =
+                    new LearnerStatusPublishCourseReportViewModel();
+            learnerStatusPublishCourseReportViewModel.setCourseName(object[LEARNER_STATUS_REPORT_COURSE_NAME_INDEX].toString());
+            learnerStatusPublishCourseReportViewModel.setCourseStatus(Integer.parseInt(object[LEARNER_STATUS_REPORT_COURSE_STATUS_INDEX].toString()));
+            learnerStatusPublishCourseReportViewModel.setCounterInProcessStatus(Integer.parseInt(object[LEARNER_STATUS_REPORT_COURSE_IN_PROCESS].toString()));
+            learnerStatusPublishCourseReportViewModel.setCounterPassedStatus(Integer.parseInt(object[LEARNER_STATUS_REPORT_COURSE_PASSED].toString()));
+            learnerStatusPublishCourseReportViewModel.setCounterNotPassedStatus(Integer.parseInt(object[LEARNER_STATUS_REPORT_COURSE_NOT_PASSED].toString()));
+            data.add(learnerStatusPublishCourseReportViewModel);
+        }
+        return data;
+    }
+
+    public static List<Integer> castListObjectToListInteger(List<Object[]> objects){
+        List<Integer> data = new ArrayList<>();
+        for (Object[] object:
+             objects) {
+            for (Object item:
+                 object) {
+                data.add(Integer.parseInt(item.toString()));
+            }
+        }
+        return data;
+    }
+
     public static List<CategoryViewModel> castListObjectToCategoryIdFromGetCategoryByCourseId(List<Object[]> objects)
     throws NumberFormatException{
         List<CategoryViewModel> data = new ArrayList<>();
@@ -272,6 +339,26 @@ public class ManualCastUtils implements Serializable {
         return result;
     }
 
+    public static List<Notification> castListObjectToNotification(List<Object> objects){
+        List<Notification> result = new ArrayList<>();
+        for (Object object:
+                objects) {
+            Notification notification = new Notification();
+            Object[] data = (Object[]) object;
+            notification.setNotificationId(Long.parseLong(data[NOTIFICATION_ID_INDEX].toString()));
+            notification.setObjectId(Long.parseLong(data[NOTIFICATION_OBJECT_ID_INDEX].toString()));
+            notification.setObjectName(data[NOTIFICATION_OBJECT_NAME_INDEX].toString());
+            notification.setObjectAvatar(data[NOTIFICATION_OBJECT_AVATAR_INDEX].toString());
+            notification.setObjectTypeId(Long.parseLong(data[NOTIFICATION_OBJECT_TYPE_ID_INDEX].toString()));
+            notification.setContent(data[NOTIFICATION_CONTENT_INDEX].toString());
+            notification.setViewed(data[NOTIFICATION_IS_VIEWED_INDEX].toString().equals("1") ? true : false);
+            notification.setCreateDate(Timestamp.valueOf(data[NOTIFICATION_CREATED_DATE_INDEX].toString()));
+            notification.setRoleTarget(Long.parseLong(data[NOTIFICATION_ROLE_TARGET_INDEX].toString()));
+            result.add(notification);
+        }
+        return result;
+    }
+
     //CAST OBJECT TO OBJECT DEFINED
     public static Course castCourseCreateViewModelToCourse(CourseCreateViewModel courseCreateViewModel){
         Course course = new Course();
@@ -281,6 +368,7 @@ public class ManualCastUtils implements Serializable {
             course.setPoint(courseCreateViewModel.getPoint());
             course.setStatusId(Status.COURSE_STATUS_DRAFTED);
             course.setImage(courseCreateViewModel.getImage());
+            course.setRequiredPoint(courseCreateViewModel.getRequiredPoint());
         }
         return course;
     }
@@ -299,6 +387,7 @@ public class ManualCastUtils implements Serializable {
         courseDetailsViewModel.setListCategorys(course.getListCategorys());
         courseDetailsViewModel.setLessonViewModels(course.getLessonViewModels());
         courseDetailsViewModel.setListLearningLogLessonIds(course.getListLearningLogLessonIds());
+        courseDetailsViewModel.setRequiredPoint(course.getRequiredPoint());
         UserDetailViewModel author = new UserDetailViewModel();
         author.setUserId(course.getUser().getUserId());
         author.setFullName(course.getUser().getFullName());

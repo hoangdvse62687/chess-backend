@@ -12,6 +12,23 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "game_history")
 @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="gamehistoryId",scope = GameHistory.class)
+@NamedStoredProcedureQueries({
+        @NamedStoredProcedureQuery(
+                name = "getRateWinnableReport",
+                procedureName = "get_rate_winnable_report",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "year",type = Integer.class)
+                }
+        ),
+        @NamedStoredProcedureQuery(
+                name = "getRateWinnableLevelReport",
+                procedureName = "get_rate_winnable_level_report",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "year",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "isWin",type = Integer.class),
+                }
+        )
+})
 public class GameHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

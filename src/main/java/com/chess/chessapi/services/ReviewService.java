@@ -55,7 +55,7 @@ public class ReviewService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
-    public long create(ReviewCreateViewModel reviewCreateViewModel,long userId,String userName){
+    public long create(ReviewCreateViewModel reviewCreateViewModel,long userId,String userAvatar,String userName){
         Review review = new Review();
         review.setContent(reviewCreateViewModel.getContent());
         review.setCreatedDate(TimeUtils.getCurrentTime());
@@ -71,7 +71,7 @@ public class ReviewService {
         Review savedReview = this.reviewRepository.save(review);
 
         long authorId = this.courseService.getAuthorIdByCourseId(reviewCreateViewModel.getCourseId());
-        this.notificationService.sendNotificationToUser(AppMessage.NOTIFICATION_REVIEW,userName,ObjectType.REVIEW,
+        this.notificationService.sendNotificationToUser(AppMessage.NOTIFICATION_REVIEW,userName,userAvatar,ObjectType.REVIEW,
                 savedReview.getReviewId(),authorId,AppRole.ROLE_INSTRUCTOR);
         return savedReview.getReviewId();
     }
@@ -110,7 +110,7 @@ public class ReviewService {
 
     //PRIVATE DEFINED
     private PagedList<ReviewPaginationViewModel> fillDataToPaginationCustom(List<Object[]> rawData,long totalElements,int pageSize){
-        long totalPages = (totalElements / pageSize) + 1;
+        long totalPages = (long) Math.ceil(totalElements / (double) pageSize);
         List<ReviewPaginationViewModel> data = ManualCastUtils.castListObjectToReviewFromGetReview(rawData);
         return new PagedList<ReviewPaginationViewModel>(Math.toIntExact(totalPages),totalElements,data);
     }

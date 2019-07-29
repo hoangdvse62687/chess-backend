@@ -11,6 +11,7 @@ public class CourseDetailsViewModel {
     private String description;
     private Timestamp createdDate;
     private Float point;
+    private Float requiredPoint;
     private Long statusId;
     private String image;
     private UserDetailViewModel author;
@@ -158,5 +159,13 @@ public class CourseDetailsViewModel {
 
     public void setExerciseViewModels(List<Long> exerciseViewModels) {
         this.exerciseViewModels = exerciseViewModels;
+    }
+
+    public Float getRequiredPoint() {
+        return requiredPoint;
+    }
+
+    public void setRequiredPoint(Float requiredPoint) {
+        this.requiredPoint = requiredPoint;
     }
 }

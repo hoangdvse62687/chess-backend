@@ -12,7 +12,7 @@ public class ExerciseUpdateViewModel {
     @NotNull(message = "Exercise id must not be null")
     private long exerciseId;
     @NotNull(message = "Question must not be null")
-    @Length(max = 1000,message = "Question is required not larger than 1000 characters")
+    @Length(min=6,max = 1000,message = "Question is required in range 6~1000 characters")
     private String question;
 
     @Column(name = "content",columnDefinition = "json")

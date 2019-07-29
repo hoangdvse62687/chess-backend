@@ -9,6 +9,7 @@ import com.chess.chessapi.models.PagedList;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.services.NotificationService;
 import com.chess.chessapi.services.UserService;
+import com.chess.chessapi.viewmodels.NotificationPaginationsViewModel;
 import com.chess.chessapi.viewmodels.UpdateIsViewedNotification;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -38,7 +39,13 @@ public class NotificationController {
     @GetMapping("/get-current-user-notifications-pagination")
     @PreAuthorize("isAuthenticated()")
     public JsonResult getNotifications(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize,
-                                      boolean sortIsViewed){
+                                       String sortBy,String sortDirection){
+        if(sortBy == null){
+            sortBy = "";
+        }
+        if(sortDirection == null){
+            sortDirection = "";
+        }
         UserPrincipal currentUser = this.userService.getCurrentUser();
 
         List<GrantedAuthority> authorities = new ArrayList<>();
@@ -48,15 +55,13 @@ public class NotificationController {
              authorities) {
             role_id = Integer.parseInt(authority.toString());
         }
-        Page<Notification> listNofication = null;
+        NotificationPaginationsViewModel data = null;
         try{
-            listNofication = this.notificationService
-                    .getPagination(page,pageSize, role_id,currentUser.getId().toString(),sortIsViewed);
+            data = this.notificationService
+                    .getPagination(page,pageSize, role_id,currentUser.getId(),sortBy,sortDirection);
         }catch (IllegalArgumentException ex){
             throw new ResourceNotFoundException("Page","number",page);
         }
-        PagedList<Notification> data = new PagedList<>(listNofication.getTotalPages()
-                ,listNofication.getTotalElements(),listNofication.getContent());
         return new JsonResult(null,data);
     }
 

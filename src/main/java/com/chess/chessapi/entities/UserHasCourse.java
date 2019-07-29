@@ -6,10 +6,32 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.time.Year;
 
 @Entity
 @Table(name = "user_has_course")
 @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="userHasCourseId",scope = UserHasCourse.class)
+@NamedStoredProcedureQueries({
+        @NamedStoredProcedureQuery(
+                name = "getLearnerStatusCourseReport",
+                procedureName = "get_learner_status_course_report",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "authorId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageIndex",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageSize",type = Integer.class),
+						@StoredProcedureParameter(mode = ParameterMode.IN,name = "courseName",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalElements",type = Long.class)
+                }
+        ),
+        @NamedStoredProcedureQuery(
+                name = "getEnrollmentReport",
+                procedureName = "get_enrollment_report",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "authorId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "year",type = Integer.class)
+                }
+        )
+})
 public class UserHasCourse {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

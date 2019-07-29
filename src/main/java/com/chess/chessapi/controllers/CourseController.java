@@ -107,12 +107,18 @@ public class CourseController {
     @ApiOperation(value = "Get course pagination")
     @GetMapping("/get-course-pagination")
     public @ResponseBody JsonResult getCoursePaginationByStatusId(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
-            ,String statusId,String nameCourse){
+            ,String statusId,String nameCourse,String sortBy,String sortDirection){
         if(nameCourse == null){
             nameCourse = "";
         }
         if(statusId == null){
             statusId = "";
+        }
+        if(sortBy == null){
+            sortBy = "";
+        }
+        if(sortDirection == null){
+            sortDirection = "";
         }
         PagedList<CoursePaginationViewModel> data = null;
         try{
@@ -121,7 +127,7 @@ public class CourseController {
             if(userPrincipal != null){
                 userId = userPrincipal.getId();
             }
-            data = this.courseService.getCoursePaginationByStatusId(nameCourse,page,pageSize, statusId,userId);
+            data = this.courseService.getCoursePaginationByStatusId(nameCourse,page,pageSize, statusId,userId,sortBy,sortDirection);
         }catch (IllegalArgumentException ex){
             throw new ResourceNotFoundException("Page","number",page);
         }
@@ -282,7 +288,7 @@ public class CourseController {
                     //Send notification to author
                     //Send notification to Admin
                     this.notificationService.sendNotificationToAdmin(AppMessage.CREATE_NEW_COURSE,course.getName(),
-                            ObjectType.COURSE,course.getCourseId());
+                            course.getImage(),ObjectType.COURSE,course.getCourseId());
                     this.courseService.updateStatus(coursePublishViewModel.getCourseId(),Status.COURSE_STATUS_WAITING);
                     message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.COURSE);
                 }else {
@@ -312,7 +318,7 @@ public class CourseController {
                     .orElseThrow(() -> new ResourceNotFoundException("Course","id",enrollCourseViewModel.getCourseId()));
             UserPrincipal userPrincipal = this.userService.getCurrentUser();
             float calculatePointUpdate = this.userService.getPointByUserId(userPrincipal.getId());
-            if(calculatePointUpdate < -course.getPoint()){
+            if(calculatePointUpdate < course.getRequiredPoint()){
                 throw new AccessDeniedException(AppMessage.POINT_DENY_MESSAGE);
             }
 
@@ -320,9 +326,7 @@ public class CourseController {
                 try {
                     this.userHasCourseService.create(userPrincipal.getId(),course.getCourseId()
                             , TimeUtils.getCurrentTime(),Status.USER_HAS_COURSE_STATUS_IN_PROCESS);
-                    if(course.getPoint() < 0){
-                        this.userService.increasePoint(userPrincipal.getId(),course.getPoint());
-                    }
+                    this.userService.increasePoint(userPrincipal.getId(),-course.getRequiredPoint());
                     message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.ENROLL);
                 }catch (DataIntegrityViolationException ex){
                     message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.ENROLL);
@@ -338,8 +342,21 @@ public class CourseController {
 
     @ApiOperation(value = "get course paginations by category id")
     @GetMapping("/get-course-paginations-by-category-id")
-    public @ResponseBody JsonResult getCoursePaginationByCourseId(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize,@RequestParam("categoryId") long categoryId){
+    public @ResponseBody JsonResult getCoursePaginationByCourseId(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
+            ,@RequestParam("categoryId") long categoryId,String statusId,String nameCourse,String sortBy,String sortDirection){
 
+        if(nameCourse == null){
+            nameCourse = "";
+        }
+        if(sortDirection == null){
+            sortDirection = "";
+        }
+        if(sortBy == null){
+            sortBy = "";
+        }
+        if(statusId == null){
+            statusId = "";
+        }
         PagedList<CoursePaginationViewModel> data = null;
         try{
             UserPrincipal userPrincipal = this.userService.getCurrentUser();
@@ -347,7 +364,7 @@ public class CourseController {
             if(userPrincipal != null){
                 userId = userPrincipal.getId();
             }
-            data = courseService.getCoursePaginationsByCategoryId(page,pageSize,categoryId,userId);
+            data = courseService.getCoursePaginationsByCategoryId(nameCourse,statusId,page,pageSize,categoryId,userId,sortBy,sortDirection);
         }catch (IllegalArgumentException ex){
             throw new ResourceNotFoundException("Page","number",page);
         }
@@ -383,10 +400,11 @@ public class CourseController {
         }else{
             try{
                 UserPrincipal userPrincipal = this.userService.getCurrentUser();
+                User user = this.userService.getUserById(userPrincipal.getId()).get();
                 if(!this.courseService.checkPermissionReviewCourse(reviewCreateViewModel.getCourseId(),userPrincipal)){
                     throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
                 }
-                savedId = this.reviewService.create(reviewCreateViewModel,userPrincipal.getId(),userPrincipal.getName());
+                savedId = this.reviewService.create(reviewCreateViewModel,user.getUserId(),user.getAvatar(),user.getFullName());
                 message =  AppMessage.getMessageSuccess(AppMessage.CREATE,AppMessage.REVIEW);
             }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.CREATE,AppMessage.REVIEW);

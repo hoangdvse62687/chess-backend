@@ -101,12 +101,16 @@ public class UserService {
         this.certificatesService.updateCertifications(oldCetificates,user.getCertificates());
     }
 
-    public PagedList<UserPaginationViewModel> getPagination(int page, int pageSize, String email, String role, String isActive){
+    public PagedList<UserPaginationViewModel> getPagination(int page, int pageSize, String email, String role, String isActive,String isReviewed){
         PageRequest pageable =  null;
         pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.USER_CREATED_DATE).descending());
 
         Page<Object> rawData = null;
-        if(!role.isEmpty() && !isActive.isEmpty()){
+        if(!role.isEmpty() && !isActive.isEmpty() && !isReviewed.isEmpty()){
+            rawData = this.userRepository.findAllByFullNameFilterRoleAndStatusAndReviewed
+                    (pageable,email,'%' + role + '%',Boolean.valueOf(isActive),Boolean.valueOf(isReviewed));
+        }
+        else if(!role.isEmpty() && !isActive.isEmpty()){
             rawData = this.userRepository.findAllByFullNameFilterRoleAndStatus(pageable,email,'%' + role + '%',Boolean.valueOf(isActive));
         }else if(!isActive.isEmpty()){
             rawData = this.userRepository.findAllByFullNameFilterStatus(pageable,email,Boolean.valueOf(isActive));
@@ -123,8 +127,8 @@ public class UserService {
     public void updateStatus(User user,long userId,boolean isActive){
         //notification send to user
         this.notificationService.sendNotificationToUser(isActive ? AppMessage.UPDATE_USER_STATUS_ACTIVE : AppMessage.UPDATE_USER_STATUS_INACTIVE,
-                user.getEmail(),ObjectType.USER,userId,userId,user.getRoleId());
-        this.userRepository.updateStatus(userId,isActive);
+                user.getEmail(),user.getAvatar(),ObjectType.USER,userId,userId,user.getRoleId());
+        this.userRepository.updateStatus(userId,isActive,true);
 
         //send email
         Mail mail = new Mail(AppMessage.ACCEPT_INSTRUCTOR_REQUEST_SUBJECT,user.getEmail(),
@@ -214,15 +218,17 @@ public class UserService {
         user.setActive(Status.ACTIVE);
         user.setRoleId(AppRole.ROLE_LEARNER);
         user.setPoint(Common.DEFAULT_POINT_LEARNER);
+        user.setReviewed(true);
     }
 
     private void registerInstructor(User user){
         user.setActive(Status.INACTIVE);
         user.setRoleId(AppRole.ROLE_INSTRUCTOR);
         user.setPoint(0);
+        user.setReviewed(false);
         // create notification for admin
-        this.notificationService.sendNotificationToAdmin(AppMessage.CREATE_NEW_USER_AS_INSTRUCTOR,user.getEmail()
-                ,ObjectType.USER,user.getUserId());
+        this.notificationService.sendNotificationToAdmin(AppMessage.CREATE_NEW_USER_AS_INSTRUCTOR,user.getEmail(),
+                user.getAvatar(),ObjectType.USER,user.getUserId());
     }
 
     private PagedList<UserPaginationViewModel> fillDataToPaginationCustom(Page<Object> rawData){

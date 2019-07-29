@@ -26,7 +26,7 @@ public class GameHistoryCreateViewModel {
     private int gameTime;
 
     @NotNull(message = "Point must not be null")
-    private int point;
+    private float point;
 
     public Timestamp getStartTime() {
         return startTime;
@@ -68,11 +68,11 @@ public class GameHistoryCreateViewModel {
         this.gameTime = gameTime;
     }
 
-    public int getPoint() {
+    public float getPoint() {
         return point;
     }
 
-    public void setPoint(int point) {
+    public void setPoint(float point) {
         this.point = point;
     }
 }

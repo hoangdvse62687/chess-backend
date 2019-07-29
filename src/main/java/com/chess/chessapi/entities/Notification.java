@@ -9,6 +9,22 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "notification")
+@NamedStoredProcedureQueries({
+        @NamedStoredProcedureQuery(
+                name = "getNotificationPagination",
+                procedureName = "get_notification_pagination",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "role",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "userId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageIndex",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageSize",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortBy",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortDirection",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalElements",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalNotViewedElements",type = Long.class)
+                }
+        ),
+})
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -23,6 +39,11 @@ public class Notification {
     @Column(name = "object_name")
     @Length(max = 255,message = "ObjectName is required not larger than 255 characters")
     private String objectName;
+
+    @NotNull(message = "Object avatar must not be null")
+    @Column(name = "object_avatar")
+    @Length(max = 255,message = "Object Avatar is required not larger than 255 characters")
+    private String objectAvatar;
 
     @NotNull(message = "Object Type must not be null")
     @Column(name = "object_type_id")
@@ -116,5 +137,13 @@ public class Notification {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getObjectAvatar() {
+        return objectAvatar;
+    }
+
+    public void setObjectAvatar(String objectAvatar) {
+        this.objectAvatar = objectAvatar;
     }
 }

@@ -4,14 +4,21 @@ import com.chess.chessapi.constants.AppRole;
 import com.chess.chessapi.constants.EntitiesFieldName;
 import com.chess.chessapi.entities.Notification;
 import com.chess.chessapi.entities.User;
+import com.chess.chessapi.models.PagedList;
 import com.chess.chessapi.repositories.NotificationRepository;
+import com.chess.chessapi.utils.ManualCastUtils;
 import com.chess.chessapi.utils.TimeUtils;
+import com.chess.chessapi.viewmodels.CoursePaginationViewModel;
+import com.chess.chessapi.viewmodels.NotificationPaginationsViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.StoredProcedureQuery;
 import java.util.List;
 
 @Service
@@ -19,33 +26,33 @@ public class NotificationService {
     @Autowired
     private NotificationRepository notificationRepository;
 
+    @PersistenceContext
+    private EntityManager em;
     //public method
     public Notification create(Notification notification){
         return notificationRepository.save(notification);
     }
 
-    public Page<Notification> getPagination(int page,int pageSize,long role_id,String userId,boolean sortIsViewed){
-        PageRequest pageable =  null;
+    public NotificationPaginationsViewModel getPagination(int pageIndex, int pageSize, long role_id, long userId, String sortBy, String sortDirection){
+        StoredProcedureQuery storedProcedureQuery = this.em.createNamedStoredProcedureQuery("getNotificationPagination");
+        storedProcedureQuery.setParameter("role",role_id);
+        storedProcedureQuery.setParameter("pageIndex",(pageIndex - 1) * pageSize);
+        storedProcedureQuery.setParameter("pageSize",pageSize);
+        storedProcedureQuery.setParameter("userId",userId);
+        storedProcedureQuery.setParameter("sortBy",sortBy);
+        storedProcedureQuery.setParameter("sortDirection",sortDirection);
+        storedProcedureQuery.setParameter("totalElements",Long.parseLong("0"));
+        storedProcedureQuery.setParameter("totalNotViewedElements",Long.parseLong("0"));
 
-        if(sortIsViewed){
-            pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.NOTIFICATION_IS_VIEWED).ascending());
-        }else {
-            pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.NOTIFICATION_CREATED_DATE).descending());
-        }
+        storedProcedureQuery.execute();
 
-        Page<Notification> notificationPage;
-        if(role_id == AppRole.ROLE_ADMIN){
-            notificationPage = this.notificationRepository.findAllByRoleWithPagination(pageable,AppRole.ROLE_ADMIN);
-        }else if(role_id == AppRole.ROLE_INSTRUCTOR){
-            notificationPage = this.notificationRepository.findAllByRoleAndObjectIdWithPagination(pageable,AppRole.ROLE_INSTRUCTOR,userId);
-        }else{
-            notificationPage = this.notificationRepository.findAllByRoleAndObjectIdWithPagination(pageable,AppRole.ROLE_LEARNER,userId);
-        }
-
-        return notificationPage;
+        List<Object> rawData = storedProcedureQuery.getResultList();
+        long totalNotViewedElements = Long.parseLong(storedProcedureQuery.getOutputParameterValue("totalNotViewedElements").toString());
+        final long totalElements = Long.parseLong(storedProcedureQuery.getOutputParameterValue("totalElements").toString());
+        return new NotificationPaginationsViewModel(this.fillDataToPaginationCustom(rawData,totalElements,pageSize),totalNotViewedElements);
     }
 
-    public void sendNotificationToAdmin(String content,String objectName,int objectType,long objectId){
+    public void sendNotificationToAdmin(String content,String objectName,String objectAvatar,int objectType,long objectId){
         Notification notification = new Notification();
         notification.setObjectTypeId(objectType);
         notification.setObjectName(objectName);
@@ -53,11 +60,12 @@ public class NotificationService {
         notification.setContent(content);
         notification.setCreateDate(TimeUtils.getCurrentTime());
         notification.setViewed(false);
+        notification.setObjectAvatar(objectAvatar);
         notification.setRoleTarget(AppRole.ROLE_ADMIN);
         this.create(notification);
     }
 
-    public void sendNotificationToUser(String content,String objectName,int objectType,long objectId
+    public void sendNotificationToUser(String content,String objectName,String objectAvatar,int objectType,long objectId
             ,long userId,long roleTarget){
         Notification notification = new Notification();
         notification.setObjectTypeId(objectType);
@@ -65,6 +73,7 @@ public class NotificationService {
         notification.setContent(content);
         notification.setViewed(false);
         notification.setObjectId(objectId);
+        notification.setObjectAvatar(objectAvatar);
 
         User user = new User();
         user.setUserId(userId);
@@ -79,4 +88,12 @@ public class NotificationService {
         this.notificationRepository.updateIsViewed(notificationIds);
     }
     //end public method
+
+    //PRIVATE METHOD DEFINED
+    private PagedList<Notification> fillDataToPaginationCustom(List<Object> rawData, long totalElements, int pageSize){
+        long totalPages = (long) Math.ceil(totalElements / (double) pageSize);
+        List<Notification> data = ManualCastUtils.castListObjectToNotification(rawData);
+        return new PagedList<Notification>(Math.toIntExact(totalPages),totalElements,data);
+    }
+    //END PRIVATE METHOD DEFINED
 }

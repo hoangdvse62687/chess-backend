@@ -48,6 +48,10 @@ public class CourseService {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private CategoryService categoryService;
+
     //Public method
     public Course create(CourseCreateViewModel courseCreateViewModel, long userId){
         //default setting when created course is inactive
@@ -62,7 +66,8 @@ public class CourseService {
         return savedCourse;
     }
 
-    public PagedList<CoursePaginationViewModel> getCoursePaginationByStatusId(String courseName,int pageIndex, int pageSize, String statusId,long userId)
+    public PagedList<CoursePaginationViewModel> getCoursePaginationByStatusId(String courseName
+            ,int pageIndex, int pageSize, String statusId,long userId,String sortBy,String sortDirection)
             throws NumberFormatException{
         StoredProcedureQuery storedProcedureQuery = this.em.createNamedStoredProcedureQuery("getCoursePaginations");
         storedProcedureQuery.setParameter("courseName",courseName);
@@ -70,6 +75,8 @@ public class CourseService {
         storedProcedureQuery.setParameter("pageSize",pageSize);
         storedProcedureQuery.setParameter("statusId",statusId);
         storedProcedureQuery.setParameter("userId",userId);
+        storedProcedureQuery.setParameter("sortBy",sortBy);
+        storedProcedureQuery.setParameter("sortDirection",sortDirection);
         storedProcedureQuery.setParameter("totalElements",Long.parseLong("0"));
 
 
@@ -80,13 +87,18 @@ public class CourseService {
         return this.fillDataToPaginationCustom(rawData,totalElements,pageSize);
     }
 
-    public PagedList<CoursePaginationViewModel> getCoursePaginationsByCategoryId(int pageIndex,int pageSize,long categoryId,long userId){
+    public PagedList<CoursePaginationViewModel> getCoursePaginationsByCategoryId(String courseName, String statusId
+            ,int pageIndex,int pageSize,long categoryId,long userId,String sortBy,String sortDirection){
         StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getCourseByCategoryId");
+        query.setParameter("courseName",courseName);
         query.setParameter("pageSize",pageSize);
+        query.setParameter("totalElements",Long.parseLong("0"));
         query.setParameter("pageIndex",(pageIndex - 1) * pageSize);
+        query.setParameter("statusId",statusId);
         query.setParameter("userId",userId);
         query.setParameter("categoryId",categoryId);
-        query.setParameter("totalElements",Long.parseLong("0"));
+        query.setParameter("sortBy",sortBy);
+        query.setParameter("sortDirection",sortDirection);
 
         query.execute();
         List<Object[]> rawData = query.getResultList();
@@ -164,7 +176,7 @@ public class CourseService {
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public void updateCourse(Course course){
          this.courseRepository.updateCourse(course.getCourseId(),course.getName(),course.getDescription(),
-                 course.getPoint(),course.getStatusId(),course.getImage());
+                 course.getPoint(),course.getStatusId(),course.getImage(),course.getRequiredPoint());
          //only get old has status in-process
         List<UserHasCourse> oldUserHasCourses = this.userHasCourseService
                 .getAllByCourseIdAndStatusId(course.getCourseId(),Status.USER_HAS_COURSE_STATUS_IN_PROCESS);
@@ -216,7 +228,7 @@ public class CourseService {
         }
 
         //Send notification to author
-        this.notificationService.sendNotificationToUser(messageNotification,course.getName(),ObjectType.COURSE,
+        this.notificationService.sendNotificationToUser(messageNotification,course.getName(),course.getImage(),ObjectType.COURSE,
                 course.getCourseId(),course.getUser().getUserId(),AppRole.ROLE_INSTRUCTOR);
 
         this.updateStatus(courseUpdateStatusViewModel.getCourseId(),courseUpdateStatusViewModel.getStatusId());
@@ -231,8 +243,8 @@ public class CourseService {
 
     //Private method
     private PagedList<CoursePaginationViewModel> fillDataToPaginationCustom(List<Object[]> rawData,long totalElements,int pageSize){
-        long totalPages = (totalElements / pageSize) + 1;
-        List<CoursePaginationViewModel> data = ManualCastUtils.castListObjectToCourseFromGetCoursePaginations(rawData);
+        long totalPages = (long) Math.ceil(totalElements / (double) pageSize);
+        List<CoursePaginationViewModel> data = ManualCastUtils.castListObjectToCourseFromGetCoursePaginations(rawData,this.categoryService.getAllCategory());
         return new PagedList<CoursePaginationViewModel>(Math.toIntExact(totalPages),totalElements,data);
     }
 

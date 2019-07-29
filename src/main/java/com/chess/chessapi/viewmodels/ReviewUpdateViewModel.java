@@ -1,5 +1,7 @@
 package com.chess.chessapi.viewmodels;
 
+import org.hibernate.validator.constraints.Length;
+
 import javax.validation.constraints.NotNull;
 
 public class ReviewUpdateViewModel {
@@ -7,6 +9,7 @@ public class ReviewUpdateViewModel {
     private long reviewId;
 
     @NotNull(message = "Content must not be null")
+    @Length(min = 6,max = 1000,message = "name is required in range 6 ~ 1000 characters")
     private String content;
 
     private int rating;

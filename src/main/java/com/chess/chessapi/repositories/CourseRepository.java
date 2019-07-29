@@ -16,11 +16,11 @@ public interface CourseRepository extends JpaRepository<Course,Long> {
     @Transactional
     void updateStatus(long courseId,long statusId);
 
-    @Query(value = "Update course c Set c.name = ?2,c.description = ?3,c.point = ?4,c.status_id = ?5,c.image = ?6" +
+    @Query(value = "Update course c Set c.name = ?2,c.description = ?3,c.point = ?4,c.status_id = ?5,c.image = ?6,c.required_point=?7" +
             " where c.id = ?1",nativeQuery = true)
     @Modifying
     @Transactional
-    void updateCourse(long courseId,String name,String description,Float point,long statusId,String image);
+    void updateCourse(long courseId,String name,String description,Float point,long statusId,String image,Float requiredPoint);
 
     @Query(value = "Select c.owner From course c where id = ?1",nativeQuery = true)
     Long findAuthorIdByCourseId(long courseId);

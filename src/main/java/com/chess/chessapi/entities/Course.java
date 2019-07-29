@@ -28,6 +28,8 @@ import java.util.List;
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageSize",type = Integer.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "statusId",type = String.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "userId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortBy",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortDirection",type = String.class),
                         @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalElements",type = Long.class)
                 }
         ),
@@ -42,10 +44,14 @@ import java.util.List;
                 name = "getCourseByCategoryId",
                 procedureName = "get_courses_by_categoryid",
                 parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseName",type = String.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageIndex",type = Integer.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageSize",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "statusId",type = String.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "categoryId",type = Long.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "userId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortBy",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortDirection",type = String.class),
                         @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalElements",type = Long.class)
                 }
         ),
@@ -95,6 +101,10 @@ public class Course {
 
     @Min(value =0,message = "Point should equal or larger than 0")
     private float point;
+
+    @Min(value =0,message = "Required Point should equal or larger than 0")
+    @Column(name = "required_point")
+    private float requiredPoint;
 
     @Column(name = "status_id")
     private Long statusId;
@@ -325,5 +335,13 @@ public class Course {
 
     public void setListExerciseIds(List<Long> listExerciseIds) {
         this.listExerciseIds = listExerciseIds;
+    }
+
+    public float getRequiredPoint() {
+        return requiredPoint;
+    }
+
+    public void setRequiredPoint(float requiredPoint) {
+        this.requiredPoint = requiredPoint;
     }
 }

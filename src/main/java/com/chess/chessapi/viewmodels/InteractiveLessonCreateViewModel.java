@@ -1,12 +1,14 @@
 package com.chess.chessapi.viewmodels;
 
 import com.chess.chessapi.entities.InteractiveLesson;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 public class InteractiveLessonCreateViewModel {
     @NotNull(message = "Name must not be null")
+    @Length(min = 6,max = 1000,message = "Name is required in range 6 ~ 1000 characters")
     private String name;
 
     @Valid

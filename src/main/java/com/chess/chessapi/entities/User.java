@@ -25,6 +25,13 @@ import java.util.List;
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseId",type = Long.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "userHasCourseStatusId",type = Long.class)
                 }
+        ),
+        @NamedStoredProcedureQuery(
+                name = "getUsersRegisterReport",
+                procedureName = "get_users_register_report",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "year",type = Integer.class)
+                }
         )
 })
 public class User {
@@ -58,6 +65,8 @@ public class User {
     @Column(name = "role_id")
     private long roleId;
 
+    @Column(name = "is_reviewed")
+    private boolean isReviewed;
 
     @Length(max = 255, message = "Achievement shouldn't larger than 255 characters")
     private String achievement;
@@ -287,5 +296,13 @@ public class User {
 
     public void setExerciseLogs(List<ExerciseLog> exerciseLogs) {
         this.exerciseLogs = exerciseLogs;
+    }
+
+    public boolean isReviewed() {
+        return isReviewed;
+    }
+
+    public void setReviewed(boolean reviewed) {
+        isReviewed = reviewed;
     }
 }

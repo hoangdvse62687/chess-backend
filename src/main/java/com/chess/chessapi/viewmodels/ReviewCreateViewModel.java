@@ -8,7 +8,7 @@ public class ReviewCreateViewModel {
     @NotNull(message = "Rating must not be null")
     private int rating;
 
-    @Length(max = 1000,message = "name is required not large than 1000 characters")
+    @Length(min = 6,max = 1000,message = "name is required in range 6 ~ 1000 characters")
     @NotNull(message = "Content must not be null")
     private String content;
 

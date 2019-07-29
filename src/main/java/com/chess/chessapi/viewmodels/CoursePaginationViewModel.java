@@ -1,6 +1,7 @@
 package com.chess.chessapi.viewmodels;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 public class CoursePaginationViewModel {
     private long courseId;
@@ -9,9 +10,11 @@ public class CoursePaginationViewModel {
     private String courseImage;
     private Timestamp courseCreatedDate;
     private Float point;
+    private Float requiredPoint;
     private long statusId;
     private UserDetailViewModel author;
     private boolean isEnrolled;
+    private List<CategoryViewModel> listCategorys;
 
     public CoursePaginationViewModel() {
 
@@ -87,5 +90,21 @@ public class CoursePaginationViewModel {
 
     public void setEnrolled(boolean enrolled) {
         isEnrolled = enrolled;
+    }
+
+    public Float getRequiredPoint() {
+        return requiredPoint;
+    }
+
+    public void setRequiredPoint(Float requiredPoint) {
+        this.requiredPoint = requiredPoint;
+    }
+
+    public List<CategoryViewModel> getListCategorys() {
+        return listCategorys;
+    }
+
+    public void setListCategorys(List<CategoryViewModel> listCategorys) {
+        this.listCategorys = listCategorys;
     }
 }

@@ -20,6 +20,9 @@ public class CourseCreateViewModel {
     @Min(value =0,message = "Point should equal or larger than 0")
     private float point;
 
+    @Min(value =0,message = "Required Point should equal or larger than 0")
+    private float requiredPoint;
+
     @NotNull(message = "Image must not be null")
     @Length(max = 255,message = "Image must not be larger than 255 characters")
     private String image;
@@ -65,5 +68,17 @@ public class CourseCreateViewModel {
 
     public void setListCategoryIds(List<Long> listCategoryIds) {
         this.listCategoryIds = listCategoryIds;
+    }
+
+    public void setPoint(float point) {
+        this.point = point;
+    }
+
+    public float getRequiredPoint() {
+        return requiredPoint;
+    }
+
+    public void setRequiredPoint(float requiredPoint) {
+        this.requiredPoint = requiredPoint;
     }
 }

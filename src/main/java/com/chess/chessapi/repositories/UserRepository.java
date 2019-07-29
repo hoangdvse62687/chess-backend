@@ -50,13 +50,19 @@ public interface UserRepository extends JpaRepository<User, Long> {
             nativeQuery = true)
     Page<Object> findAllByFullNameFilterRoleAndStatus(Pageable pageable,String email,String role,boolean isActive);
 
+    @Query(value = "Select u.id,u.email,u.role_id,u.is_active,u.avatar,u.full_name,u.created_date " +
+            "From users u WHERE u.full_name like ?1 and u.role_id like ?2 and u.is_active = ?3 and u.is_reviewed = ?4",
+            countQuery = "Select count(u.id) from users u WHERE u.email like ?1 and u.role_id like ?2 and u.is_active = ?3 and u.is_reviewed = ?4",
+            nativeQuery = true)
+    Page<Object> findAllByFullNameFilterRoleAndStatusAndReviewed(Pageable pageable,String email,String role,boolean isActive,boolean isReviewed);
+
     Optional<User> findByEmail(String email);
 
     @Modifying
     @Transactional
-    @Query(value = "Update users u Set u.is_active = ?2 Where u.id = ?1"
+    @Query(value = "Update users u Set u.is_active = ?2,u.is_reviewed = ?3 Where u.id = ?1"
             ,nativeQuery = true)
-    void updateStatus(long id,boolean isActive);
+    void updateStatus(long id,boolean isActive,boolean isReviewed);
 
     @Modifying
     @Transactional
