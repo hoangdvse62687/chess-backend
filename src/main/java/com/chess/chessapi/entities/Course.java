@@ -78,7 +78,10 @@ import java.util.List;
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseName",type = String.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageIndex",type = Integer.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageSize",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "statusId",type = String.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "userId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortBy",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortDirection",type = String.class),
                         @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalElements",type = Long.class)
                 }
         ),

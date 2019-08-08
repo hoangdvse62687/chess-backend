@@ -11,6 +11,9 @@ public class UninteractiveLessonCreateViewModel {
     @Length(min = 6,max = 1000,message = "Name is required in range 6 ~ 1000 characters")
     private String name;
 
+    @Length(max = 1000,message = "Description is required not large than 1000 characters")
+    private String description;
+
     @NotNull(message = "Uninteractive Lesson must not be null")
     private String content;
 
@@ -38,5 +41,13 @@ public class UninteractiveLessonCreateViewModel {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

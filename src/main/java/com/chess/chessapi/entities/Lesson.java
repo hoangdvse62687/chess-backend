@@ -29,6 +29,19 @@ import java.util.List;
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "lessonId",type = Long.class),
                         @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "hasPermission",type = Boolean.class)
                 }
+        ),
+        @NamedStoredProcedureQuery(
+                name = "getLessonPaginationByUserid",
+                procedureName = "get_lesson_pagination_by_userid",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "userId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "lessonName",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageIndex",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageSize",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortBy",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortDirection",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalElements",type = Long.class)
+                }
         )
 })
 public class Lesson {
@@ -40,6 +53,9 @@ public class Lesson {
     @NotNull(message = "Name must not be null")
     @Length(max = 1000,message = "name is required not large than 1000 characters")
     private String name;
+
+    @Length(max = 1000,message = "Description is required not large than 1000 characters")
+    private String description;
 
     @Column(name = "created_date")
     private Timestamp createdDate;
@@ -136,5 +152,13 @@ public class Lesson {
 
     public void setLessonType(int lessonType) {
         this.lessonType = lessonType;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

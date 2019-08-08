@@ -1,6 +1,7 @@
 package com.chess.chessapi.services;
 
 import com.chess.chessapi.constants.AppRole;
+import com.chess.chessapi.constants.Common;
 import com.chess.chessapi.constants.EntitiesFieldName;
 import com.chess.chessapi.entities.Notification;
 import com.chess.chessapi.entities.User;
@@ -15,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -36,12 +39,8 @@ public class NotificationService {
     public NotificationPaginationsViewModel getPagination(int pageIndex, int pageSize, long role_id, long userId, String sortBy, String sortDirection){
         StoredProcedureQuery storedProcedureQuery = this.em.createNamedStoredProcedureQuery("getNotificationPagination");
         storedProcedureQuery.setParameter("role",role_id);
-        storedProcedureQuery.setParameter("pageIndex",(pageIndex - 1) * pageSize);
-        storedProcedureQuery.setParameter("pageSize",pageSize);
+        Common.storedProcedureQueryPaginationSetup(storedProcedureQuery,pageIndex,pageSize,sortBy,sortDirection);
         storedProcedureQuery.setParameter("userId",userId);
-        storedProcedureQuery.setParameter("sortBy",sortBy);
-        storedProcedureQuery.setParameter("sortDirection",sortDirection);
-        storedProcedureQuery.setParameter("totalElements",Long.parseLong("0"));
         storedProcedureQuery.setParameter("totalNotViewedElements",Long.parseLong("0"));
 
         storedProcedureQuery.execute();
@@ -84,6 +83,7 @@ public class NotificationService {
         this.create(notification);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public void updateIsView(List<Long> notificationIds){
         this.notificationRepository.updateIsViewed(notificationIds);
     }

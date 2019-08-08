@@ -37,14 +37,17 @@ public class ManualCastUtils implements Serializable {
     private static final int COURSE_USER_AVATAR_INDEX = 10;
     private static final int COURSE_USER_IS_ENROLLED = 11;
     private static final int COURSE_CATEGORY_IDS= 12;
+    private static final int COURSE_RATING_INDEX= 13;
+    private static final int COURSE_TOTAL_RATING_INDEX= 14;
     //END COURSE DEFINED
 
     //LESSON DEFINED
     private static final int LESSON_ID_INDEX = 0;
     private static final int LESSON_NAME_INDEX = 1;
-    private static final int LESSON_CREATED_DATE_INDEX = 2;
-    private static final int LESSON_TYPE_INDEX = 3;
-    private static final int LESSON_ORDER_LESSON_INDEX = 4;
+    private static final int LESSON_DESCRIPTION_INDEX = 2;
+    private static final int LESSON_CREATED_DATE_INDEX = 3;
+    private static final int LESSON_TYPE_INDEX = 4;
+    private static final int LESSON_ORDER_LESSON_INDEX = 5;
     //END LESSON DEFINED
 
     //NULL VALUE DEFINED
@@ -121,6 +124,18 @@ public class ManualCastUtils implements Serializable {
     private static final int NOTIFICATION_ROLE_TARGET_INDEX = 8;
     private static final int NOTIFICATION_USER_ID_INDEX = 9;
     //END NOTIFICATION DEFINED
+
+    //POINT LOG DEFINED
+    public static final int POINT_LOG_CONTENT_INDEX = 0;
+    public static final int POINT_LOG_POINT_INDEX = 1;
+    public static final int POINT_LOG_CREATED_DATE_INDEX = 2;
+    //END POINT LOG DEFINED
+
+    //COURSE FOR NOTIFICATION DEFINED
+    public static final int COURSE_FOR_NOTIFICATION_ID_INDEX = 0;
+    public static final int COURSE_FOR_NOTIFICATION_NAME_INDEX = 1;
+    public static final int COURSE_FOR_NOTIFICATION_IMAGE_INDEX = 2;
+    //END COURSE FOR NOTIFICATION DEFINED
     public static User castObjectToUserByFindCustom(Object object)
             throws NumberFormatException{
         if(object == null){
@@ -216,6 +231,8 @@ public class ManualCastUtils implements Serializable {
                 }
             }
             coursePaginationViewModel.setListCategorys(categoryViewModels);
+            coursePaginationViewModel.setRating(Double.parseDouble(object[COURSE_RATING_INDEX].toString()));
+            coursePaginationViewModel.setTotalRating(Long.parseLong(object[COURSE_TOTAL_RATING_INDEX].toString()));
             data.add(coursePaginationViewModel);
         }
         return data;
@@ -262,6 +279,19 @@ public class ManualCastUtils implements Serializable {
             userDetailViewModel.setEmail(object[USER_EMAIL_INDEX].toString());
             userDetailViewModel.setRoleId(Integer.parseInt(object[USER_ROLE_INDEX].toString()));
             data.add(userDetailViewModel);
+        }
+        return data;
+    }
+
+    public static List<PointLogViewModel> castListObjectToPointLogPagination(List<Object[]> objects){
+        List<PointLogViewModel> data = new ArrayList<>();
+        for (Object[] object:
+                objects) {
+            PointLogViewModel pointLogViewModel = new PointLogViewModel();
+            pointLogViewModel.setContent(object[POINT_LOG_CONTENT_INDEX].toString());
+            pointLogViewModel.setPoint(Float.parseFloat(object[POINT_LOG_POINT_INDEX].toString()));
+            pointLogViewModel.setCreatedDate(Timestamp.valueOf(object[POINT_LOG_CREATED_DATE_INDEX].toString()));
+            data.add(pointLogViewModel);
         }
         return data;
     }
@@ -315,6 +345,7 @@ public class ManualCastUtils implements Serializable {
             LessonViewModel lessonViewModel = new LessonViewModel();
             lessonViewModel.setLessonId(Long.parseLong(object[LESSON_ID_INDEX].toString()));
             lessonViewModel.setName(object[LESSON_NAME_INDEX].toString());
+            lessonViewModel.setDescription(handleNullValueObject(object[LESSON_DESCRIPTION_INDEX],String.class));
             lessonViewModel.setCreatedDate(Timestamp.valueOf(object[LESSON_CREATED_DATE_INDEX].toString()));
             lessonViewModel.setLessonOrdered(Integer.parseInt(object[LESSON_ORDER_LESSON_INDEX].toString()));
             lessonViewModel.setLessonType(Integer.parseInt(object[LESSON_TYPE_INDEX].toString()));
@@ -323,7 +354,7 @@ public class ManualCastUtils implements Serializable {
         return data;
     }
 
-    public static List<LessonViewModel> castPageObjectToLessonViewModel(Page<Object> objects)
+    public static List<LessonViewModel> castPageObjectToLessonViewModel(List<Object[]>  objects)
             throws NumberFormatException{
         List<LessonViewModel> result = new ArrayList<>();
         for (Object object:
@@ -332,6 +363,7 @@ public class ManualCastUtils implements Serializable {
             Object[] data = (Object[]) object;
             lessonViewModel.setLessonId(Long.parseLong(data[LESSON_ID_INDEX].toString()));
             lessonViewModel.setName(data[LESSON_NAME_INDEX].toString());
+            lessonViewModel.setDescription(handleNullValueObject(data[LESSON_DESCRIPTION_INDEX],String.class));
             lessonViewModel.setCreatedDate(Timestamp.valueOf(data[LESSON_CREATED_DATE_INDEX].toString()));
             lessonViewModel.setLessonType(Integer.parseInt(data[LESSON_TYPE_INDEX].toString()));
             result.add(lessonViewModel);
@@ -448,6 +480,20 @@ public class ManualCastUtils implements Serializable {
             reviewPaginationViewModel.setReviewer(reviewer);
 
             data.add(reviewPaginationViewModel);
+        }
+        return data;
+    }
+
+    public static List<CourseForNotificationViewModel> castListObjectsToCourseForNotificationViewModel(List<Object[]> objects){
+        List<CourseForNotificationViewModel> data = new ArrayList<>();
+        for(Object[] object:
+            objects){
+            CourseForNotificationViewModel courseForNotificationViewModel = new CourseForNotificationViewModel();
+            courseForNotificationViewModel.setCourseId(Long.parseLong(object[COURSE_FOR_NOTIFICATION_ID_INDEX].toString()));
+            courseForNotificationViewModel.setCourseName(object[COURSE_FOR_NOTIFICATION_NAME_INDEX].toString());
+            courseForNotificationViewModel.setCourseImage(object[COURSE_FOR_NOTIFICATION_IMAGE_INDEX].toString());
+
+            data.add(courseForNotificationViewModel);
         }
         return data;
     }

@@ -15,6 +15,8 @@ public class CoursePaginationViewModel {
     private UserDetailViewModel author;
     private boolean isEnrolled;
     private List<CategoryViewModel> listCategorys;
+    private double rating;
+    private long totalRating;
 
     public CoursePaginationViewModel() {
 
@@ -106,5 +108,21 @@ public class CoursePaginationViewModel {
 
     public void setListCategorys(List<CategoryViewModel> listCategorys) {
         this.listCategorys = listCategorys;
+    }
+
+    public double getRating() {
+        return rating;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
+    }
+
+    public long getTotalRating() {
+        return totalRating;
+    }
+
+    public void setTotalRating(long totalRating) {
+        this.totalRating = totalRating;
     }
 }

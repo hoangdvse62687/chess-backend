@@ -12,7 +12,6 @@ public class GameHistoryCreateViewModel {
     private Timestamp startTime;
 
     @NotNull(message = "Record must not be null")
-    @Length(max = 3000, message = "record shouldn't larger than 3000 characters")
     private String record;
 
     @NotNull(message = "Level must not be null")
@@ -27,6 +26,8 @@ public class GameHistoryCreateViewModel {
 
     @NotNull(message = "Point must not be null")
     private float point;
+
+    private int status;
 
     public Timestamp getStartTime() {
         return startTime;
@@ -74,5 +75,13 @@ public class GameHistoryCreateViewModel {
 
     public void setPoint(float point) {
         this.point = point;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

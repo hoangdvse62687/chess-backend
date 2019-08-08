@@ -39,12 +39,12 @@ public class AppMessage implements Serializable {
 
     //NOTIFICATION DEFINE
     public static final String CREATE_NEW_USER_AS_INSTRUCTOR = " is created as instructor role. Click to review its.";
-    public static final String UPDATE_USER_STATUS_ACTIVE = " has been actived";
-    public static final String UPDATE_USER_STATUS_INACTIVE = " has been inactived";
-    public static final String CREATE_NEW_COURSE = " is waitting for you to accept";
-    public static final String UPDATE_COURSE_STATUS_PUBLISHED = " is published";
-    public static final String UPDATE_COURSE_STATUS_REJECTED = " is rejected";
-    public static final String NOTIFICATION_REVIEW = " has reviewed your course";
+    public static final String UPDATE_USER_STATUS_ACTIVE = "đã được mở khóa";
+    public static final String UPDATE_USER_STATUS_INACTIVE = "đã bị ngưng hoạt động";
+    public static final String CREATE_NEW_COURSE = "đang chờ bạn xét duyệt";
+    public static final String UPDATE_COURSE_STATUS_PUBLISHED = "đã được công khai";
+    public static final String UPDATE_COURSE_STATUS_REJECTED = "đã bị từ chối công khai";
+    public static final String NOTIFICATION_REVIEW = "đã nhận xét khóa học của bạn";
     //END NOTIFICATION DEFINE
 
     //MAIL DEFINED

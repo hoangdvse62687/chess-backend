@@ -22,11 +22,17 @@ public class ReportController {
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION +")")
     public @ResponseBody
     JsonResult getLearnerStatusCourse(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
-	,String courseName) {
+	,String courseName,String sortBy,String sortDirection) {
 		if(courseName == null){
             courseName = "";
         }
-        return new JsonResult("",this.reportService.getLearnerStatusReport(page,pageSize,courseName));
+        if(sortDirection == null){
+            sortDirection = "";
+        }
+        if(sortBy == null){
+            sortBy = "";
+        }
+        return new JsonResult("",this.reportService.getLearnerStatusReport(page,pageSize,courseName,sortBy,sortDirection));
     }
 
     @ApiOperation(value = "Get Enrollment Report")

@@ -54,6 +54,9 @@ public class UserService {
     @Autowired
     private MailContentBuilderUtils mailContentBuilderUtils;
 
+    @Autowired
+    private PointLogService pointLogService;
+
     public UserPrincipal getCurrentUser(){
         UserPrincipal user = null;
         try{
@@ -74,7 +77,7 @@ public class UserService {
     public Optional<User> getUserByEmail(String email){return userRepository.findByEmail(email);}
 
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
-    public void register(User user,HttpServletRequest request){
+    public User register(User user,HttpServletRequest request){
         if(user.getRoleId() == AppRole.ROLE_INSTRUCTOR){
             this.registerInstructor(user);
         }else {
@@ -85,10 +88,14 @@ public class UserService {
             this.certificatesService.create(c.getCertificateLink(),user.getUserId());
         }
 
+        this.pointLogService.create(Common.USER_GAIN_FREE_POINT_MESSAGE,Common.DEFAULT_POINT_LEARNER,user.getUserId());
+
         this.userRepository.updateRegister(user.getUserId(),user.getFullName(),user.getAchievement(),user.getPoint(),
-                user.getRoleId(),user.isActive(),user.getAvatar());
+                user.getRoleId(),user.isActive(),user.getAvatar(),user.isReviewed());
 
         this.setUserRoleAuthentication(user,request);
+
+        return user;
     }
 
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
@@ -125,17 +132,17 @@ public class UserService {
 
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public void updateStatus(User user,long userId,boolean isActive){
-        //notification send to user
-        this.notificationService.sendNotificationToUser(isActive ? AppMessage.UPDATE_USER_STATUS_ACTIVE : AppMessage.UPDATE_USER_STATUS_INACTIVE,
-                user.getEmail(),user.getAvatar(),ObjectType.USER,userId,userId,user.getRoleId());
         this.userRepository.updateStatus(userId,isActive,true);
-
-        //send email
-        Mail mail = new Mail(AppMessage.ACCEPT_INSTRUCTOR_REQUEST_SUBJECT,user.getEmail(),
-                this.mailContentBuilderUtils.build(user.getFullName(),AppMessage.ACCEPT_INSTRUCTOR_REQUEST_CONTENT
-                ,MailContentBuilderUtils.SOURCE_LINK_GO_TO_PROFILE,MailContentBuilderUtils.SOURCE_NAME_GO_TO_PROFILE));
-
-        this.mailService.sendMessage(mail);
+        if(user.getRoleId() != AppRole.ROLE_ADMIN){
+            //notification send to user
+            this.notificationService.sendNotificationToUser(isActive ? AppMessage.UPDATE_USER_STATUS_ACTIVE : AppMessage.UPDATE_USER_STATUS_INACTIVE,
+                    user.getEmail(),user.getAvatar(),ObjectType.USER,userId,userId,user.getRoleId());
+            //send email
+            Mail mail = new Mail(AppMessage.ACCEPT_INSTRUCTOR_REQUEST_SUBJECT,user.getEmail(),
+                    this.mailContentBuilderUtils.build(user.getFullName(),AppMessage.ACCEPT_INSTRUCTOR_REQUEST_CONTENT
+                            ,MailContentBuilderUtils.SOURCE_LINK_GO_TO_PROFILE,MailContentBuilderUtils.SOURCE_NAME_GO_TO_PROFILE));
+            this.mailService.sendMessage(mail);
+        }
     }
 
     public void getUserDetails(User user){

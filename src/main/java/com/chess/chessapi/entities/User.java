@@ -46,7 +46,7 @@ public class User {
     private String email;
 
     @NotNull(message = "Full Name is required not null")
-    @Length(max = 255, message = "Full name shouldn't larger than 255 characters")
+    @Length(min = 6,max = 255, message = "Full name should be in range 6~255 characters")
     @Column(name = "full_name")
     private String fullName;
 
@@ -109,6 +109,10 @@ public class User {
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
     @JsonIgnore
     private List<ExerciseLog> exerciseLogs;
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
+    @JsonIgnore
+    private List<PointLog> pointLogs;
 
     @Transient
     private List<CourseDetailViewModel> courseDetailViewModels;
@@ -304,5 +308,13 @@ public class User {
 
     public void setReviewed(boolean reviewed) {
         isReviewed = reviewed;
+    }
+
+    public List<PointLog> getPointLogs() {
+        return pointLogs;
+    }
+
+    public void setPointLogs(List<PointLog> pointLogs) {
+        this.pointLogs = pointLogs;
     }
 }

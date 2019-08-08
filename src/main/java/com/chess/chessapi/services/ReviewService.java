@@ -72,7 +72,7 @@ public class ReviewService {
 
         long authorId = this.courseService.getAuthorIdByCourseId(reviewCreateViewModel.getCourseId());
         this.notificationService.sendNotificationToUser(AppMessage.NOTIFICATION_REVIEW,userName,userAvatar,ObjectType.REVIEW,
-                savedReview.getReviewId(),authorId,AppRole.ROLE_INSTRUCTOR);
+                reviewCreateViewModel.getCourseId(),authorId,AppRole.ROLE_INSTRUCTOR);
         return savedReview.getReviewId();
     }
 
@@ -85,10 +85,6 @@ public class ReviewService {
     }
 
     public boolean checkPermissionModifyReview(long reviewId,long userId,long courseId){
-        long authorId = this.courseService.getAuthorIdByCourseId(courseId);
-        if(authorId == userId){
-            return true;
-        }
         if(this.reviewRepository.checkPermissionModifyReview(reviewId,userId)){
             return true;
         }

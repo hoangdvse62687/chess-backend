@@ -52,7 +52,11 @@ public class CourseService {
     @Autowired
     private CategoryService categoryService;
 
+    @Autowired
+    private PointLogService pointLogService;
+
     //Public method
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public Course create(CourseCreateViewModel courseCreateViewModel, long userId){
         //default setting when created course is inactive
         Course course = ManualCastUtils.castCourseCreateViewModelToCourse(courseCreateViewModel);
@@ -62,23 +66,41 @@ public class CourseService {
         user.setUserId(userId);
         course.setUser(user);
         Course savedCourse = courseRepository.save(course);
-
+        for (Long categoryId:
+                courseCreateViewModel.getListCategoryIds()) {
+            this.categoryHasCourseService.create(categoryId,savedCourse.getCourseId());
+        }
+        //create mapping
+        this.userHasCourseService.create(userId,savedCourse.getCourseId()
+                , TimeUtils.getCurrentTime(), Status.USER_HAS_COURSE_STATUS_IN_PROCESS);
         return savedCourse;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+    public void publishCourse(CoursePublishViewModel coursePublishViewModel,Course course){
+        this.notificationService.sendNotificationToAdmin(AppMessage.CREATE_NEW_COURSE,course.getName(),
+                course.getImage(),ObjectType.COURSE,course.getCourseId());
+        this.updateStatus(coursePublishViewModel.getCourseId(),Status.COURSE_STATUS_WAITING);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+    public void enrollCourse(long userId,Course course){
+        this.userHasCourseService.create(userId,course.getCourseId()
+                , TimeUtils.getCurrentTime(),Status.USER_HAS_COURSE_STATUS_IN_PROCESS);
+        this.userService.increasePoint(userId,-course.getRequiredPoint());
+        float point = course.getRequiredPoint() < 0 ? -course.getRequiredPoint() : course.getRequiredPoint();
+        String pointStr = Integer.toString((int)point);
+        this.pointLogService.create("Bạn đã tiêu hao " + pointStr + " để đăng ký " + course.getName(),course.getRequiredPoint(),userId);
     }
 
     public PagedList<CoursePaginationViewModel> getCoursePaginationByStatusId(String courseName
             ,int pageIndex, int pageSize, String statusId,long userId,String sortBy,String sortDirection)
             throws NumberFormatException{
         StoredProcedureQuery storedProcedureQuery = this.em.createNamedStoredProcedureQuery("getCoursePaginations");
+        Common.storedProcedureQueryPaginationSetup(storedProcedureQuery,pageIndex,pageSize,sortBy,sortDirection);
         storedProcedureQuery.setParameter("courseName",courseName);
-        storedProcedureQuery.setParameter("pageIndex",(pageIndex - 1) * pageSize);
-        storedProcedureQuery.setParameter("pageSize",pageSize);
         storedProcedureQuery.setParameter("statusId",statusId);
         storedProcedureQuery.setParameter("userId",userId);
-        storedProcedureQuery.setParameter("sortBy",sortBy);
-        storedProcedureQuery.setParameter("sortDirection",sortDirection);
-        storedProcedureQuery.setParameter("totalElements",Long.parseLong("0"));
-
 
         storedProcedureQuery.execute();
 
@@ -90,15 +112,11 @@ public class CourseService {
     public PagedList<CoursePaginationViewModel> getCoursePaginationsByCategoryId(String courseName, String statusId
             ,int pageIndex,int pageSize,long categoryId,long userId,String sortBy,String sortDirection){
         StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getCourseByCategoryId");
+        Common.storedProcedureQueryPaginationSetup(query,pageIndex,pageSize,sortBy,sortDirection);
         query.setParameter("courseName",courseName);
-        query.setParameter("pageSize",pageSize);
-        query.setParameter("totalElements",Long.parseLong("0"));
-        query.setParameter("pageIndex",(pageIndex - 1) * pageSize);
         query.setParameter("statusId",statusId);
         query.setParameter("userId",userId);
         query.setParameter("categoryId",categoryId);
-        query.setParameter("sortBy",sortBy);
-        query.setParameter("sortDirection",sortDirection);
 
         query.execute();
         List<Object[]> rawData = query.getResultList();
@@ -198,13 +216,14 @@ public class CourseService {
         return this.courseRepository.findAuthorIdByCourseId(courseId);
     }
 
-    public PagedList<CoursePaginationViewModel>  getCoursePaginationsByUserId(String courseName,int pageIndex, int pageSize,long userId){
+    public PagedList<CoursePaginationViewModel> getCoursePaginationsByUserId(String courseName,int pageIndex,
+              int pageSize,long userId,String sortBy,String sortDirection,String statusId){
         StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getCoursePaginationsByUserid");
         query.setParameter("courseName",courseName);
-        query.setParameter("pageIndex",(pageIndex - 1) * pageSize);
-        query.setParameter("pageSize",pageSize);
+        query.setParameter("statusId",statusId);
         query.setParameter("userId",userId);
-        query.setParameter("totalElements",Long.parseLong("0"));
+        Common.storedProcedureQueryPaginationSetup(query,pageIndex,pageSize,sortBy,sortDirection);
+
 
         query.execute();
 
@@ -238,6 +257,14 @@ public class CourseService {
                         , MailContentBuilderUtils.SOURCE_LINK_GO_TO_COURSE + course.getCourseId(),MailContentBuilderUtils.SOURCE_NAME_GO_TO_COURSE));
 
         this.mailService.sendMessage(mail);
+    }
+
+    public List<CourseForNotificationViewModel> getCourseForNotificationByListCourseId(List<Long> listCourseIds){
+        if(listCourseIds == null){
+            return null;
+        }
+        return ManualCastUtils.castListObjectsToCourseForNotificationViewModel
+                (this.courseRepository.findCourseDetailForNotificationByListCourseId(listCourseIds));
     }
     //End Pulbic method
 

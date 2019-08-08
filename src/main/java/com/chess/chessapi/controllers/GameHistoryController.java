@@ -35,7 +35,7 @@ public class GameHistoryController {
     private UserService userService;
 
     @ApiOperation(value = "Create game history")
-    @PostMapping("/create-game-history")
+    @PostMapping("/create")
     @PreAuthorize("hasAnyAuthority("+ AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
     public @ResponseBody JsonResult createGameHistory(@RequestBody @Valid GameHistoryCreateViewModel gameHistoryCreateViewModel, BindingResult bindingResult){
         String message = "";
@@ -48,12 +48,9 @@ public class GameHistoryController {
         }else{
             try{
                 UserPrincipal userPrincipal = this.userService.getCurrentUser();
-                if(gameHistoryCreateViewModel.getPoint() < 0){
-                    //check point has enough to decrease
-                    float userPoint = this.userService.getPointByUserId(userPrincipal.getId());
-                    if(userPoint < -gameHistoryCreateViewModel.getPoint()){
-                        throw new AccessDeniedException(AppMessage.POINT_DENY_MESSAGE);
-                    }
+                if(!this.gameHistoryService.checkPointBet(userPrincipal.getId(),gameHistoryCreateViewModel.getStatus()
+                        ,gameHistoryCreateViewModel.getPoint())){
+                    throw new AccessDeniedException(AppMessage.POINT_DENY_MESSAGE);
                 }
                 savedId = this.gameHistoryService.create(gameHistoryCreateViewModel,userPrincipal.getId());
                 message = AppMessage.getMessageSuccess(AppMessage.CREATE,AppMessage.GAME_HISTORY);
@@ -66,6 +63,32 @@ public class GameHistoryController {
         createResponse.setSuccess(isSuccess);
         createResponse.setSavedId(savedId);
         return new JsonResult(message,createResponse);
+    }
+
+    @ApiOperation(value = "Update game history")
+    @PutMapping("/update")
+    @PreAuthorize("hasAnyAuthority("+ AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
+    public @ResponseBody JsonResult updateGameHistory(@RequestBody @Valid GameHistory gameHistory, BindingResult bindingResult){
+        String message = "";
+        boolean isSuccess = true;
+        if(bindingResult.hasErrors()){
+            FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
+            message = fieldError.getDefaultMessage();
+            isSuccess = false;
+        }else{
+            try{
+                UserPrincipal userPrincipal = this.userService.getCurrentUser();
+                if(!this.gameHistoryService.checkPointBet(userPrincipal.getId(),gameHistory.getStatus(),gameHistory.getPoint())){
+                    throw new AccessDeniedException(AppMessage.POINT_DENY_MESSAGE);
+                }
+                gameHistoryService.update(gameHistory,userPrincipal.getId());
+                message = AppMessage.getMessageSuccess(AppMessage.CREATE,AppMessage.GAME_HISTORY);
+            }catch (DataIntegrityViolationException ex){
+                message = AppMessage.getMessageFail(AppMessage.CREATE,AppMessage.GAME_HISTORY);
+                isSuccess = false;
+            }
+        }
+        return new JsonResult(message,isSuccess);
     }
 
     @ApiOperation(value = "Get game history paginations")

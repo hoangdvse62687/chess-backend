@@ -1,5 +1,6 @@
 package com.chess.chessapi.services;
 
+import com.chess.chessapi.constants.Common;
 import com.chess.chessapi.models.PagedList;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.utils.ManualCastUtils;
@@ -19,15 +20,16 @@ public class ReportService {
 
     @Autowired
     private UserService userService;
+
     //PUBLIC METHOD DEFINED
-    public PagedList<LearnerStatusPublishCourseReportViewModel> getLearnerStatusReport(int pageIndex, int pageSize,String courseName){
+    public PagedList<LearnerStatusPublishCourseReportViewModel> getLearnerStatusReport(int pageIndex, int pageSize,String courseName
+            ,String sortBy,String sortDirection){
         UserPrincipal userPrincipal = this.userService.getCurrentUser();
         StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getLearnerStatusCourseReport");
+        Common.storedProcedureQueryPaginationSetup(query,pageIndex,pageSize,sortBy,sortDirection);
         query.setParameter("authorId",userPrincipal.getId());
-        query.setParameter("pageIndex", (pageIndex - 1) * pageSize);
-        query.setParameter("pageSize", pageSize);
 		query.setParameter("courseName",courseName);
-        query.setParameter("totalElements",Long.parseLong("0"));
+
         query.execute();
         final long totalElements = Long.parseLong(query.getOutputParameterValue("totalElements").toString());
         return this.fillDataToPaginationCustom(query.getResultList(),totalElements,pageSize);

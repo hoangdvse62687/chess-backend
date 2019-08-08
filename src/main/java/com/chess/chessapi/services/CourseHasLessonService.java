@@ -2,8 +2,11 @@ package com.chess.chessapi.services;
 
 import com.chess.chessapi.entities.CourseHasLesson;
 import com.chess.chessapi.repositories.CourseHasLessonRepository;
+import com.chess.chessapi.utils.ManualCastUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class CourseHasLessonService {
@@ -41,6 +44,10 @@ public class CourseHasLessonService {
 
     public void deleteAllByLessonId(long lessonId){
         this.courseHasLessonRepository.deleteAllByLessonId(lessonId);
+    }
+
+    public List<Long> getListCourseIdByLessonId(long lessonId){
+        return this.courseHasLessonRepository.findListCourseIdByLessonId(lessonId);
     }
     //END PUBLIC METHOD DEFINED
 }

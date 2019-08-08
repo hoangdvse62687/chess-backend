@@ -191,15 +191,22 @@ public class LessonController {
     @ApiOperation(value = "get lesson of current user")
     @GetMapping("/get-lesson-paginations-by-current-user")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
-    public @ResponseBody JsonResult getLessonByOwner(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize,String name){
+    public @ResponseBody JsonResult getLessonByOwner(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
+            ,String name,String sortBy,String sortDirection){
         if(name == null){
             name = "";
         }
-        name = "%" + name + "%";
+        if(sortBy == null){
+            sortBy = "";
+        }
+        if(sortDirection == null) {
+            sortDirection = "";
+        }
+
         PagedList<LessonViewModel> data = null;
         UserPrincipal userPrincipal = this.userService.getCurrentUser();
         try{
-            data = this.lessonService.getAllByOwner(page,pageSize,name,userPrincipal.getId());
+            data = this.lessonService.getAllByOwner(page,pageSize,name,userPrincipal.getId(),sortBy,sortDirection);
         }catch (IllegalArgumentException ex){
             throw new ResourceNotFoundException("Page","number",page);
         }

@@ -58,24 +58,22 @@ public class UserController {
     @PutMapping(value = "/register")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_REGISTRATION_AUTHENTICATIION +")")
     public @ResponseBody JsonResult register(@Valid @RequestBody UserUpdateViewModel userUpdateViewModel, BindingResult bindingResult, @Context HttpServletRequest request){
-
         String message = "";
-        boolean isSuccess = true;
+        User user = null;
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
-            isSuccess = false;
         }else{
             try{
                 //gain redirect uri base on role
-                this.userService.register(ManualCastUtils.castUserUpdateToUser(userUpdateViewModel),request);
+                user = this.userService.register(ManualCastUtils.castUserUpdateToUser(userUpdateViewModel),request);
+
                 message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.USER);
             }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.USER);
-                isSuccess = false;
             }
         }
-        return new JsonResult(message,isSuccess);
+        return new JsonResult(message,user);
     }
 
     @ApiOperation(value = "Update profile user ")

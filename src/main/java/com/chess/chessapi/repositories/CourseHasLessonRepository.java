@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 
 @Repository
 public interface CourseHasLessonRepository extends JpaRepository<CourseHasLesson,Long> {
@@ -26,4 +28,7 @@ public interface CourseHasLessonRepository extends JpaRepository<CourseHasLesson
 
     @Query(value = "Select lesson_ordered from course_has_lesson where course_id = ?1 Order by lesson_ordered Desc LIMIT 1",nativeQuery = true)
     Integer findLastestLessonOrderedByCourseId(long courseId);
+
+    @Query(value = "Select course_id From course_has_lesson where lesson_id = ?1",nativeQuery = true)
+    List<Long> findListCourseIdByLessonId(long lessonId);
 }

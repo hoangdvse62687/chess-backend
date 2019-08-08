@@ -22,7 +22,7 @@ public class UserUpdateViewModel {
     private String email;
 
     @NotNull(message = "Full Name is required not null")
-    @Length(max = 255, message = "Full name shouldn't larger than 255 characters")
+    @Length(min = 6,max = 255, message = "Full name should be in range 6~255 characters")
     @Column(name = "full_name")
     private String fullName;
 

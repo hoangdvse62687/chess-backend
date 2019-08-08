@@ -1,5 +1,6 @@
 package com.chess.chessapi.repositories;
 
+import com.chess.chessapi.constants.AppRole;
 import com.chess.chessapi.entities.UserHasCourse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -29,5 +30,10 @@ public interface UserHasCourseRepository extends JpaRepository<UserHasCourse,Lon
             ,nativeQuery = true)
     List<UserHasCourse> findAllByCourseIdAndStatusId(long courseId,long statusId);
 
-
+    @Query(value = "Select user.id From user_has_course userHasCourse " +
+            "Inner Join users user " +
+            "On user.id = userHasCourse.user_id " +
+            "Where userHasCourse.course_id = ?1 and user.role_id = ?2"
+            ,nativeQuery = true)
+    List<Long> getAllLearnerByCourseId(long courseId,long learnerId);
 }

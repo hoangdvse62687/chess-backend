@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 
 @Repository
 public interface CourseRepository extends JpaRepository<Course,Long> {
@@ -24,4 +26,7 @@ public interface CourseRepository extends JpaRepository<Course,Long> {
 
     @Query(value = "Select c.owner From course c where id = ?1",nativeQuery = true)
     Long findAuthorIdByCourseId(long courseId);
+
+    @Query(value = "Select c.id,c.name,c.image From course c where c.id in ?1",nativeQuery = true)
+    List<Object[]> findCourseDetailForNotificationByListCourseId(List<Long> listCourseId);
 }
