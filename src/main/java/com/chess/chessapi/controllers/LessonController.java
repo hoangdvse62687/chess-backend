@@ -267,19 +267,18 @@ public class LessonController {
             throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
         }
 
-        if(!this.lessonService.isExist(mappingLessonCourseViewModel.getLessonId())){
-            new ResourceNotFoundException("Lesson","id",mappingLessonCourseViewModel.getLessonId());
-        }
-
         if(!this.courseService.isExist(mappingLessonCourseViewModel.getCourseId())){
             new ResourceNotFoundException("Course","id",mappingLessonCourseViewModel.getCourseId());
         }
 
+        Lesson lesson = this.lessonService.getById(mappingLessonCourseViewModel.getLessonId())
+                .orElseThrow(() -> new ResourceNotFoundException("Lesson","id",mappingLessonCourseViewModel.getLessonId()));
+
         Boolean isSuccess = true;
         String message = "";
         try{
-            int lessonOrder = this.courseHasLessonService.getLastestLessonOrder(mappingLessonCourseViewModel.getCourseId());
-            this.courseHasLessonService.create(mappingLessonCourseViewModel.getLessonId(),mappingLessonCourseViewModel.getCourseId(),lessonOrder);
+            this.lessonService.mappingLessonCourse(mappingLessonCourseViewModel.getLessonId(),lesson.getName()
+                    ,mappingLessonCourseViewModel.getCourseId());
             message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.LESSON);
         }catch (DataIntegrityViolationException ex){
             isSuccess = false;

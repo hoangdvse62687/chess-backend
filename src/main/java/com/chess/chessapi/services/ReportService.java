@@ -60,10 +60,9 @@ public class ReportService {
 
         return ManualCastUtils.castListObjectToListInteger(query.getResultList());
     }
-    public List<Integer> getRateWinnableLevelReport(int year,int isWin){
+    public List<Integer> getRateWinnableLevelReport(int year){
         StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getRateWinnableLevelReport");
         query.setParameter("year", year);
-        query.setParameter("isWin", isWin);
         query.execute();
 
         return ManualCastUtils.castListObjectToListInteger(query.getResultList());

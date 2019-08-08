@@ -63,7 +63,7 @@ public class ReportController {
     @GetMapping(value = "/get-rate-winnable-level-report")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_ADMIN_AUTHENTICATIION +")")
     public @ResponseBody
-    JsonResult getRateWinnableLevel(@RequestParam("year") int year,@RequestParam("isWin") int isWin) {
-        return new JsonResult("",this.reportService.getRateWinnableLevelReport(year,isWin));
+    JsonResult getRateWinnableLevel(@RequestParam("year") int year) {
+        return new JsonResult("",this.reportService.getRateWinnableLevelReport(year));
     }
 }

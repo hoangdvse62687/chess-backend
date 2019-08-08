@@ -6,4 +6,5 @@ public class ObjectType {
     public static final int INTERACTIVE_LESSON = 2;
     public static final int UNINTERACTIVE_LESSON = 3;
     public static final int REVIEW = 4;
+    public static final int LESSON = 5;
 }

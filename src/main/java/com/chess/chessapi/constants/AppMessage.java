@@ -38,7 +38,7 @@ public class AppMessage implements Serializable {
     //END PERMISION DEFINE
 
     //NOTIFICATION DEFINE
-    public static final String CREATE_NEW_USER_AS_INSTRUCTOR = " is created as instructor role. Click to review its.";
+    public static final String CREATE_NEW_USER_AS_INSTRUCTOR = " đã tạo tài khoản giảng viên";
     public static final String UPDATE_USER_STATUS_ACTIVE = "đã được mở khóa";
     public static final String UPDATE_USER_STATUS_INACTIVE = "đã bị ngưng hoạt động";
     public static final String CREATE_NEW_COURSE = "đang chờ bạn xét duyệt";

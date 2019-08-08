@@ -25,7 +25,6 @@ import java.sql.Timestamp;
                 procedureName = "get_rate_winnable_level_report",
                 parameters = {
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "year",type = Integer.class),
-                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "isWin",type = Integer.class),
                 }
         )
 })
