@@ -35,7 +35,7 @@ public class InteractiveLesson {
     @Type(type = "json")
     @Column(name = "content",columnDefinition = "json")
     @NotNull(message = "Steps must not be null")
-    private List<Step> steps = new ArrayList<Step>();
+    private List<@NotNull(message = "Step must not be null") Step> steps = new ArrayList<Step>();
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="lesson_id")

@@ -2,9 +2,7 @@ package com.chess.chessapi.controllers;
 
 import com.chess.chessapi.constants.AppMessage;
 import com.chess.chessapi.constants.AppRole;
-import com.chess.chessapi.constants.ObjectType;
 import com.chess.chessapi.entities.Lesson;
-import com.chess.chessapi.entities.User;
 import com.chess.chessapi.exceptions.AccessDeniedException;
 import com.chess.chessapi.exceptions.ResourceNotFoundException;
 import com.chess.chessapi.models.CreateResponse;
@@ -26,6 +24,8 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping(value = "/lesson")
@@ -50,7 +50,7 @@ public class LessonController {
             + AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult getLessonDetailById(@RequestParam("lessonId") long lessonId){
         UserPrincipal userPrincipal = this.userService.getCurrentUser();
-        if(!this.lessonService.checkPermissionViewLesson(userPrincipal.getId(),lessonId)){
+        if(!this.lessonService.checkPermissionViewLesson(userPrincipal,lessonId)){
             throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
         }
         Lesson lesson = this.lessonService.getById(lessonId).get();
@@ -83,6 +83,42 @@ public class LessonController {
             }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.CREATE,AppMessage.INTERACTIVE_LESSON);
                 isSuccess = false;
+                Logger.getLogger(LessonController.class.getName()).log(Level.SEVERE,null,ex);
+            }
+        }
+        CreateResponse createResponse = new CreateResponse();
+        createResponse.setSuccess(isSuccess);
+        createResponse.setSavedId(savedId);
+        return new JsonResult(message,createResponse);
+    }
+
+    @ApiOperation(value = "Create exercise lesson")
+    @PostMapping(value = "/create-exercise-lesson")
+    @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
+    public @ResponseBody JsonResult createExerciseLesson(@Valid @RequestBody ExerciseLessonCreateViewModel lessonViewModel, BindingResult bindingResult){
+        //if courseId are default => check permission create lesson on course
+        if(lessonViewModel.getCourseId() != 0){
+            if(!this.courseService.checkPermissionModifyCourse(lessonViewModel.getCourseId())){
+                throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
+            }
+        }
+
+        String message = "";
+        boolean isSuccess = true;
+        long savedId = 0;
+        if(bindingResult.hasErrors()){
+            FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
+            message = fieldError.getDefaultMessage();
+            isSuccess = false;
+        }else{
+            try{
+                UserPrincipal userPrincipal = this.userService.getCurrentUser();
+                savedId = this.lessonService.createExerciseLesson(lessonViewModel,userPrincipal.getId());
+                message =  AppMessage.getMessageSuccess(AppMessage.CREATE,AppMessage.EXERCISE);
+            }catch (DataIntegrityViolationException ex){
+                message = AppMessage.getMessageFail(AppMessage.CREATE,AppMessage.EXERCISE);
+                isSuccess = false;
+                Logger.getLogger(LessonController.class.getName()).log(Level.SEVERE,null,ex);
             }
         }
         CreateResponse createResponse = new CreateResponse();
@@ -118,6 +154,41 @@ public class LessonController {
             }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.INTERACTIVE_LESSON);
                 isSuccess = false;
+                Logger.getLogger(LessonController.class.getName()).log(Level.SEVERE,null,ex);
+            }
+        }
+        return new JsonResult(message,isSuccess);
+    }
+
+    @ApiOperation(value = "Update exercise lesson")
+    @PutMapping(value = "/update-exercise-lesson")
+    @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
+    public @ResponseBody JsonResult updateExerciseLesson(@Valid @RequestBody ExerciseLessonUpdateViewModel exerciseLessonUpdateViewModel
+            , BindingResult bindingResult){
+
+        if(!this.lessonService.checkPermissionModifyLesson(exerciseLessonUpdateViewModel.getLessonId())){
+            throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
+        }
+
+
+        if(!this.lessonService.isExist(exerciseLessonUpdateViewModel.getLessonId())){
+            new ResourceNotFoundException("Lesson","id",exerciseLessonUpdateViewModel.getLessonId());
+        }
+
+        String message = "";
+        boolean isSuccess = true;
+        if(bindingResult.hasErrors()){
+            FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
+            message = fieldError.getDefaultMessage();
+            isSuccess = false;
+        }else{
+            try{
+                this.lessonService.updateExerciseLesson(exerciseLessonUpdateViewModel);
+                message =  AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.EXERCISE);
+            }catch (DataIntegrityViolationException ex){
+                message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.EXERCISE);
+                isSuccess = false;
+                Logger.getLogger(LessonController.class.getName()).log(Level.SEVERE,null,ex);
             }
         }
         return new JsonResult(message,isSuccess);
@@ -149,6 +220,7 @@ public class LessonController {
             }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.CREATE,AppMessage.UNINTERACTIVE_LESSON);
                 isSuccess = false;
+                Logger.getLogger(LessonController.class.getName()).log(Level.SEVERE,null,ex);
             }
         }
         CreateResponse createResponse = new CreateResponse();
@@ -183,6 +255,7 @@ public class LessonController {
             }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.UNINTERACTIVE_LESSON);
                 isSuccess = false;
+                Logger.getLogger(LessonController.class.getName()).log(Level.SEVERE,null,ex);
             }
         }
         return new JsonResult(message,isSuccess);
@@ -208,6 +281,7 @@ public class LessonController {
         try{
             data = this.lessonService.getAllByOwner(page,pageSize,name,userPrincipal.getId(),sortBy,sortDirection);
         }catch (IllegalArgumentException ex){
+            Logger.getLogger(LessonController.class.getName()).log(Level.SEVERE,null,ex);
             throw new ResourceNotFoundException("Page","number",page);
         }
         return new JsonResult("",data);
@@ -229,6 +303,7 @@ public class LessonController {
         }catch (DataIntegrityViolationException ex){
             isSuccess = false;
             message =  AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.LESSON);
+            Logger.getLogger(LessonController.class.getName()).log(Level.SEVERE,null,ex);
         }
         return new JsonResult(message,isSuccess);
     }
@@ -243,15 +318,16 @@ public class LessonController {
 
         Lesson lesson = this.lessonService.getById(lessonRemoveViewModel.getLessonId())
                 .orElseThrow(() -> new ResourceNotFoundException("Lesson","id",lessonRemoveViewModel.getLessonId()));
-        this.lessonService.removeLesson(lesson);
 
         Boolean isSuccess = true;
         String message = "";
         try{
+            this.lessonService.removeLesson(lesson);
             message = AppMessage.getMessageSuccess(AppMessage.DELETE,AppMessage.LESSON);
         }catch (DataIntegrityViolationException ex){
             isSuccess = false;
             message =  AppMessage.getMessageFail(AppMessage.DELETE,AppMessage.LESSON);
+            Logger.getLogger(LessonController.class.getName()).log(Level.SEVERE,null,ex);
         }
         return new JsonResult(message,isSuccess);
     }
@@ -283,6 +359,7 @@ public class LessonController {
         }catch (DataIntegrityViolationException ex){
             isSuccess = false;
             message =  AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.LESSON);
+            Logger.getLogger(LessonController.class.getName()).log(Level.SEVERE,null,ex);
         }
         return new JsonResult(message,isSuccess);
     }

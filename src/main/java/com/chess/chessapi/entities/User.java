@@ -22,8 +22,7 @@ import java.util.List;
                 name = "getUsersByCourseid",
                 procedureName = "get_users_by_courseid",
                 parameters = {
-                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseId",type = Long.class),
-                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "userHasCourseStatusId",type = Long.class)
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseId",type = Long.class)
                 }
         ),
         @NamedStoredProcedureQuery(
@@ -68,15 +67,14 @@ public class User {
     @Column(name = "is_reviewed")
     private boolean isReviewed;
 
+    @Column(name = "modified_date")
+    private java.sql.Timestamp modifiedDate;
+
     @Length(max = 255, message = "Achievement shouldn't larger than 255 characters")
     private String achievement;
 
     @OneToMany( fetch = FetchType.LAZY,mappedBy = "user")
     private List<Certificate> certificates;
-
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
-    @JsonIgnore
-    private List<ResourceLink> resourceLinks;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
     @JsonIgnore
@@ -105,10 +103,6 @@ public class User {
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
     @JsonIgnore
     private List<Notification> notifications;
-
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
-    @JsonIgnore
-    private List<ExerciseLog> exerciseLogs;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
     @JsonIgnore
@@ -262,14 +256,6 @@ public class User {
         this.learningLogs = learningLogs;
     }
 
-    public List<ResourceLink> getResourceLinks() {
-        return resourceLinks;
-    }
-
-    public void setResourceLinks(List<ResourceLink> resourceLinks) {
-        this.resourceLinks = resourceLinks;
-    }
-
     public List<Review> getReviews() {
         return reviews;
     }
@@ -294,14 +280,6 @@ public class User {
         this.notifications = notifications;
     }
 
-    public List<ExerciseLog> getExerciseLogs() {
-        return exerciseLogs;
-    }
-
-    public void setExerciseLogs(List<ExerciseLog> exerciseLogs) {
-        this.exerciseLogs = exerciseLogs;
-    }
-
     public boolean isReviewed() {
         return isReviewed;
     }
@@ -316,5 +294,13 @@ public class User {
 
     public void setPointLogs(List<PointLog> pointLogs) {
         this.pointLogs = pointLogs;
+    }
+
+    public Timestamp getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(Timestamp modifiedDate) {
+        this.modifiedDate = modifiedDate;
     }
 }

@@ -12,10 +12,6 @@ import com.chess.chessapi.utils.ManualCastUtils;
 import com.chess.chessapi.utils.TimeUtils;
 import com.chess.chessapi.viewmodels.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.json.JsonParser;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +22,8 @@ import javax.persistence.StoredProcedureQuery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Service
 public class LessonService {
@@ -56,11 +54,16 @@ public class LessonService {
     @Autowired
     private UserHasCourseService userHasCourseService;
 
+    @Autowired
+    private ExerciseService exerciseService;
+
     @PersistenceContext
     private EntityManager em;
 
     private final String CREATE_LESSON_NOTIFICATION_MESSAGE = " đã thêm bài học ";
     private final String UPDATE_LESSON_NOTIFICATION_MESSAGE = " đã cập nhật bài học ";
+    private final String CREATE_EXECERCISE_NOTIFICATION_MESSAGE = " đã thêm bài tập mới ";
+    private final String UPDATE_EXECERCISE_NOTIFICATION_MESSAGE = " đã cập nhật bài tập ";
 
     //PUBLIC METHOD DEFINED
     public Optional<Lesson> getById(long id){
@@ -97,7 +100,7 @@ public class LessonService {
 
         //create mapping course has lesson in case has course id
         this.createLessonCourseMapping(lessonViewModel.getCourseId(),savedLesson.getLessonId()
-                ,savedLesson.getName());
+                ,savedLesson.getName(),CREATE_LESSON_NOTIFICATION_MESSAGE);
         return savedLesson.getLessonId();
     }
 
@@ -115,14 +118,33 @@ public class LessonService {
 
         //create mapping course has lesson in case has course id
         this.createLessonCourseMapping(uninteractiveLessonCreateViewModel.getCourseId(),savedLesson.getLessonId()
-                ,savedLesson.getName());
+                ,savedLesson.getName(),CREATE_LESSON_NOTIFICATION_MESSAGE);
+        return savedLesson.getLessonId();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+    public long createExerciseLesson(ExerciseLessonCreateViewModel exerciseLessonCreateViewModel, long userId){
+        //Create Lesson
+        Lesson savedLesson = this.createLesson(exerciseLessonCreateViewModel.getName(),exerciseLessonCreateViewModel.getDescription()
+                ,userId,ObjectType.EXERCISE);
+        //create interactive lesson
+
+        Exercise exercise = new Exercise();
+        exercise.setLesson(savedLesson);
+        exercise.setQuestion(exerciseLessonCreateViewModel.getExerciseCreateViewModel().getQuestion());
+        exercise.setAnswer(exerciseLessonCreateViewModel.getExerciseCreateViewModel().getAnswer());
+        this.exerciseService.create(exercise);
+
+        //create mapping course has lesson in case has course id
+        this.createLessonCourseMapping(exerciseLessonCreateViewModel.getCourseId(),savedLesson.getLessonId()
+                ,savedLesson.getName(),CREATE_EXECERCISE_NOTIFICATION_MESSAGE);
         return savedLesson.getLessonId();
     }
 
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public void updateInteractiveLesson(InteractiveLessonUpdateViewModel lessonViewModel){
         //update lesson
-        this.updateLesson(lessonViewModel.getLessonId(),lessonViewModel.getName(),lessonViewModel.getDescription());
+        this.updateLesson(lessonViewModel.getLessonId(),lessonViewModel.getName(),lessonViewModel.getDescription(),UPDATE_LESSON_NOTIFICATION_MESSAGE);
 
         //update interactive lesson info
         this.interactiveLessonService.update(lessonViewModel.getInteractiveLesson().getInteractiveLessonId()
@@ -131,10 +153,21 @@ public class LessonService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+    public void updateExerciseLesson(ExerciseLessonUpdateViewModel lessonViewModel){
+        //update lesson
+        this.updateLesson(lessonViewModel.getLessonId(),lessonViewModel.getName(),lessonViewModel.getDescription(),UPDATE_EXECERCISE_NOTIFICATION_MESSAGE);
+
+        //update interactive lesson info
+        this.exerciseService.update(lessonViewModel.getExercise().getExerciseId(),lessonViewModel.getExercise().getQuestion()
+                ,ManualCastUtils.castListStepSuggestToJson(lessonViewModel.getExercise().getAnswer()));
+
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public void updateUninteractiveLesson(UninteractiveLessonUpdateViewModel uninteractiveLessonUpdateViewModel){
         //update lesson
         this.updateLesson(uninteractiveLessonUpdateViewModel.getLessonId(),
-                uninteractiveLessonUpdateViewModel.getName(),uninteractiveLessonUpdateViewModel.getDescription());
+                uninteractiveLessonUpdateViewModel.getName(),uninteractiveLessonUpdateViewModel.getDescription(),UPDATE_LESSON_NOTIFICATION_MESSAGE);
 
         //update uninteractive lesson info
         this.uninteractiveLessonService.update(uninteractiveLessonUpdateViewModel.getUninteractiveLesson().getUninteractiveLessonId(),
@@ -142,10 +175,10 @@ public class LessonService {
 
     }
 
-    public void updateLesson(long lessonId,String name,String description){
-        this.lessonRepository.update(lessonId,name,description);
-        this.sendNotificationForLearner(lessonId
-                ,UPDATE_LESSON_NOTIFICATION_MESSAGE + name,null);
+    public void updateLesson(long lessonId,String name,String description,String content){
+        this.lessonRepository.update(lessonId,name,description,TimeUtils.getCurrentTime());
+        this.sendNotification(lessonId
+                ,content + name,null);
     }
 
     public PagedList<LessonViewModel> getAllByOwner(int pageIndex, int pageSize, String name, long userId,String sortBy,String sortDirection){
@@ -185,9 +218,17 @@ public class LessonService {
         this.lessonRepository.delete(lesson);
     }
 
-    public boolean checkPermissionViewLesson(long userId,long lessonId){
+    public boolean checkPermissionViewLesson(UserPrincipal userPrincipal,long lessonId){
+        if(userPrincipal == null){
+            return false;
+        }
+
+        //allow admin permission view course
+        if(Long.parseLong(userPrincipal.getRole()) == AppRole.ROLE_ADMIN){
+            return true;
+        }
         StoredProcedureQuery storedProcedureQuery = this.em.createNamedStoredProcedureQuery("checkPermssionToViewLesson");
-        storedProcedureQuery.setParameter("userId",userId);
+        storedProcedureQuery.setParameter("userId",userPrincipal.getId());
         storedProcedureQuery.setParameter("lessonId",lessonId);
         storedProcedureQuery.setParameter("hasPermission",true);
 
@@ -203,7 +244,7 @@ public class LessonService {
 
         List<Long> listCourseIds = new ArrayList<>();
         listCourseIds.add(courseId);
-        this.sendNotificationForLearner(lessonId
+        this.sendNotification(lessonId
                 ,CREATE_LESSON_NOTIFICATION_MESSAGE + lessonName,listCourseIds);
     }
 
@@ -231,7 +272,7 @@ public class LessonService {
         return this.lessonRepository.save(lesson);
     }
 
-    private void sendNotificationForLearner(long lessonId,String content,List<Long> listCourseIds){
+    private void sendNotification(long lessonId,String content,List<Long> listCourseIds){
         //allow send continue even errors occurs
         List<CourseForNotificationViewModel> courseForNotificationViewModels = new ArrayList<>();
         if(listCourseIds != null){
@@ -249,24 +290,28 @@ public class LessonService {
                             (courseForNotificationViewModel.getCourseId(), AppRole.ROLE_LEARNER);
                     for(Long userId: listUserIds){
                         this.notificationService.sendNotificationToUser(content,courseForNotificationViewModel.getCourseName()
-                                ,courseForNotificationViewModel.getCourseImage(),ObjectType.LESSON,lessonId,userId,AppRole.ROLE_LEARNER);
+                                ,courseForNotificationViewModel.getCourseImage(),ObjectType.COURSE,courseForNotificationViewModel.getCourseId()
+                                ,userId,AppRole.ROLE_LEARNER);
                     }
+                    this.notificationService.sendNotificationToAdmin(content,courseForNotificationViewModel.getCourseName()
+                            ,courseForNotificationViewModel.getCourseImage(),ObjectType.COURSE,courseForNotificationViewModel.getCourseId());
                 }
             }catch (Exception ex){
                 //will write in logger later
+                Logger.getLogger(LessonService.class.getName()).log(Level.SEVERE,null,ex);
             }
         }
     }
 
-    private void createLessonCourseMapping(long courseId,long lessonId,String lessonName){
+    private void createLessonCourseMapping(long courseId,long lessonId,String lessonName,String content){
         if(courseId != 0){
             int lessonOrder = this.courseHasLessonService.getLastestLessonOrder(courseId);
             lessonOrder++;
             this.courseHasLessonService.create(lessonId
                     ,courseId,lessonOrder);
 
-            this.sendNotificationForLearner(lessonId
-                    ,CREATE_LESSON_NOTIFICATION_MESSAGE + lessonName,null);
+            this.sendNotification(lessonId
+                    ,content + lessonName,null);
         }
     }
     //END PRIVATE METHOD DEFINED

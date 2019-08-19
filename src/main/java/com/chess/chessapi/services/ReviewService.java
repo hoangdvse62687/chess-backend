@@ -77,7 +77,8 @@ public class ReviewService {
     }
 
     public void update(ReviewUpdateViewModel reviewUpdateViewModel){
-        this.reviewRepository.update(reviewUpdateViewModel.getReviewId(),reviewUpdateViewModel.getContent(),reviewUpdateViewModel.getRating());
+        this.reviewRepository.update(reviewUpdateViewModel.getReviewId(),reviewUpdateViewModel.getContent()
+                ,reviewUpdateViewModel.getRating(),TimeUtils.getCurrentTime());
     }
 
     public void remove(long reviewId){

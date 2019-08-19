@@ -2,20 +2,16 @@ package com.chess.chessapi.controllers;
 
 import com.chess.chessapi.constants.AppMessage;
 import com.chess.chessapi.constants.AppRole;
-import com.chess.chessapi.constants.ObjectType;
 import com.chess.chessapi.constants.Status;
 import com.chess.chessapi.entities.*;
 import com.chess.chessapi.exceptions.AccessDeniedException;
 import com.chess.chessapi.exceptions.ResourceNotFoundException;
 import com.chess.chessapi.models.CreateResponse;
 import com.chess.chessapi.models.JsonResult;
-import com.chess.chessapi.models.Mail;
 import com.chess.chessapi.models.PagedList;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.services.*;
-import com.chess.chessapi.utils.MailContentBuilderUtils;
 import com.chess.chessapi.utils.ManualCastUtils;
-import com.chess.chessapi.utils.TimeUtils;
 import com.chess.chessapi.viewmodels.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping(value = "/course")
@@ -52,10 +50,7 @@ public class CourseController {
     private ReviewService reviewService;
 
     @Autowired
-    private ExerciseLogService exerciseLogService;
-
-    @Autowired
-    private ExerciseService exerciseService;
+    private UserHasCourseService userHasCourseService;
 
     @ApiOperation(value = "Create course")
     @PostMapping("/create-course")
@@ -77,6 +72,7 @@ public class CourseController {
             }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.CREATE,AppMessage.COURSE);
                 isSuccess = false;
+                Logger.getLogger(CourseController.class.getName()).log(Level.SEVERE,null,ex);
             }
         }
         CreateResponse createResponse = new CreateResponse();
@@ -110,6 +106,7 @@ public class CourseController {
             }
             data = this.courseService.getCoursePaginationByStatusId(nameCourse,page,pageSize, statusId,userId,sortBy,sortDirection);
         }catch (IllegalArgumentException ex){
+            Logger.getLogger(CourseController.class.getName()).log(Level.SEVERE,null,ex);
             throw new ResourceNotFoundException("Page","number",page);
         }
 
@@ -117,9 +114,9 @@ public class CourseController {
     }
 
     @ApiOperation(value = "remove course")
-    @PutMapping("/remove-course")
+    @PutMapping("/change-status-to-drafting")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
-    public @ResponseBody JsonResult removeCourse(@Valid @RequestBody CourseRemoveViewModel courseRemoveViewModel
+    public @ResponseBody JsonResult changeStatusToDrafting(@Valid @RequestBody CourseRemoveViewModel courseRemoveViewModel
             , BindingResult bindingResult){
 
         boolean hasPermissionModify = this.courseService.checkPermissionUpdateStatusCourse(courseRemoveViewModel.getCourseId());
@@ -134,8 +131,8 @@ public class CourseController {
             try{
                 if(hasPermissionModify){
                     if(this.courseService.isExist(courseRemoveViewModel.getCourseId())){
-                        this.courseService.updateStatus(courseRemoveViewModel.getCourseId(),Status.COURSE_STATUS_REMOVED);
-                        message = AppMessage.getMessageSuccess(AppMessage.DELETE,AppMessage.COURSE);
+                        this.courseService.updateStatus(courseRemoveViewModel.getCourseId(),Status.COURSE_STATUS_DRAFTED);
+                        message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.COURSE);
                     }else{
                         throw new ResourceNotFoundException("Course","id",courseRemoveViewModel.getCourseId());
                     }
@@ -143,8 +140,9 @@ public class CourseController {
                     throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
                 }
             }catch (DataIntegrityViolationException ex){
-                message = AppMessage.getMessageFail(AppMessage.DELETE,AppMessage.COURSE);
+                message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.COURSE);
                 isSuccess = false;
+                Logger.getLogger(CourseController.class.getName()).log(Level.SEVERE,null,ex);
             }
         }
 
@@ -174,6 +172,7 @@ public class CourseController {
             }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.COURSE);
                 isSuccess = false;
+                Logger.getLogger(CourseController.class.getName()).log(Level.SEVERE,null,ex);
             }
         }
 
@@ -191,14 +190,12 @@ public class CourseController {
         course.setTutors(this.userService.getTutors(userDetailViewModels));
         course.setListCategorys(this.categoryService.getListCategoryIdsByCourseId(course.getCourseId()));
         course.setLessonViewModels(this.lessonService.getLessonByCourseId(course.getCourseId()));
-        course.setListExerciseIds(this.exerciseService.getExerciseIdsByCourseId(courseId));
         //check permission to get lesson and learning log
         UserPrincipal userPrincipal = this.userService.getCurrentUser();
         boolean isEnrolled = this.courseService.checkPermissionViewCourseDetail(courseId,userPrincipal);
 
         if(isEnrolled){
             course.setListLearningLogLessonIds(this.learningLogService.getAllByCourseId(course.getCourseId(),userPrincipal.getId()));
-            course.setListLogExerciseIds(this.exerciseLogService.getAllExerciseIdsInLogByCourseIdAndUserId(userPrincipal.getId(),course.getCourseId()));
         }
         CourseDetailsViewModel courseDetailsViewModel = ManualCastUtils.castCourseToCourseDetailsViewModel(course,course.getLessonViewModels().size());
         courseDetailsViewModel.setEnrolled(isEnrolled);
@@ -228,6 +225,7 @@ public class CourseController {
             }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.COURSE);
                 isSuccess = false;
+                Logger.getLogger(CourseController.class.getName()).log(Level.SEVERE,null,ex);
             }
         }
         return new JsonResult(message,isSuccess);
@@ -274,6 +272,7 @@ public class CourseController {
             }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.COURSE);
                 isSuccess = false;
+                Logger.getLogger(CourseController.class.getName()).log(Level.SEVERE,null,ex);
             }
         }
 
@@ -298,14 +297,15 @@ public class CourseController {
             if(calculatePointUpdate < course.getRequiredPoint()){
                 throw new AccessDeniedException(AppMessage.POINT_DENY_MESSAGE);
             }
-
-            if(course.getStatusId() == Status.COURSE_STATUS_PUBLISHED){
+            boolean isEnrolled = this.userHasCourseService.isEnrolled(course.getCourseId(),userPrincipal.getId());
+            if(course.getStatusId() == Status.COURSE_STATUS_PUBLISHED && !isEnrolled){
                 try {
                     this.courseService.enrollCourse(userPrincipal.getId(),course);
                     message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.ENROLL);
                 }catch (DataIntegrityViolationException ex){
                     message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.ENROLL);
                     isSuccess = false;
+                    Logger.getLogger(CourseController.class.getName()).log(Level.SEVERE,null,ex);
                 }
             }else {
                 message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.ENROLL);
@@ -341,6 +341,7 @@ public class CourseController {
             }
             data = courseService.getCoursePaginationsByCategoryId(nameCourse,statusId,page,pageSize,categoryId,userId,sortBy,sortDirection);
         }catch (IllegalArgumentException ex){
+            Logger.getLogger(CourseController.class.getName()).log(Level.SEVERE,null,ex);
             throw new ResourceNotFoundException("Page","number",page);
         }
 
@@ -383,6 +384,7 @@ public class CourseController {
             }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.CREATE,AppMessage.REVIEW);
                 isSuccess = false;
+                Logger.getLogger(CourseController.class.getName()).log(Level.SEVERE,null,ex);
             }
         }
 
@@ -418,6 +420,7 @@ public class CourseController {
             }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.REVIEW);
                 isSuccess = false;
+                Logger.getLogger(CourseController.class.getName()).log(Level.SEVERE,null,ex);
             }
         }
         return new JsonResult(message,isSuccess);
@@ -449,6 +452,7 @@ public class CourseController {
             }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.REVIEW);
                 isSuccess = false;
+                Logger.getLogger(CourseController.class.getName()).log(Level.SEVERE,null,ex);
             }
         }
         return new JsonResult(message,isSuccess);
@@ -474,6 +478,7 @@ public class CourseController {
         try{
             data = this.courseService.getCoursePaginationsByUserId(nameCourse,page,pageSize,userId,sortBy,sortDirection,statusId);
         }catch (IllegalArgumentException ex){
+            Logger.getLogger(CourseController.class.getName()).log(Level.SEVERE,null,ex);
             throw new ResourceNotFoundException("Page","number",page);
         }
 

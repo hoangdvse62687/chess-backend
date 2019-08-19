@@ -3,7 +3,6 @@ package com.chess.chessapi.controllers;
 
 import com.chess.chessapi.constants.AppMessage;
 import com.chess.chessapi.constants.AppRole;
-import com.chess.chessapi.constants.EntitiesFieldName;
 import com.chess.chessapi.entities.User;
 import com.chess.chessapi.exceptions.AccessDeniedException;
 import com.chess.chessapi.exceptions.ResourceNotFoundException;
@@ -28,6 +27,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 @RestController
@@ -70,6 +71,7 @@ public class UserController {
 
                 message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.USER);
             }catch (DataIntegrityViolationException ex){
+                Logger.getLogger(UserController.class.getName()).log(Level.SEVERE,null,ex);
                 message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.USER);
             }
         }
@@ -102,6 +104,7 @@ public class UserController {
             }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.PROFILE);
                 isSuccess = false;
+                Logger.getLogger(UserController.class.getName()).log(Level.SEVERE,null,ex);
             }
         }
         return new JsonResult(message,isSuccess);
@@ -131,6 +134,7 @@ public class UserController {
         try{
             data = this.userService.getPagination(page,pageSize,email,role,isActive,isReview);
         }catch (IllegalArgumentException ex){
+            Logger.getLogger(UserController.class.getName()).log(Level.SEVERE,null,ex);
             throw new ResourceNotFoundException("Page","number",page);
         }
 
@@ -160,6 +164,7 @@ public class UserController {
         }catch (DataIntegrityViolationException ex){
             isSuccess = false;
             message =  AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.USER);
+            Logger.getLogger(UserController.class.getName()).log(Level.SEVERE,null,ex);
         }
         return new JsonResult(message,isSuccess);
     }

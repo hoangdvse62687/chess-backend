@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class LearningLogService {
@@ -26,6 +27,7 @@ public class LearningLogService {
         Lesson lesson = new Lesson();
         lesson.setLessonId(learningLogCreateViewModel.getLessonId());
         learningLog.setLesson(lesson);
+        learningLog.setPassed(learningLog.isPassed());
         User user = new User();
         user.setUserId(userId);
         learningLog.setUser(user);
@@ -34,11 +36,24 @@ public class LearningLogService {
         return savedLearningLog.getLearninglogId();
     }
 
+    public void update(LearningLog learningLog,boolean isPassed){
+        learningLog.setPassed(isPassed);
+        this.learningLogRepository.save(learningLog);
+    }
+
     public List<Long> getAllByCourseId(long courseId,long userId){
         return this.learningLogRepository.findAllByCourseIdAndUserId(courseId,userId);
     }
 
     public void deleteAllByLessonId(long lessonId){
         this.learningLogRepository.deleteAllByLessonId(lessonId);
+    }
+
+    public void deleteAllByLessonIdAndCourseId(long lessonId,long courseId){
+        this.learningLogRepository.deleteAllByLessonIdAndCourseId(lessonId,courseId);
+    }
+
+    public Optional<LearningLog> getById(long learningLogId){
+        return this.learningLogRepository.findById(learningLogId);
     }
 }

@@ -47,6 +47,9 @@ public class Review {
     @Column(name = "created_date")
     private java.sql.Timestamp createdDate;
 
+    @Column(name = "modified_date")
+    private java.sql.Timestamp modifiedDate;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
     @JsonIgnore
@@ -103,5 +106,13 @@ public class Review {
 
     public void setCourse(Course course) {
         this.course = course;
+    }
+
+    public Timestamp getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(Timestamp modifiedDate) {
+        this.modifiedDate = modifiedDate;
     }
 }

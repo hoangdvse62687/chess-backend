@@ -11,7 +11,6 @@ import org.hibernate.validator.constraints.Length;
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -85,6 +84,14 @@ import java.util.List;
                         @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalElements",type = Long.class)
                 }
         ),
+        @NamedStoredProcedureQuery(
+                name = "getPublishCourseReport",
+                procedureName = "get_publish_course_report"
+        ),
+        @NamedStoredProcedureQuery(
+                name = "getCourseStatusReport",
+                procedureName = "get_course_status_report"
+        ),
 })
 public class Course {
     @Id
@@ -115,6 +122,9 @@ public class Course {
     @Length(max = 255,message = "Image must not be larger than 255 characters")
     private String image;
 
+    @Column(name = "modified_date")
+    private java.sql.Timestamp modifiedDate;
+
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "course")
     @JsonIgnore
     private List<UserHasCourse> userHasCourses;
@@ -130,10 +140,6 @@ public class Course {
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "course")
     @JsonIgnore
     private List<LearningLog> learningLogs;
-
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "course")
-    @JsonIgnore
-    private List<Exercise> exercises;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "course")
     @JsonIgnore
@@ -153,9 +159,6 @@ public class Course {
 
     @Transient
     private List<Long> listLogExerciseIds;
-
-    @Transient
-    private List<Long> listExerciseIds;
 
     @Transient
     private List<LessonViewModel> lessonViewModels;
@@ -288,14 +291,6 @@ public class Course {
         this.listLearningLogLessonIds = listLearningLogLessonIds;
     }
 
-    public List<Exercise> getExercises() {
-        return exercises;
-    }
-
-    public void setExercises(List<Exercise> exercises) {
-        this.exercises = exercises;
-    }
-
     public List<Review> getReviews() {
         return reviews;
     }
@@ -332,19 +327,19 @@ public class Course {
         this.listLogExerciseIds = listLogExerciseIds;
     }
 
-    public List<Long> getListExerciseIds() {
-        return listExerciseIds;
-    }
-
-    public void setListExerciseIds(List<Long> listExerciseIds) {
-        this.listExerciseIds = listExerciseIds;
-    }
-
     public float getRequiredPoint() {
         return requiredPoint;
     }
 
     public void setRequiredPoint(float requiredPoint) {
         this.requiredPoint = requiredPoint;
+    }
+
+    public Timestamp getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(Timestamp modifiedDate) {
+        this.modifiedDate = modifiedDate;
     }
 }

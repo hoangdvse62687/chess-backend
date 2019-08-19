@@ -66,6 +66,9 @@ public class Lesson {
     @OneToOne(mappedBy = "lesson",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private UninteractiveLesson uninteractiveLesson;
 
+    @OneToOne(mappedBy = "lesson",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private Exercise exercise;
+
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "lesson")
     @JsonIgnore
     private List<CourseHasLesson> courseHasLessons;
@@ -81,6 +84,9 @@ public class Lesson {
 
     @Column(name = "type")
     private int lessonType;
+
+    @Column(name = "modified_date")
+    private java.sql.Timestamp modifiedDate;
 
     public long getLessonId() {
         return lessonId;
@@ -160,5 +166,21 @@ public class Lesson {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Exercise getExercise() {
+        return exercise;
+    }
+
+    public void setExercise(Exercise exercise) {
+        this.exercise = exercise;
+    }
+
+    public Timestamp getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(Timestamp modifiedDate) {
+        this.modifiedDate = modifiedDate;
     }
 }

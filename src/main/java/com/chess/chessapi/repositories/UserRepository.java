@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.util.Optional;
 
 @Repository
@@ -66,16 +67,17 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Modifying
     @Transactional
-    @Query(value = "Update users u Set u.full_name = ?2,u.achievement = ?3,u.avatar = ?4 Where u.id = ?1"
+    @Query(value = "Update users u Set u.full_name = ?2,u.achievement = ?3,u.avatar = ?4,u.modified_date = ?5 Where u.id = ?1"
             ,nativeQuery = true)
-    void updateProfile(long id,String name,String achievement,String avatar);
+    void updateProfile(long id,String name,String achievement,String avatar, Timestamp modifiedDate);
 
     @Modifying
     @Transactional
     @Query(value = "Update users u Set u.full_name = ?2,u.achievement = ?3,u.point = ?4" +
-            ",u.role_id = ?5,u.is_active = ?6,u.avatar = ?7,u.is_reviewed = ?8 Where u.id = ?1"
+            ",u.role_id = ?5,u.is_active = ?6,u.avatar = ?7,u.is_reviewed = ?8,u.modified_date = ?9 Where u.id = ?1"
             ,nativeQuery = true)
-    void updateRegister(long id,String name,String achievement,float point,long role,boolean isActive,String avatar,boolean isReviewed);
+    void updateRegister(long id, String name, String achievement, float point, long role, boolean isActive, String avatar
+            , boolean isReviewed, Timestamp modifiedDate);
 
     @Modifying
     @Transactional

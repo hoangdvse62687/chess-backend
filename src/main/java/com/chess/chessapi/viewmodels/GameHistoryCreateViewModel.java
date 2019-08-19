@@ -7,12 +7,6 @@ import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 
 public class GameHistoryCreateViewModel {
-    @NotNull(message = "Start time must not be null")
-    @Column(name = "start_time")
-    private Timestamp startTime;
-
-    @NotNull(message = "Record must not be null")
-    private String record;
 
     @NotNull(message = "Level must not be null")
     private int level;
@@ -26,24 +20,6 @@ public class GameHistoryCreateViewModel {
 
     @NotNull(message = "Point must not be null")
     private float point;
-
-    private int status;
-
-    public Timestamp getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Timestamp startTime) {
-        this.startTime = startTime;
-    }
-
-    public String getRecord() {
-        return record;
-    }
-
-    public void setRecord(String record) {
-        this.record = record;
-    }
 
     public int getLevel() {
         return level;
@@ -75,13 +51,5 @@ public class GameHistoryCreateViewModel {
 
     public void setPoint(float point) {
         this.point = point;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
     }
 }

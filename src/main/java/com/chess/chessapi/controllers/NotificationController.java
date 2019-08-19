@@ -2,10 +2,8 @@ package com.chess.chessapi.controllers;
 
 import com.chess.chessapi.constants.AppMessage;
 import com.chess.chessapi.constants.AppRole;
-import com.chess.chessapi.entities.Notification;
 import com.chess.chessapi.exceptions.ResourceNotFoundException;
 import com.chess.chessapi.models.JsonResult;
-import com.chess.chessapi.models.PagedList;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.services.NotificationService;
 import com.chess.chessapi.services.UserService;
@@ -15,7 +13,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.validation.BindingResult;
@@ -25,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping(value = "/notification")
@@ -60,6 +59,7 @@ public class NotificationController {
             data = this.notificationService
                     .getPagination(page,pageSize, role_id,currentUser.getId(),sortBy,sortDirection);
         }catch (IllegalArgumentException ex){
+            Logger.getLogger(NotificationController.class.getName()).log(Level.SEVERE,null,ex);
             throw new ResourceNotFoundException("Page","number",page);
         }
         return new JsonResult(null,data);
@@ -82,6 +82,7 @@ public class NotificationController {
             }catch (DataIntegrityViolationException ex){
                 isSuccess = false;
                 message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.NOTIFICATION);
+                Logger.getLogger(NotificationController.class.getName()).log(Level.SEVERE,null,ex);
             }
         }
 

@@ -37,14 +37,10 @@ public class Exercise {
     @NotNull(message = "Steps must not be null")
     private List<StepSuggest> answer = new ArrayList<StepSuggest>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="course_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="lesson_id")
     @JsonIgnore
-    private Course course;
-
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "exercise")
-    @JsonIgnore
-    private List<ExerciseLog> exerciseLogs;
+    private Lesson lesson;
 
     public long getExerciseId() {
         return exerciseId;
@@ -70,19 +66,11 @@ public class Exercise {
         this.answer = answer;
     }
 
-    public Course getCourse() {
-        return course;
+    public Lesson getLesson() {
+        return lesson;
     }
 
-    public void setCourse(Course course) {
-        this.course = course;
-    }
-
-    public List<ExerciseLog> getExerciseLogs() {
-        return exerciseLogs;
-    }
-
-    public void setExerciseLogs(List<ExerciseLog> exerciseLogs) {
-        this.exerciseLogs = exerciseLogs;
+    public void setLesson(Lesson lesson) {
+        this.lesson = lesson;
     }
 }

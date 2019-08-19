@@ -11,8 +11,8 @@ import java.util.List;
 
 @Repository
 public interface GameHistoryRepository extends JpaRepository<GameHistory,Long> {
-    @Query(value = "Select * from game_history where user_id = ?1",
+    @Query(value = "Select id,start_time,level,game_time,point,status from game_history where user_id = ?1",
             countQuery = "Select count(id) from game_history where user_id = ?1",
             nativeQuery = true)
-    Page<GameHistory> findAllByUserId(Pageable pageable, long userId);
+    Page<Object> findAllByUserId(Pageable pageable, long userId);
 }

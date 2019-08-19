@@ -90,7 +90,7 @@ public class CourseService {
         this.userService.increasePoint(userId,-course.getRequiredPoint());
         float point = course.getRequiredPoint() < 0 ? -course.getRequiredPoint() : course.getRequiredPoint();
         String pointStr = Integer.toString((int)point);
-        this.pointLogService.create("Bạn đã tiêu hao " + pointStr + " để đăng ký " + course.getName(),course.getRequiredPoint(),userId);
+        this.pointLogService.create("Bạn đã tiêu hao " + pointStr + " điểm để đăng ký " + course.getName(),course.getRequiredPoint(),userId);
     }
 
     public PagedList<CoursePaginationViewModel> getCoursePaginationByStatusId(String courseName
@@ -125,7 +125,7 @@ public class CourseService {
     }
 
     public void updateStatus(long courseId,long statusId){
-        this.courseRepository.updateStatus(courseId,statusId);
+        this.courseRepository.updateStatus(courseId,statusId,TimeUtils.getCurrentTime());
     }
 
     public Optional<Course> getCourseById(long id){
@@ -194,7 +194,7 @@ public class CourseService {
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public void updateCourse(Course course){
          this.courseRepository.updateCourse(course.getCourseId(),course.getName(),course.getDescription(),
-                 course.getPoint(),course.getStatusId(),course.getImage(),course.getRequiredPoint());
+                 course.getPoint(),course.getStatusId(),course.getImage(),course.getRequiredPoint(),TimeUtils.getCurrentTime());
          //only get old has status in-process
         List<UserHasCourse> oldUserHasCourses = this.userHasCourseService
                 .getAllByCourseIdAndStatusId(course.getCourseId(),Status.USER_HAS_COURSE_STATUS_IN_PROCESS);
@@ -265,6 +265,14 @@ public class CourseService {
         }
         return ManualCastUtils.castListObjectsToCourseForNotificationViewModel
                 (this.courseRepository.findCourseDetailForNotificationByListCourseId(listCourseIds));
+    }
+
+    public CourseForNotificationViewModel getCourseForNotificationByCourseId(Long listCourseIds){
+        if(listCourseIds == 0){
+            return null;
+        }
+        return ManualCastUtils.castObjectsToCourseForNotificationViewModel
+                (this.courseRepository.findCourseDetailForNotificationByCourseId(listCourseIds));
     }
     //End Pulbic method
 

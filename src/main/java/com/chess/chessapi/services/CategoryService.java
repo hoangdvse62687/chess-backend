@@ -1,11 +1,9 @@
 package com.chess.chessapi.services;
 
-import com.chess.chessapi.constants.AppRole;
 import com.chess.chessapi.entities.Category;
 import com.chess.chessapi.repositories.CategoryRepository;
 import com.chess.chessapi.utils.ManualCastUtils;
 import com.chess.chessapi.viewmodels.CategoryViewModel;
-import com.chess.chessapi.viewmodels.CourseDetailViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,9 +17,6 @@ import java.util.Optional;
 public class CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
-
-    @Autowired
-    private CourseService courseService;
 
     @PersistenceContext
     private EntityManager em;

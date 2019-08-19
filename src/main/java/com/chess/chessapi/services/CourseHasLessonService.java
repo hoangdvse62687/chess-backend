@@ -2,9 +2,10 @@ package com.chess.chessapi.services;
 
 import com.chess.chessapi.entities.CourseHasLesson;
 import com.chess.chessapi.repositories.CourseHasLessonRepository;
-import com.chess.chessapi.utils.ManualCastUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -13,6 +14,8 @@ public class CourseHasLessonService {
     @Autowired
     private CourseHasLessonRepository courseHasLessonRepository;
 
+    @Autowired
+    private LearningLogService learningLogService;
     //PUBLIC METHOD DEFINED
     public void create(long lessonId,long courseId,int lessonOrdered){
         this.courseHasLessonRepository.create(lessonId,courseId,lessonOrdered);
@@ -26,10 +29,12 @@ public class CourseHasLessonService {
         this.courseHasLessonRepository.delete(courseHasLesson);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public void removeLessonFromCourse(long lessonId,long courseId){
         CourseHasLesson courseHasLesson = this.getByLessonIdAndCourseId(lessonId,courseId);
         if(courseHasLesson != null){
             this.delete(courseHasLesson);
+            this.learningLogService.deleteAllByLessonIdAndCourseId(lessonId,courseId);
         }
     }
 

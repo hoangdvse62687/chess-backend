@@ -14,7 +14,7 @@ public class InteractiveLessonViewModel {
     private String initCode;
 
     @NotNull(message = "Steps must not be null")
-    private List<Step> steps = new ArrayList<Step>();
+    private List<@NotNull(message = "Step must not be null") Step> steps = new ArrayList<Step>();
 
     public String getInitCode() {
         return initCode;

@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
+
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review,Long> {
@@ -16,8 +18,8 @@ public interface ReviewRepository extends JpaRepository<Review,Long> {
 
     @Modifying
     @Transactional
-    @Query(value = "Update review Set content = ?2,rating = ?3 Where id = ?1",nativeQuery = true)
-    void update(long reviewId,String content,float rating);
+    @Query(value = "Update review Set content = ?2,rating = ?3,modified_date = ?4 Where id = ?1",nativeQuery = true)
+    void update(long reviewId, String content, float rating, Timestamp modifiedDate);
 
     @Modifying
     @Transactional

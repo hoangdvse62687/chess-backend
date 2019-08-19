@@ -36,4 +36,7 @@ public interface UserHasCourseRepository extends JpaRepository<UserHasCourse,Lon
             "Where userHasCourse.course_id = ?1 and user.role_id = ?2"
             ,nativeQuery = true)
     List<Long> getAllLearnerByCourseId(long courseId,long learnerId);
+
+    @Query(value = "Select If(count(id) > 0 ,1,0) From user_has_course Where user_id = ?2 and course_id = ?1",nativeQuery = true)
+    Long isEnrolled(long courseId,long userId);
 }

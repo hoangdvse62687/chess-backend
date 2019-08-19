@@ -53,6 +53,9 @@ public class UserHasCourse {
     @Column(name = "enrolled_date")
     private Timestamp enrolledDate;
 
+    @Column(name = "modified_date")
+    private java.sql.Timestamp modifiedDate;
+
     @Column(name = "status_id")
     private long statusId;
 
@@ -94,5 +97,21 @@ public class UserHasCourse {
 
     public void setStatusId(long statusId) {
         this.statusId = statusId;
+    }
+
+    public Timestamp getEnrolledDate() {
+        return enrolledDate;
+    }
+
+    public void setEnrolledDate(Timestamp enrolledDate) {
+        this.enrolledDate = enrolledDate;
+    }
+
+    public Timestamp getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(Timestamp modifiedDate) {
+        this.modifiedDate = modifiedDate;
     }
 }

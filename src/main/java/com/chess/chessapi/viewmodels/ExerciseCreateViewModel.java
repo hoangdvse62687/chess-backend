@@ -11,16 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ExerciseCreateViewModel {
+
     @NotNull(message = "Question must not be null")
     @Length(min=6,max = 1000,message = "Question is required in range 6~1000 characters")
     private String question;
 
     @Column(name = "content",columnDefinition = "json")
     @NotNull(message = "Steps must not be null")
-    private List<StepSuggest> answer = new ArrayList<StepSuggest>();
+    private List<@NotNull(message = "Step Suggest must not be null") StepSuggest> answer = new ArrayList<StepSuggest>();
 
-    @NotNull(message = "Course id must not be null")
-    private long courseId;
 
     public String getQuestion() {
         return question;
@@ -36,13 +35,5 @@ public class ExerciseCreateViewModel {
 
     public void setAnswer(List<StepSuggest> answer) {
         this.answer = answer;
-    }
-
-    public long getCourseId() {
-        return courseId;
-    }
-
-    public void setCourseId(long courseId) {
-        this.courseId = courseId;
     }
 }

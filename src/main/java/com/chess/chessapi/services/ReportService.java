@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.StoredProcedureQuery;
+import java.math.BigInteger;
 import java.util.List;
 
 @Service
@@ -42,7 +43,7 @@ public class ReportService {
         query.setParameter("year", year);
         query.execute();
 
-        return ManualCastUtils.castListObjectToListInteger(query.getResultList());
+        return query.getResultList();
     }
 
     public List<Integer> getUsersRegisterReport(int year){
@@ -50,7 +51,7 @@ public class ReportService {
         query.setParameter("year", year);
         query.execute();
 
-        return ManualCastUtils.castListObjectToListInteger(query.getResultList());
+        return query.getResultList();
     }
 
     public List<Integer> getRateWinnableReport(int year){
@@ -58,14 +59,28 @@ public class ReportService {
         query.setParameter("year", year);
         query.execute();
 
-        return ManualCastUtils.castListObjectToListInteger(query.getResultList());
+        return query.getResultList();
     }
     public List<Integer> getRateWinnableLevelReport(int year){
         StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getRateWinnableLevelReport");
         query.setParameter("year", year);
         query.execute();
 
-        return ManualCastUtils.castListObjectToListInteger(query.getResultList());
+        return query.getResultList();
+    }
+
+    public List<BigInteger> getPublishCourseReport(){
+        StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getPublishCourseReport");
+        query.execute();
+
+        return query.getResultList();
+    }
+
+    public List<Integer> getCourseStatusReport(){
+        StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getCourseStatusReport");
+        query.execute();
+
+        return query.getResultList();
     }
     //END PUBLIC METHOD DEFINED
 

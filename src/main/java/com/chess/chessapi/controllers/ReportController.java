@@ -66,4 +66,20 @@ public class ReportController {
     JsonResult getRateWinnableLevel(@RequestParam("year") int year) {
         return new JsonResult("",this.reportService.getRateWinnableLevelReport(year));
     }
+
+    @ApiOperation(value = "Get Publish Course Report")
+    @GetMapping(value = "/get-publish-course-report")
+    @PreAuthorize("hasAuthority("+ AppRole.ROLE_ADMIN_AUTHENTICATIION +")")
+    public @ResponseBody
+    JsonResult getPublishCourseReport() {
+        return new JsonResult("",this.reportService.getPublishCourseReport());
+    }
+
+    @ApiOperation(value = "Get Course Status Report")
+    @GetMapping(value = "/get-course-status-report")
+    @PreAuthorize("hasAuthority("+ AppRole.ROLE_ADMIN_AUTHENTICATIION +")")
+    public @ResponseBody
+    JsonResult getCourseStatusReport() {
+        return new JsonResult("",this.reportService.getCourseStatusReport());
+    }
 }

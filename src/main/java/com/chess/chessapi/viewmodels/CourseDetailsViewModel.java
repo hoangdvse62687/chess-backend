@@ -23,7 +23,6 @@ public class CourseDetailsViewModel {
     private int totalLesson;
     private boolean isEnrolled;
     private List<Long> listLogExerciseIds;
-    private List<Long> exerciseViewModels;
 
     public long getCourseId() {
         return courseId;
@@ -151,14 +150,6 @@ public class CourseDetailsViewModel {
 
     public void setListLogExerciseIds(List<Long> listLogExerciseIds) {
         this.listLogExerciseIds = listLogExerciseIds;
-    }
-
-    public List<Long> getExerciseViewModels() {
-        return exerciseViewModels;
-    }
-
-    public void setExerciseViewModels(List<Long> exerciseViewModels) {
-        this.exerciseViewModels = exerciseViewModels;
     }
 
     public Float getRequiredPoint() {

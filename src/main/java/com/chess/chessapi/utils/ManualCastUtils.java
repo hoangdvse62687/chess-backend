@@ -71,9 +71,10 @@ public class ManualCastUtils implements Serializable {
     private static final int REVIEW_VIEW_MODEL_CONTENT_INDEX = 2;
     private static final int REVIEW_VIEW_MODEL_USER_ID_INDEX = 3;
     private static final int REVIEW_VIEW_MODEL_CREATED_DATE_INDEX = 4;
-    private static final int REVIEW_VIEW_MODEL_USER_FULLNAME_INDEX = 5;
-    private static final int REVIEW_VIEW_MODEL_EMAIL_INDEX = 6;
-    private static final int REVIEW_VIEW_MODEL_USER_AVATAR_INDEX = 7;
+    private static final int REVIEW_VIEW_MODEL_MODIFIED_DATE_INDEX = 5;
+    private static final int REVIEW_VIEW_MODEL_USER_FULLNAME_INDEX = 6;
+    private static final int REVIEW_VIEW_MODEL_EMAIL_INDEX = 7;
+    private static final int REVIEW_VIEW_MODEL_USER_AVATAR_INDEX = 8;
     //END REVIEW VIEW MODEL DEFINED
 
     //CATEGORY VIEW MODEL DEFINED
@@ -136,6 +137,16 @@ public class ManualCastUtils implements Serializable {
     public static final int COURSE_FOR_NOTIFICATION_NAME_INDEX = 1;
     public static final int COURSE_FOR_NOTIFICATION_IMAGE_INDEX = 2;
     //END COURSE FOR NOTIFICATION DEFINED
+
+    //GAME HISTORY DEFINED
+    public static final int GAMEHISTORY_VIEW_MODEL_ID_INDEX = 0;
+    public static final int GAMEHISTORY_VIEW_MODEL_STARTTIME_INDEX = 1;
+    public static final int GAMEHISTORY_VIEW_MODEL_LEVEL_INDEX = 2;
+    public static final int GAMEHISTORY_VIEW_MODEL_GAMETIME_INDEX = 3;
+    public static final int GAMEHISTORY_VIEW_MODEL_POINT_INDEX = 4;
+    public static final int GAMEHISTORY_VIEW_MODEL_STATUS_INDEX = 5;
+    //END GAME HISTORY DEFINED
+
     public static User castObjectToUserByFindCustom(Object object)
             throws NumberFormatException{
         if(object == null){
@@ -190,6 +201,24 @@ public class ManualCastUtils implements Serializable {
             users.add(user);
         }
         return users;
+    }
+
+    public static List<GameHistoryViewModel> castPageObjectsToGameHistoryViewModel(Page<Object> objects)
+            throws NumberFormatException{
+        List<GameHistoryViewModel> gameHistoryViewModels = new ArrayList<>();
+        for (Object object:
+                objects.getContent()) {
+            GameHistoryViewModel gameHistoryViewModel = new GameHistoryViewModel();
+            Object[] data = (Object[]) object;
+            gameHistoryViewModel.setGamehistoryId(Long.parseLong(data[GAMEHISTORY_VIEW_MODEL_ID_INDEX].toString()));
+            gameHistoryViewModel.setStartTime(Timestamp.valueOf(data[GAMEHISTORY_VIEW_MODEL_STARTTIME_INDEX].toString()));
+            gameHistoryViewModel.setGameTime(Integer.parseInt(data[GAMEHISTORY_VIEW_MODEL_GAMETIME_INDEX].toString()));
+            gameHistoryViewModel.setLevel(Integer.parseInt(data[GAMEHISTORY_VIEW_MODEL_LEVEL_INDEX].toString()));
+            gameHistoryViewModel.setPoint(Float.parseFloat(data[GAMEHISTORY_VIEW_MODEL_POINT_INDEX].toString()));
+            gameHistoryViewModel.setStatus(Integer.parseInt(data[GAMEHISTORY_VIEW_MODEL_STATUS_INDEX].toString()));
+            gameHistoryViewModels.add(gameHistoryViewModel);
+        }
+        return gameHistoryViewModels;
     }
 
     public static List<CoursePaginationViewModel> castListObjectToCourseFromGetCoursePaginations(List<Object[]> objects,List<Category> categories)
@@ -312,18 +341,6 @@ public class ManualCastUtils implements Serializable {
         return data;
     }
 
-    public static List<Integer> castListObjectToListInteger(List<Object[]> objects){
-        List<Integer> data = new ArrayList<>();
-        for (Object[] object:
-             objects) {
-            for (Object item:
-                 object) {
-                data.add(Integer.parseInt(item.toString()));
-            }
-        }
-        return data;
-    }
-
     public static List<CategoryViewModel> castListObjectToCategoryIdFromGetCategoryByCourseId(List<Object[]> objects)
     throws NumberFormatException{
         List<CategoryViewModel> data = new ArrayList<>();
@@ -428,7 +445,6 @@ public class ManualCastUtils implements Serializable {
         courseDetailsViewModel.setAuthor(author);
         courseDetailsViewModel.setTotalLesson(totalLesson);
         courseDetailsViewModel.setListLogExerciseIds(course.getListLogExerciseIds());
-        courseDetailsViewModel.setExerciseViewModels(course.getListExerciseIds());
         return courseDetailsViewModel;
     }
 
@@ -471,6 +487,9 @@ public class ManualCastUtils implements Serializable {
             reviewPaginationViewModel.setRating(Integer.parseInt(object[REVIEW_VIEW_MODEL_RATING_INDEX].toString()));
             reviewPaginationViewModel.setContent(object[REVIEW_VIEW_MODEL_CONTENT_INDEX].toString());
             reviewPaginationViewModel.setCreatedDate(Timestamp.valueOf(object[REVIEW_VIEW_MODEL_CREATED_DATE_INDEX].toString()));
+            if(object[REVIEW_VIEW_MODEL_MODIFIED_DATE_INDEX] != null){
+                reviewPaginationViewModel.setModifiedDate(Timestamp.valueOf(object[REVIEW_VIEW_MODEL_MODIFIED_DATE_INDEX].toString()));
+            }
 
             UserDetailViewModel reviewer = new UserDetailViewModel();
             reviewer.setUserId(Long.parseLong(object[REVIEW_VIEW_MODEL_USER_ID_INDEX].toString()));
@@ -497,6 +516,18 @@ public class ManualCastUtils implements Serializable {
         }
         return data;
     }
+
+    public static CourseForNotificationViewModel castObjectsToCourseForNotificationViewModel(Object objects){
+        Object[] object = (Object[]) objects;
+        if(object == null){
+            return null;
+        }
+        CourseForNotificationViewModel courseForNotificationViewModel = new CourseForNotificationViewModel();
+        courseForNotificationViewModel.setCourseId(Long.parseLong(object[COURSE_FOR_NOTIFICATION_ID_INDEX].toString()));
+        courseForNotificationViewModel.setCourseName(object[COURSE_FOR_NOTIFICATION_NAME_INDEX].toString());
+        courseForNotificationViewModel.setCourseImage(object[COURSE_FOR_NOTIFICATION_IMAGE_INDEX].toString());
+        return courseForNotificationViewModel;
+    }
     //END CAST OBJECT TO OBJECT DEFINED
 
     //CASTE OBJECT TO JSON DEFINED
@@ -513,6 +544,28 @@ public class ManualCastUtils implements Serializable {
                     + COMMA + D_QUOT + STEP_JSON_PARSER_MOVE_DIRECTION + D_QUOT + COLON + D_QUOT +step.getMoveDirection() + D_QUOT
                     + COMMA + D_QUOT + STEP_JSON_PARSER_FEN + D_QUOT + COLON + D_QUOT +step.getFen() + D_QUOT
                     + COMMA + D_QUOT + STEP_JSON_PARSER_PRE_ID + D_QUOT + COLON + D_QUOT +step.getPreId() + D_QUOT
+                    + RIGHT_ANGLE_BRACKET + COMMA;
+        }
+
+        return LEFT_SQUARE_BRACKET + result.substring(0,result.length() - 1) + RIGHT_SQUARE_BRACKET;
+    }
+
+    public static String castListStepSuggestToJson(List<StepSuggest> steps){
+        if(steps == null || steps.isEmpty()){
+            return LEFT_SQUARE_BRACKET + " " + RIGHT_SQUARE_BRACKET;
+        }
+        String result = "";
+        for (StepSuggest step:
+                steps) {
+            result += LEFT_ANGLE_BRACKET + D_QUOT  + STEP_JSON_PARSER_ID + D_QUOT + COLON + D_QUOT +step.getId()+ D_QUOT
+                    + COMMA + D_QUOT + STEP_JSON_PARSER_MOVE + D_QUOT + COLON + D_QUOT +step.getMove() + D_QUOT
+                    + COMMA + D_QUOT + STEP_JSON_PARSER_CONTENT + D_QUOT + COLON + D_QUOT +step.getContent() + D_QUOT
+                    + COMMA + D_QUOT + STEP_JSON_PARSER_MOVE_DIRECTION + D_QUOT + COLON + D_QUOT +step.getMoveDirection() + D_QUOT
+                    + COMMA + D_QUOT + STEP_JSON_PARSER_FEN + D_QUOT + COLON + D_QUOT +step.getFen() + D_QUOT
+                    + COMMA + D_QUOT + STEP_JSON_PARSER_PRE_ID + D_QUOT + COLON + D_QUOT +step.getPreId() + D_QUOT
+                    + COMMA + D_QUOT + STEP_JSON_PARSER_RIGHTRESPONSE + D_QUOT + COLON + D_QUOT +step.getRightResponse() + D_QUOT
+                    + COMMA + D_QUOT + STEP_JSON_PARSER_WRONGRRESPONSE + D_QUOT + COLON + D_QUOT +step.getWrongResponse() + D_QUOT
+                    + COMMA + D_QUOT + STEP_JSON_PARSER_SUGGEST + D_QUOT + COLON + D_QUOT +step.getSuggest() + D_QUOT
                     + RIGHT_ANGLE_BRACKET + COMMA;
         }
 

@@ -9,6 +9,7 @@ import com.chess.chessapi.repositories.UserRepository;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.utils.MailContentBuilderUtils;
 import com.chess.chessapi.utils.ManualCastUtils;
+import com.chess.chessapi.utils.TimeUtils;
 import com.chess.chessapi.viewmodels.UserDetailViewModel;
 import com.chess.chessapi.viewmodels.UserPaginationViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,7 +92,7 @@ public class UserService {
         this.pointLogService.create(Common.USER_GAIN_FREE_POINT_MESSAGE,Common.DEFAULT_POINT_LEARNER,user.getUserId());
 
         this.userRepository.updateRegister(user.getUserId(),user.getFullName(),user.getAchievement(),user.getPoint(),
-                user.getRoleId(),user.isActive(),user.getAvatar(),user.isReviewed());
+                user.getRoleId(),user.isActive(),user.getAvatar(),user.isReviewed(), TimeUtils.getCurrentTime());
 
         this.setUserRoleAuthentication(user,request);
 
@@ -100,7 +101,8 @@ public class UserService {
 
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public void updateProfile(User user){
-        this.userRepository.updateProfile(user.getUserId(),user.getFullName(),user.getAchievement(),user.getAvatar());
+        this.userRepository.updateProfile(user.getUserId(),user.getFullName(),user.getAchievement()
+                ,user.getAvatar(),TimeUtils.getCurrentTime());
 
         //handle cetificate update
         List<Certificate> oldCetificates = this.certificatesService.findAllByUserId(user.getUserId());
@@ -163,7 +165,6 @@ public class UserService {
         //getting users by courseid only get the in-process
         StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getUsersByCourseid");
         query.setParameter("courseId",courseId);
-        query.setParameter("userHasCourseStatusId",Status.USER_HAS_COURSE_STATUS_IN_PROCESS);
         query.execute();
 
         //end getting users by courseid

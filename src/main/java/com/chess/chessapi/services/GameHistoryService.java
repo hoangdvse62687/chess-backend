@@ -4,8 +4,13 @@ import com.chess.chessapi.constants.EntitiesFieldName;
 import com.chess.chessapi.constants.GameHistoryStatus;
 import com.chess.chessapi.entities.GameHistory;
 import com.chess.chessapi.entities.User;
+import com.chess.chessapi.models.PagedList;
 import com.chess.chessapi.repositories.GameHistoryRepository;
+import com.chess.chessapi.utils.ManualCastUtils;
+import com.chess.chessapi.utils.TimeUtils;
 import com.chess.chessapi.viewmodels.GameHistoryCreateViewModel;
+import com.chess.chessapi.viewmodels.GameHistoryUpdateViewModel;
+import com.chess.chessapi.viewmodels.GameHistoryViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,6 +18,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GameHistoryService {
@@ -41,9 +49,9 @@ public class GameHistoryService {
         gameHistory.setGameTime(gameHistoryCreateViewModel.getGameTime());
         gameHistory.setLevel(gameHistoryCreateViewModel.getLevel());
         gameHistory.setPoint(gameHistoryCreateViewModel.getPoint());
-        gameHistory.setRecord(gameHistoryCreateViewModel.getRecord());
-        gameHistory.setStartTime(gameHistoryCreateViewModel.getStartTime());
-        gameHistory.setStatus(gameHistoryCreateViewModel.getStatus());
+        gameHistory.setRecord("");
+        gameHistory.setStartTime(TimeUtils.getCurrentTime());
+        gameHistory.setStatus(GameHistoryStatus.BET);
         User user = new User();
         user.setUserId(userId);
         gameHistory.setUser(user);
@@ -55,17 +63,22 @@ public class GameHistoryService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
-    public void update(GameHistory gameHistory,long userId){
+    public void update(GameHistory gameHistory,GameHistoryUpdateViewModel gameHistoryUpdateViewModel, long userId){
         User user = new User();
         user.setUserId(userId);
         gameHistory.setUser(user);
+        gameHistory.setStatus(gameHistoryUpdateViewModel.getStatus());
+        gameHistory.setPoint(gameHistoryUpdateViewModel.getPoint());
+        gameHistory.setRecord(gameHistoryUpdateViewModel.getRecord());
+
         this.handleDataCreateUpdate(userId,gameHistory);
 
         this.gameHistoryRepository.save(gameHistory);
     }
-    public Page<GameHistory> getPagination(int page,int pageSize,long userId){
+    public PagedList<GameHistoryViewModel> getPagination(int page, int pageSize, long userId){
         PageRequest pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.GAME_HISTORY_START_TIME).descending());
-        return this.gameHistoryRepository.findAllByUserId(pageable,userId);
+
+        return this.fillDataToPaginationCustom(this.gameHistoryRepository.findAllByUserId(pageable,userId));
     }
 
     public boolean checkPointBet(long userId,int status,float pointRequired){
@@ -77,6 +90,10 @@ public class GameHistoryService {
             }
         }
         return result;
+    }
+
+    public Optional<GameHistory> getById(long gameHistoryId){
+        return this.gameHistoryRepository.findById(gameHistoryId);
     }
     //END PUBLIC METHOD DEFINED
 
@@ -115,6 +132,13 @@ public class GameHistoryService {
                 gameHistory.getPoint(),gameHistory.getLevel());
         this.pointLogService.create(content,gameHistory.getPoint(),
                 userId);
+    }
+
+    private PagedList<GameHistoryViewModel> fillDataToPaginationCustom(Page<Object> rawData){
+        final List<GameHistoryViewModel> content = ManualCastUtils.castPageObjectsToGameHistoryViewModel(rawData);
+        final int totalPages = rawData.getTotalPages();
+        final long totalElements = rawData.getTotalElements();
+        return new PagedList<GameHistoryViewModel>(totalPages,totalElements,content);
     }
     //END PRIVATE METHOD DEFINED
 }

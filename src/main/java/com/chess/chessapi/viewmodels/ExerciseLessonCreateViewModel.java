@@ -1,15 +1,11 @@
 package com.chess.chessapi.viewmodels;
 
-import com.chess.chessapi.entities.InteractiveLesson;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
 
-public class InteractiveLessonUpdateViewModel {
-    private long lessonId;
-
+public class ExerciseLessonCreateViewModel {
     @NotNull(message = "Name must not be null")
     @Length(min = 6,max = 1000,message = "Name is required in range 6 ~ 1000 characters")
     private String name;
@@ -18,16 +14,10 @@ public class InteractiveLessonUpdateViewModel {
     private String description;
 
     @Valid
-    @NotNull(message = "Interactive Lesson must not be null")
-    private InteractiveLesson interactiveLesson;
+    @NotNull(message = "Exercise must not be null")
+    private ExerciseCreateViewModel exerciseCreateViewModel;
 
-    public long getLessonId() {
-        return lessonId;
-    }
-
-    public void setLessonId(long lessonId) {
-        this.lessonId = lessonId;
-    }
+    private long courseId;
 
     public String getName() {
         return name;
@@ -37,19 +27,27 @@ public class InteractiveLessonUpdateViewModel {
         this.name = name;
     }
 
-    public InteractiveLesson getInteractiveLesson() {
-        return interactiveLesson;
-    }
-
-    public void setInteractiveLesson(InteractiveLesson interactiveLesson) {
-        this.interactiveLesson = interactiveLesson;
-    }
-
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public ExerciseCreateViewModel getExerciseCreateViewModel() {
+        return exerciseCreateViewModel;
+    }
+
+    public void setExerciseCreateViewModel(ExerciseCreateViewModel exerciseCreateViewModel) {
+        this.exerciseCreateViewModel = exerciseCreateViewModel;
+    }
+
+    public long getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(long courseId) {
+        this.courseId = courseId;
     }
 }

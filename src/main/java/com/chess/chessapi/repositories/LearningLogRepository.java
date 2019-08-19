@@ -18,4 +18,9 @@ public interface LearningLogRepository extends JpaRepository<LearningLog,Long> {
     @Transactional
     @Query(value = "Delete From learning_log where lesson_id = ?1",nativeQuery = true)
     void deleteAllByLessonId(long lessonId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "Delete From learning_log where lesson_id = ?1 and course_id = ?2",nativeQuery = true)
+    void deleteAllByLessonIdAndCourseId(long lessonId,long courseId);
 }

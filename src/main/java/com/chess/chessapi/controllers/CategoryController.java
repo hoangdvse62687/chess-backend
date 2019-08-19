@@ -18,6 +18,8 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping(value = "/category")
@@ -55,6 +57,7 @@ public class CategoryController {
         }catch (DataIntegrityViolationException ex){
             isSuccess = false;
             message =  AppMessage.getMessageFail(AppMessage.DELETE,AppMessage.CATEGORY);
+            Logger.getLogger(CategoryController.class.getName()).log(Level.SEVERE,null,ex);
         }
         return new JsonResult(message,isSuccess);
     }
@@ -77,6 +80,7 @@ public class CategoryController {
             } catch (DataIntegrityViolationException ex) {
                 isSuccess = false;
                 message = AppMessage.getMessageFail(AppMessage.CREATE, AppMessage.CATEGORY);
+                Logger.getLogger(CategoryController.class.getName()).log(Level.SEVERE,null,ex);
             }
         }
         CreateResponse createResponse = new CreateResponse();
@@ -106,6 +110,7 @@ public class CategoryController {
             } catch (DataIntegrityViolationException ex) {
                 isSuccess = false;
                 message = AppMessage.getMessageFail(AppMessage.UPDATE, AppMessage.CATEGORY);
+                Logger.getLogger(CategoryController.class.getName()).log(Level.SEVERE,null,ex);
             }
         }
         return new JsonResult(message,isSuccess);

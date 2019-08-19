@@ -1,13 +1,13 @@
 package com.chess.chessapi.viewmodels;
 
-import com.chess.chessapi.entities.InteractiveLesson;
+import com.chess.chessapi.entities.Exercise;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 
-public class InteractiveLessonUpdateViewModel {
+public class ExerciseLessonUpdateViewModel {
     private long lessonId;
 
     @NotNull(message = "Name must not be null")
@@ -17,9 +17,10 @@ public class InteractiveLessonUpdateViewModel {
     @Length(max = 1000,message = "Description is required not large than 1000 characters")
     private String description;
 
+
     @Valid
-    @NotNull(message = "Interactive Lesson must not be null")
-    private InteractiveLesson interactiveLesson;
+    @NotNull(message = "Exercise must not be null")
+    private Exercise exercise;
 
     public long getLessonId() {
         return lessonId;
@@ -37,19 +38,19 @@ public class InteractiveLessonUpdateViewModel {
         this.name = name;
     }
 
-    public InteractiveLesson getInteractiveLesson() {
-        return interactiveLesson;
-    }
-
-    public void setInteractiveLesson(InteractiveLesson interactiveLesson) {
-        this.interactiveLesson = interactiveLesson;
-    }
-
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Exercise getExercise() {
+        return exercise;
+    }
+
+    public void setExercise(Exercise exercise) {
+        this.exercise = exercise;
     }
 }
