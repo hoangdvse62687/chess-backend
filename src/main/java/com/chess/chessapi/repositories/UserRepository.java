@@ -87,4 +87,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = "Select point From users where id = ?1",nativeQuery = true)
     Float findPointByUserId(long id);
+
+    @Modifying
+    @Transactional
+    @Query(value = "Delete from users where id = ?1"
+            ,nativeQuery = true)
+    void deleteUser(long userId);
 }

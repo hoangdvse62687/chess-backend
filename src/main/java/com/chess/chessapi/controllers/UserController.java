@@ -81,7 +81,7 @@ public class UserController {
     @ApiOperation(value = "Update profile user ")
     @PutMapping(value = "/update-profile")
     @PreAuthorize("isAuthenticated()")
-    public @ResponseBody JsonResult updateProfile(@Valid @RequestBody UserUpdateViewModel userUpdateViewModel, BindingResult bindingResult){
+    public @ResponseBody JsonResult updateProfile(@Valid @RequestBody UserUpdateViewModel userUpdateViewModel, BindingResult bindingResult, @Context HttpServletRequest request){
         if(!this.userService.checkPermissionModify(userUpdateViewModel.getUserId())){
             throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
         }
@@ -98,7 +98,7 @@ public class UserController {
             isSuccess = false;
         }else{
             try{
-                this.userService.updateProfile(ManualCastUtils.castUserUpdateToUser(userUpdateViewModel));
+                this.userService.updateProfile(ManualCastUtils.castUserUpdateToUser(userUpdateViewModel),request);
 
                 message =  AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.PROFILE);
             }catch (DataIntegrityViolationException ex){
@@ -153,13 +153,13 @@ public class UserController {
     @ApiOperation(value = "Update user status")
     @PutMapping(value = "/update-status")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_ADMIN_AUTHENTICATIION+")")
-    public @ResponseBody JsonResult updateStatus(@RequestBody UserUpdateStatusViewModel userUpdateStatusViewModel){
+    public @ResponseBody JsonResult updateStatus(@RequestBody UserUpdateStatusViewModel userUpdateStatusViewModel, @Context HttpServletRequest request){
         Boolean isSuccess = true;
         String message = "";
         try{
             User user = this.userService.getUserById(userUpdateStatusViewModel.getUserId())
                     .orElseThrow(() -> new ResourceNotFoundException("User","id",userUpdateStatusViewModel.getUserId()));
-            this.userService.updateStatus(user,userUpdateStatusViewModel.getUserId(),userUpdateStatusViewModel.isActive());
+            this.userService.updateStatus(user,userUpdateStatusViewModel.getUserId(),userUpdateStatusViewModel.isActive(),request);
             message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.USER);
         }catch (DataIntegrityViolationException ex){
             isSuccess = false;

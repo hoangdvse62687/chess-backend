@@ -1,6 +1,7 @@
 package com.chess.chessapi.security.oauth2;
 
 import com.chess.chessapi.constants.AppRole;
+import com.chess.chessapi.constants.Status;
 import com.chess.chessapi.entities.User;
 import com.chess.chessapi.exceptions.OAuth2AuthenticationProcessingException;
 import com.chess.chessapi.constants.AuthProvider;
@@ -67,6 +68,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         user.setFullName(oAuth2UserInfo.getName());
         user.setEmail(oAuth2UserInfo.getEmail());
         user.setAvatar(oAuth2UserInfo.getImageUrl());
+        user.setActive(Status.ACTIVE);
         user.setPoint(0);
         user.setRoleId(AppRole.ROLE_REGISTRATION);
         user.setCreatedDate(TimeUtils.getCurrentTime());

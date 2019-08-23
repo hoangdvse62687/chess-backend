@@ -1,5 +1,7 @@
 package com.chess.chessapi.security;
 
+import com.chess.chessapi.constants.AppMessage;
+import com.chess.chessapi.exceptions.AccessDeniedException;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,10 +46,15 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                     //set sesson
                     session.setAttribute(userId.toString(),userDetails);
                 }
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                UserPrincipal userPrincipal = (UserPrincipal) userDetails;
+                if(userPrincipal.isStatus()){
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }else {
+                    throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
+                }
             }
         } catch (Exception ex) {
             logger.error("Could not set user authentication in security context", ex);

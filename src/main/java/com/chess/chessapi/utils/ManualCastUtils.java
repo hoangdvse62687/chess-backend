@@ -39,6 +39,7 @@ public class ManualCastUtils implements Serializable {
     private static final int COURSE_CATEGORY_IDS= 12;
     private static final int COURSE_RATING_INDEX= 13;
     private static final int COURSE_TOTAL_RATING_INDEX= 14;
+    private static final int COURSE_LEARNING_PROCESS_PERCENT = 15;
     //END COURSE DEFINED
 
     //LESSON DEFINED
@@ -100,9 +101,10 @@ public class ManualCastUtils implements Serializable {
     private static final String STEP_JSON_PARSER_MOVE_DIRECTION = "moveDirection";
     private static final String STEP_JSON_PARSER_FEN= "fen";
     private static final String STEP_JSON_PARSER_PRE_ID= "preId";
+    private static final String STEP_JSON_PARSER_ANSWERTYPE = "answerType";
+    private static final String STEP_JSON_PARSER_ANSWERARR = "answerArr";
     private static final String STEP_JSON_PARSER_RIGHTRESPONSE = "rightResponse";
     private static final String STEP_JSON_PARSER_WRONGRRESPONSE = "wrongResponse";
-    private static final String STEP_JSON_PARSER_SUGGEST = "suggest";
     //END STEP JSON PARSER DEFINED
 
     //LEARNER STATUS PUBLISH COURSE REPORT
@@ -157,7 +159,7 @@ public class ManualCastUtils implements Serializable {
         user.setUserId(Long.parseLong(data[USER_ID_INDEX].toString()));
         user.setEmail(data[USER_EMAIL_INDEX].toString());
         user.setRoleId(Long.parseLong(data[USER_ROLE_INDEX].toString()));
-        user.setActive(Boolean.parseBoolean(data[USER_ISACTIVE_INDEX].toString()));
+        user.setActive(Integer.parseInt(data[USER_ISACTIVE_INDEX].toString()) == 1 ? true : false);
         return user;
     }
 
@@ -262,6 +264,12 @@ public class ManualCastUtils implements Serializable {
             coursePaginationViewModel.setListCategorys(categoryViewModels);
             coursePaginationViewModel.setRating(Double.parseDouble(object[COURSE_RATING_INDEX].toString()));
             coursePaginationViewModel.setTotalRating(Long.parseLong(object[COURSE_TOTAL_RATING_INDEX].toString()));
+            double learningProcessPercent = Double.parseDouble(object[COURSE_LEARNING_PROCESS_PERCENT].toString());
+            if(learningProcessPercent > 1){
+                coursePaginationViewModel.setLearningProcessPercent(100);
+            }else{
+                coursePaginationViewModel.setLearningProcessPercent((int)(learningProcessPercent * 100));
+            }
             data.add(coursePaginationViewModel);
         }
         return data;
@@ -337,6 +345,18 @@ public class ManualCastUtils implements Serializable {
             learnerStatusPublishCourseReportViewModel.setCounterPassedStatus(Integer.parseInt(object[LEARNER_STATUS_REPORT_COURSE_PASSED].toString()));
             learnerStatusPublishCourseReportViewModel.setCounterNotPassedStatus(Integer.parseInt(object[LEARNER_STATUS_REPORT_COURSE_NOT_PASSED].toString()));
             data.add(learnerStatusPublishCourseReportViewModel);
+        }
+        return data;
+    }
+
+    public static List<Integer> castListObjectToListInteger(List<Object[]> objects){
+        List<Integer> data = new ArrayList<>();
+        for (Object[] object:
+                objects) {
+            for (Object item:
+                    object) {
+                data.add(Integer.parseInt(item.toString()));
+            }
         }
         return data;
     }
@@ -550,6 +570,26 @@ public class ManualCastUtils implements Serializable {
         return LEFT_SQUARE_BRACKET + result.substring(0,result.length() - 1) + RIGHT_SQUARE_BRACKET;
     }
 
+    public static String castAnswerToJson(ExerciseAnwserArray exerciseAnwserArray){
+        if(exerciseAnwserArray == null){
+            return LEFT_SQUARE_BRACKET + " " + RIGHT_SQUARE_BRACKET;
+        }
+        String result = "";
+        String answerArr = "";
+        for (List<StepSuggest> stepSuggest:
+                exerciseAnwserArray.getAnswerArr()) {
+            answerArr += castListStepSuggestToJson(stepSuggest);
+        }
+
+        answerArr = LEFT_SQUARE_BRACKET + answerArr + RIGHT_SQUARE_BRACKET;
+
+        result += LEFT_ANGLE_BRACKET + D_QUOT  + STEP_JSON_PARSER_ANSWERARR + D_QUOT + COLON + answerArr
+                + COMMA + D_QUOT + STEP_JSON_PARSER_ANSWERTYPE + D_QUOT + COLON + D_QUOT + exerciseAnwserArray.getAnswerType() + D_QUOT
+                + COMMA + D_QUOT + STEP_JSON_PARSER_FEN + D_QUOT + COLON + D_QUOT + exerciseAnwserArray.getFen() + D_QUOT
+                + RIGHT_ANGLE_BRACKET + COMMA;
+
+        return result.substring(0,result.length() - 1);
+    }
     public static String castListStepSuggestToJson(List<StepSuggest> steps){
         if(steps == null || steps.isEmpty()){
             return LEFT_SQUARE_BRACKET + " " + RIGHT_SQUARE_BRACKET;
@@ -565,7 +605,6 @@ public class ManualCastUtils implements Serializable {
                     + COMMA + D_QUOT + STEP_JSON_PARSER_PRE_ID + D_QUOT + COLON + D_QUOT +step.getPreId() + D_QUOT
                     + COMMA + D_QUOT + STEP_JSON_PARSER_RIGHTRESPONSE + D_QUOT + COLON + D_QUOT +step.getRightResponse() + D_QUOT
                     + COMMA + D_QUOT + STEP_JSON_PARSER_WRONGRRESPONSE + D_QUOT + COLON + D_QUOT +step.getWrongResponse() + D_QUOT
-                    + COMMA + D_QUOT + STEP_JSON_PARSER_SUGGEST + D_QUOT + COLON + D_QUOT +step.getSuggest() + D_QUOT
                     + RIGHT_ANGLE_BRACKET + COMMA;
         }
 

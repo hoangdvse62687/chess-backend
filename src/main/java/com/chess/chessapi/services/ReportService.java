@@ -43,7 +43,7 @@ public class ReportService {
         query.setParameter("year", year);
         query.execute();
 
-        return query.getResultList();
+        return ManualCastUtils.castListObjectToListInteger(query.getResultList());
     }
 
     public List<Integer> getUsersRegisterReport(int year){
@@ -51,7 +51,7 @@ public class ReportService {
         query.setParameter("year", year);
         query.execute();
 
-        return query.getResultList();
+        return ManualCastUtils.castListObjectToListInteger(query.getResultList());
     }
 
     public List<Integer> getRateWinnableReport(int year){
@@ -59,14 +59,14 @@ public class ReportService {
         query.setParameter("year", year);
         query.execute();
 
-        return query.getResultList();
+        return ManualCastUtils.castListObjectToListInteger(query.getResultList());
     }
     public List<Integer> getRateWinnableLevelReport(int year){
         StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getRateWinnableLevelReport");
         query.setParameter("year", year);
         query.execute();
 
-        return query.getResultList();
+        return ManualCastUtils.castListObjectToListInteger(query.getResultList());
     }
 
     public List<BigInteger> getPublishCourseReport(){
@@ -80,7 +80,7 @@ public class ReportService {
         StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getCourseStatusReport");
         query.execute();
 
-        return query.getResultList();
+        return ManualCastUtils.castListObjectToListInteger(query.getResultList());
     }
     //END PUBLIC METHOD DEFINED
 

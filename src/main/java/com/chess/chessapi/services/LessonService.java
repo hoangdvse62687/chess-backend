@@ -131,8 +131,8 @@ public class LessonService {
 
         Exercise exercise = new Exercise();
         exercise.setLesson(savedLesson);
-        exercise.setQuestion(exerciseLessonCreateViewModel.getExerciseCreateViewModel().getQuestion());
-        exercise.setAnswer(exerciseLessonCreateViewModel.getExerciseCreateViewModel().getAnswer());
+        exercise.setQuestion(exerciseLessonCreateViewModel.getExercise().getQuestion());
+        exercise.setAnswer(exerciseLessonCreateViewModel.getExercise().getAnswer());
         this.exerciseService.create(exercise);
 
         //create mapping course has lesson in case has course id
@@ -159,7 +159,7 @@ public class LessonService {
 
         //update interactive lesson info
         this.exerciseService.update(lessonViewModel.getExercise().getExerciseId(),lessonViewModel.getExercise().getQuestion()
-                ,ManualCastUtils.castListStepSuggestToJson(lessonViewModel.getExercise().getAnswer()));
+                ,ManualCastUtils.castAnswerToJson(lessonViewModel.getExercise().getAnswer()));
 
     }
 

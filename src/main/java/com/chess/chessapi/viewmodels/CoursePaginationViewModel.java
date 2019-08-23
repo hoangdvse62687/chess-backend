@@ -17,6 +17,8 @@ public class CoursePaginationViewModel {
     private List<CategoryViewModel> listCategorys;
     private double rating;
     private long totalRating;
+    private int learningProcessPercent;
+
 
     public CoursePaginationViewModel() {
 
@@ -124,5 +126,13 @@ public class CoursePaginationViewModel {
 
     public void setTotalRating(long totalRating) {
         this.totalRating = totalRating;
+    }
+
+    public int getLearningProcessPercent() {
+        return learningProcessPercent;
+    }
+
+    public void setLearningProcessPercent(int learningProcessPercent) {
+        this.learningProcessPercent = learningProcessPercent;
     }
 }

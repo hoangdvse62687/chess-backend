@@ -15,7 +15,7 @@ public class ExerciseLessonCreateViewModel {
 
     @Valid
     @NotNull(message = "Exercise must not be null")
-    private ExerciseCreateViewModel exerciseCreateViewModel;
+    private ExerciseCreateViewModel exercise;
 
     private long courseId;
 
@@ -35,12 +35,12 @@ public class ExerciseLessonCreateViewModel {
         this.description = description;
     }
 
-    public ExerciseCreateViewModel getExerciseCreateViewModel() {
-        return exerciseCreateViewModel;
+    public ExerciseCreateViewModel getExercise() {
+        return exercise;
     }
 
-    public void setExerciseCreateViewModel(ExerciseCreateViewModel exerciseCreateViewModel) {
-        this.exerciseCreateViewModel = exerciseCreateViewModel;
+    public void setExercise(ExerciseCreateViewModel exercise) {
+        this.exercise = exercise;
     }
 
     public long getCourseId() {
