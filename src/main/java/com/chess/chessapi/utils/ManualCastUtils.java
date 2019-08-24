@@ -126,6 +126,18 @@ public class ManualCastUtils implements Serializable {
     private static final int NOTIFICATION_CREATED_DATE_INDEX = 7;
     private static final int NOTIFICATION_ROLE_TARGET_INDEX = 8;
     private static final int NOTIFICATION_USER_ID_INDEX = 9;
+
+    private static final String NOTIFICATION_ID = "notificationId";
+    private static final String NOTIFICATION_OBJECT_ID_ = "objectId";
+    private static final String NOTIFICATION_OBJECT_NAME = "objectName";
+    private static final String NOTIFICATION_OBJECT_AVATAR = "objectAvatar";
+    private static final String NOTIFICATION_OBJECT_TYPE_ID = "objectTypeId";
+    private static final String NOTIFICATION_CONTENT = "content";
+    private static final String NOTIFICATION_IS_VIEWED = "isViewed";
+    private static final String NOTIFICATION_CREATED_DATE = "createDate";
+    private static final String NOTIFICATION_ROLE_TARGET = "roleTarget";
+    private static final String NOTIFICATION_TO = "to";
+    private static final String NOTIFICATION = "notification";
     //END NOTIFICATION DEFINED
 
     //POINT LOG DEFINED
@@ -572,7 +584,7 @@ public class ManualCastUtils implements Serializable {
 
     public static String castAnswerToJson(ExerciseAnwserArray exerciseAnwserArray){
         if(exerciseAnwserArray == null){
-            return LEFT_SQUARE_BRACKET + " " + RIGHT_SQUARE_BRACKET;
+            return LEFT_ANGLE_BRACKET + " " + RIGHT_ANGLE_BRACKET;
         }
         String result = "";
         String answerArr = "";
@@ -590,6 +602,27 @@ public class ManualCastUtils implements Serializable {
 
         return result.substring(0,result.length() - 1);
     }
+
+    public static String castToNotificationJson(Notification notification,String to){
+        if(notification == null){
+            return LEFT_ANGLE_BRACKET + " " + RIGHT_ANGLE_BRACKET;
+        }
+        String notificationJson = LEFT_ANGLE_BRACKET + D_QUOT  + NOTIFICATION_ID + D_QUOT + COLON + D_QUOT + notification.getNotificationId() + D_QUOT
+                + COMMA + D_QUOT + NOTIFICATION_OBJECT_ID_ + D_QUOT + COLON + D_QUOT + notification.getObjectId() + D_QUOT
+                + COMMA + D_QUOT + NOTIFICATION_OBJECT_NAME + D_QUOT + COLON + D_QUOT + notification.getObjectName() + D_QUOT
+                + COMMA + D_QUOT + NOTIFICATION_OBJECT_AVATAR + D_QUOT + COLON + D_QUOT + notification.getObjectAvatar() + D_QUOT
+                + COMMA + D_QUOT + NOTIFICATION_OBJECT_TYPE_ID + D_QUOT + COLON + D_QUOT + notification.getObjectTypeId() + D_QUOT
+                + COMMA + D_QUOT + NOTIFICATION_CONTENT + D_QUOT + COLON + D_QUOT + notification.getContent() + D_QUOT
+                + COMMA + D_QUOT + NOTIFICATION_IS_VIEWED + D_QUOT + COLON + D_QUOT + notification.isViewed()+ D_QUOT
+                + COMMA + D_QUOT + NOTIFICATION_CREATED_DATE + D_QUOT + COLON + D_QUOT + notification.getCreateDate().toString() + D_QUOT
+                + COMMA + D_QUOT + NOTIFICATION_ROLE_TARGET + D_QUOT + COLON + D_QUOT + notification.getRoleTarget() + D_QUOT
+                + RIGHT_ANGLE_BRACKET;
+
+        return LEFT_ANGLE_BRACKET + D_QUOT  + NOTIFICATION + D_QUOT + COLON + notificationJson
+                + COMMA + D_QUOT + NOTIFICATION_TO + D_QUOT + COLON + D_QUOT + to + D_QUOT
+                + RIGHT_ANGLE_BRACKET;
+    }
+
     public static String castListStepSuggestToJson(List<StepSuggest> steps){
         if(steps == null || steps.isEmpty()){
             return LEFT_SQUARE_BRACKET + " " + RIGHT_SQUARE_BRACKET;

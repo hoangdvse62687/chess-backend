@@ -214,6 +214,18 @@ public class UserService {
         return this.userRepository.existsById(userId);
     }
 
+    public String findAppIdByUserId(long userId){
+        return this.userRepository.findAppIdByUserId(userId);
+    }
+
+    public List<String> findListAppIdByRoleId(long roleId){
+        return this.userRepository.findListAppIdByRoleId(roleId);
+    }
+
+    public void updateAppIdByUserId(String token,long userId){
+        this.userRepository.updateAppIdByUserId(token,userId);
+    }
+
     // private method
     private void setUserRoleAuthentication(User user,HttpServletRequest request){
         List<GrantedAuthority> authorities = Collections.

@@ -8,6 +8,7 @@ import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.services.NotificationService;
 import com.chess.chessapi.services.UserService;
 import com.chess.chessapi.viewmodels.NotificationPaginationsViewModel;
+import com.chess.chessapi.viewmodels.NotificationTokenUpdateViewModel;
 import com.chess.chessapi.viewmodels.UpdateIsViewedNotification;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -19,6 +20,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,5 +89,15 @@ public class NotificationController {
         }
 
         return new JsonResult(message,isSuccess);
+    }
+
+    @ApiOperation(value = "update notification token")
+    @PostMapping("/update-notification-token")
+    @PreAuthorize("isAuthenticated()")
+    public JsonResult updateNotificationToken(@RequestBody NotificationTokenUpdateViewModel notificationTokenUpdateViewModel){
+        UserPrincipal userPrincipal = this.userService.getCurrentUser();
+
+        this.notificationService.updateNotificationTokenId(userPrincipal.getId(),notificationTokenUpdateViewModel.getToken());
+        return new JsonResult("",true);
     }
 }
