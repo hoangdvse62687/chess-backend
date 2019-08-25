@@ -27,7 +27,8 @@ public class LearningLogService {
         Lesson lesson = new Lesson();
         lesson.setLessonId(learningLogCreateViewModel.getLessonId());
         learningLog.setLesson(lesson);
-        learningLog.setPassed(learningLog.isPassed());
+//        learningLog.setPassed(learningLog.isPassed());
+        learningLog.setPassed(true);
         User user = new User();
         user.setUserId(userId);
         learningLog.setUser(user);
