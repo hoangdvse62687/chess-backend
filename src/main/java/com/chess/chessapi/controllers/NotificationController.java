@@ -28,7 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @RestController
-@RequestMapping(value = "/notification")
+@RequestMapping(value = "/notifications")
 @Api(value = "Notification Management")
 public class NotificationController {
     @Autowired
@@ -37,7 +37,7 @@ public class NotificationController {
     private NotificationService notificationService;
 
     @ApiOperation(value = "Get current user notification pagings")
-    @GetMapping("/get-current-user-notifications-pagination")
+    @GetMapping("/current-user")
     @PreAuthorize("isAuthenticated()")
     public JsonResult getNotifications(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize,
                                        String sortBy,String sortDirection){
@@ -68,7 +68,7 @@ public class NotificationController {
     }
 
     @ApiOperation(value = "update is view by list notification ids")
-    @PutMapping("/update-is-viewed")
+    @PutMapping("/is-viewed")
     @PreAuthorize("isAuthenticated()")
     public JsonResult updateIsViewed(@RequestBody @Valid UpdateIsViewedNotification updateIsViewedNotification, BindingResult bindingResult){
         String message = "";
@@ -92,7 +92,7 @@ public class NotificationController {
     }
 
     @ApiOperation(value = "update notification token")
-    @PostMapping("/update-notification-token")
+    @PostMapping("/token")
     @PreAuthorize("isAuthenticated()")
     public JsonResult updateNotificationToken(@RequestBody NotificationTokenUpdateViewModel notificationTokenUpdateViewModel){
         UserPrincipal userPrincipal = this.userService.getCurrentUser();

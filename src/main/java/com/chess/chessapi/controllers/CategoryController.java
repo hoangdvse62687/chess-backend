@@ -22,7 +22,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @RestController
-@RequestMapping(value = "/category")
 @Api(value = "Category Management")
 public class CategoryController {
     @Autowired
@@ -30,25 +29,25 @@ public class CategoryController {
 
 
     @ApiOperation(value = "get categories")
-    @GetMapping("/get-categories")
+    @GetMapping("/categories")
     public @ResponseBody JsonResult getCategories(){
         return new JsonResult(null,this.categoryService.getAllCategory());
     }
 
     @ApiOperation(value = "get category detail by id")
-    @GetMapping("/get-by-id")
-    public @ResponseBody JsonResult getCategoryById(@RequestParam("categoryId") long categoryId){
+    @GetMapping("/categories/{id}")
+    public @ResponseBody JsonResult getCategoryById(@PathVariable("id") long categoryId){
         Category category = this.categoryService.getCategoryById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category","id",categoryId));
         return new JsonResult(null,category);
     }
 
     @ApiOperation(value = "remove category")
-    @PutMapping("/remove-category")
+    @DeleteMapping("/categories/{id}")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_ADMIN_AUTHENTICATIION+")")
-    public @ResponseBody JsonResult removeCategoryById(@RequestBody CategoryViewModel Category){
-        Category category = this.categoryService.getCategoryById(Category.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("Category","id",Category.getCategoryId()));
+    public @ResponseBody JsonResult removeCategoryById(@PathVariable("id") long categoryId){
+        Category category = this.categoryService.getCategoryById(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Category","id",categoryId));
         Boolean isSuccess = true;
         String message = "";
         try{
@@ -63,7 +62,7 @@ public class CategoryController {
     }
 
     @ApiOperation(value = "create category")
-    @PostMapping("/create-category")
+    @PostMapping("/categories")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_ADMIN_AUTHENTICATIION+")")
     public @ResponseBody JsonResult createCategory(@RequestBody @Valid CategoryViewModel category, BindingResult bindingResult){
         Boolean isSuccess = true;
@@ -90,7 +89,7 @@ public class CategoryController {
     }
 
     @ApiOperation(value = "update category")
-    @PostMapping("/update-category")
+    @PutMapping("/categories")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_ADMIN_AUTHENTICATIION+")")
     public @ResponseBody JsonResult updateCategory(@RequestBody @Valid CategoryViewModel category, BindingResult bindingResult){
         if(!this.categoryService.isExist(category.getCategoryId())){

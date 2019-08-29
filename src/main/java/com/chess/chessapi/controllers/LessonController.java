@@ -28,7 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @RestController
-@RequestMapping(value = "/lesson")
+@RequestMapping(value = "/lessons")
 @Api(value = "Lesson Management")
 public class LessonController {
     @Autowired
@@ -44,11 +44,11 @@ public class LessonController {
     private CourseHasLessonService courseHasLessonService;
 
     @ApiOperation(value = "get lesson detail by id")
-    @GetMapping("/get-by-id")
+    @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority("+ AppRole.ROLE_LEARNER_AUTHENTICATIION+","
             + AppRole.ROLE_ADMIN_AUTHENTICATIION+","
             + AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
-    public @ResponseBody JsonResult getLessonDetailById(@RequestParam("lessonId") long lessonId){
+    public @ResponseBody JsonResult getLessonDetailById(@PathVariable("id") long lessonId){
         UserPrincipal userPrincipal = this.userService.getCurrentUser();
         if(!this.lessonService.checkPermissionViewLesson(userPrincipal,lessonId)){
             throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
@@ -58,7 +58,7 @@ public class LessonController {
     }
 
     @ApiOperation(value = "Create interactive lesson")
-    @PostMapping(value = "/create-interactive-lesson")
+    @PostMapping(value = "/interactive-lesson")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult createInteractiveLesson(@Valid @RequestBody InteractiveLessonCreateViewModel lessonViewModel, BindingResult bindingResult){
         //if courseId are default => check permission create lesson on course
@@ -93,7 +93,7 @@ public class LessonController {
     }
 
     @ApiOperation(value = "Create exercise lesson")
-    @PostMapping(value = "/create-exercise-lesson")
+    @PostMapping(value = "/exercise-lesson")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult createExerciseLesson(@Valid @RequestBody ExerciseLessonCreateViewModel lessonViewModel, BindingResult bindingResult){
         //if courseId are default => check permission create lesson on course
@@ -128,7 +128,7 @@ public class LessonController {
     }
 
     @ApiOperation(value = "Update interactive lesson")
-    @PutMapping(value = "/update-interactive-lesson")
+    @PutMapping(value = "/interactive-lesson")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult updateInteractiveLesson(@Valid @RequestBody InteractiveLessonUpdateViewModel interactiveLessonUpdateViewModel, BindingResult bindingResult){
 
@@ -161,7 +161,7 @@ public class LessonController {
     }
 
     @ApiOperation(value = "Update exercise lesson")
-    @PutMapping(value = "/update-exercise-lesson")
+    @PutMapping(value = "/exercise-lesson")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult updateExerciseLesson(@Valid @RequestBody ExerciseLessonUpdateViewModel exerciseLessonUpdateViewModel
             , BindingResult bindingResult){
@@ -195,7 +195,7 @@ public class LessonController {
     }
 
     @ApiOperation(value = "Create uninteractive lesson")
-    @PostMapping(value = "/create-uninteractive-lesson")
+    @PostMapping(value = "/uninteractive-lesson")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult createUninteractiveLesson(@Valid @RequestBody UninteractiveLessonCreateViewModel lessonViewModel, BindingResult bindingResult){
         //if courseId are default => check permission create lesson on course
@@ -230,7 +230,7 @@ public class LessonController {
     }
 
     @ApiOperation(value = "Update uninteractive lesson")
-    @PutMapping(value = "/update-uninteractive-lesson")
+    @PutMapping(value = "/uninteractive-lesson")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult updateUninteractiveLesson(@Valid @RequestBody UninteractiveLessonUpdateViewModel uninteractiveLessonUpdateViewModel, BindingResult bindingResult){
 
@@ -262,7 +262,7 @@ public class LessonController {
     }
 
     @ApiOperation(value = "get lesson of current user")
-    @GetMapping("/get-lesson-paginations-by-current-user")
+    @GetMapping("/current-user")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult getLessonByOwner(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
             ,String name,String sortBy,String sortDirection){
@@ -288,7 +288,7 @@ public class LessonController {
     }
 
     @ApiOperation(value = "Remove lesson from course")
-    @PutMapping(value = "/remove-lesson-course")
+    @DeleteMapping(value = "/lesson-course")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult removeLessonFromCourse(@RequestBody LessonCourseRemoveViewModel lessonCourseRemoveViewModel){
         if(!this.courseService.checkPermissionModifyCourse(lessonCourseRemoveViewModel.getCourseId())){
@@ -309,15 +309,15 @@ public class LessonController {
     }
 
     @ApiOperation(value = "Remove lesson")
-    @PutMapping(value = "/remove-lesson")
+    @DeleteMapping(value = "/{id}")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
-    public @ResponseBody JsonResult removeLesson(@RequestBody LessonRemoveViewModel lessonRemoveViewModel){
-        if(!this.lessonService.checkPermissionModifyLesson(lessonRemoveViewModel.getLessonId())){
+    public @ResponseBody JsonResult removeLesson(@PathVariable("id") long lessonId){
+        if(!this.lessonService.checkPermissionModifyLesson(lessonId)){
             throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
         }
 
-        Lesson lesson = this.lessonService.getById(lessonRemoveViewModel.getLessonId())
-                .orElseThrow(() -> new ResourceNotFoundException("Lesson","id",lessonRemoveViewModel.getLessonId()));
+        Lesson lesson = this.lessonService.getById(lessonId)
+                .orElseThrow(() -> new ResourceNotFoundException("Lesson","id",lessonId));
 
         Boolean isSuccess = true;
         String message = "";
@@ -332,7 +332,7 @@ public class LessonController {
         return new JsonResult(message,isSuccess);
     }
     @ApiOperation(value = "mapping lesson to course")
-    @PutMapping(value = "/mapping-lesson-course")
+    @PostMapping(value = "/lesson-course")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult mappingLessonCourse(@RequestBody MappingLessonCourseViewModel mappingLessonCourseViewModel){
         if(!this.courseService.checkPermissionModifyCourse(mappingLessonCourseViewModel.getCourseId())){

@@ -18,7 +18,7 @@ public class CourseDetailsViewModel {
     private List<UserDetailViewModel> userEnrolleds;
     private List<UserDetailViewModel> tutors;
     private List<CategoryViewModel> listCategorys;
-    private List<Long> listLearningLogLessonIds;
+    private List<LearningLogViewModel> listLearningLogLessonIds;
     private List<LessonViewModel> lessonViewModels;
     private int totalLesson;
     private boolean isEnrolled;
@@ -104,11 +104,11 @@ public class CourseDetailsViewModel {
         isEnrolled = enrolled;
     }
 
-    public List<Long> getListLearningLogLessonIds() {
+    public List<LearningLogViewModel> getListLearningLogLessonIds() {
         return listLearningLogLessonIds;
     }
 
-    public void setListLearningLogLessonIds(List<Long> listLearningLogLessonIds) {
+    public void setListLearningLogLessonIds(List<LearningLogViewModel> listLearningLogLessonIds) {
         this.listLearningLogLessonIds = listLearningLogLessonIds;
     }
 

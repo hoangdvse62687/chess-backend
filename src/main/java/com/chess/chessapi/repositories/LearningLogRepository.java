@@ -11,8 +11,8 @@ import java.util.List;
 
 @Repository
 public interface LearningLogRepository extends JpaRepository<LearningLog,Long> {
-    @Query(value = "Select lesson_id From learning_log where course_id = ?1 and user_id = ?2",nativeQuery = true)
-    List<Long> findAllByCourseIdAndUserId(long courseId,long userId);
+    @Query(value = "Select lesson_id,is_passed From learning_log where course_id = ?1 and user_id = ?2",nativeQuery = true)
+    List<Object[]> findAllByCourseIdAndUserId(long courseId,long userId);
 
     @Modifying
     @Transactional

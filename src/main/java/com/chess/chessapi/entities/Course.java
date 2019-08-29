@@ -1,6 +1,7 @@
 package com.chess.chessapi.entities;
 
 import com.chess.chessapi.viewmodels.CategoryViewModel;
+import com.chess.chessapi.viewmodels.LearningLogViewModel;
 import com.chess.chessapi.viewmodels.LessonViewModel;
 import com.chess.chessapi.viewmodels.UserDetailViewModel;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -155,7 +156,7 @@ public class Course {
     private List<CategoryViewModel> listCategorys;
 
     @Transient
-    private List<Long> listLearningLogLessonIds;
+    private List<LearningLogViewModel> listLearningLogLessonIds;
 
     @Transient
     private List<Long> listLogExerciseIds;
@@ -283,11 +284,11 @@ public class Course {
         this.learningLogs = learningLogs;
     }
 
-    public List<Long> getListLearningLogLessonIds() {
+    public List<LearningLogViewModel> getListLearningLogLessonIds() {
         return listLearningLogLessonIds;
     }
 
-    public void setListLearningLogLessonIds(List<Long> listLearningLogLessonIds) {
+    public void setListLearningLogLessonIds(List<LearningLogViewModel> listLearningLogLessonIds) {
         this.listLearningLogLessonIds = listLearningLogLessonIds;
     }
 

@@ -29,7 +29,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @RestController
-@RequestMapping(value = "/game-history")
 @Api(value = "Exercise Management")
 public class GameHistoryController {
     @Autowired
@@ -39,7 +38,7 @@ public class GameHistoryController {
     private UserService userService;
 
     @ApiOperation(value = "Create game history")
-    @PostMapping("/create")
+    @PostMapping("/game-history")
     @PreAuthorize("hasAnyAuthority("+ AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
     public @ResponseBody JsonResult createGameHistory(@RequestBody @Valid GameHistoryCreateViewModel gameHistoryCreateViewModel, BindingResult bindingResult){
         String message = "";
@@ -71,7 +70,7 @@ public class GameHistoryController {
     }
 
     @ApiOperation(value = "Update game history")
-    @PutMapping("/update")
+    @PutMapping("/game-history")
     @PreAuthorize("hasAnyAuthority("+ AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
     public @ResponseBody JsonResult updateGameHistory(@RequestBody @Valid GameHistoryUpdateViewModel gameHistoryUpdateViewModel, BindingResult bindingResult){
         String message = "";
@@ -101,7 +100,7 @@ public class GameHistoryController {
     }
 
     @ApiOperation(value = "Get current user game history paginations")
-    @GetMapping("/get-current-user-game-history-paginations")
+    @GetMapping("/current-user")
     @PreAuthorize("hasAnyAuthority("+ AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
     public @ResponseBody JsonResult getGameHistory(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize){
         UserPrincipal userPrincipal = this.userService.getCurrentUser();

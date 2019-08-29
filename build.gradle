@@ -43,4 +43,11 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-thymeleaf
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: '2.1.6.RELEASE'
+
+    // https://mvnrepository.com/artifact/io.lettuce/lettuce-core
+    compile group: 'io.lettuce', name: 'lettuce-core', version: '5.1.8.RELEASE'
+
+    // https://mvnrepository.com/artifact/org.springframework.session/spring-session-data-redis
+    compile group: 'org.springframework.session', name: 'spring-session-data-redis', version: '2.1.8.RELEASE'
+
 }

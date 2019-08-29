@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping(value = "/report")
+@RequestMapping(value = "/reports")
 @Api(value = "Report Management")
 public class ReportController {
     @Autowired
     private ReportService reportService;
 
     @ApiOperation(value = "Get Learner Status Course Report ")
-    @GetMapping(value = "/get-learner-status-course")
+    @GetMapping(value = "/learner-status-course")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION +")")
     public @ResponseBody
     JsonResult getLearnerStatusCourse(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
@@ -36,7 +36,7 @@ public class ReportController {
     }
 
     @ApiOperation(value = "Get Enrollment Report")
-    @GetMapping(value = "/get-enrollment-report")
+    @GetMapping(value = "/enrollment-report")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION +")")
     public @ResponseBody
     JsonResult getEnrollment(@RequestParam("year") int year) {
@@ -44,7 +44,7 @@ public class ReportController {
     }
 
     @ApiOperation(value = "Get Users Register Report")
-    @GetMapping(value = "/get-users-register-report")
+    @GetMapping(value = "/users-register-report")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_ADMIN_AUTHENTICATIION +")")
     public @ResponseBody
     JsonResult getUsersRegister(@RequestParam("year") int year) {
@@ -52,7 +52,7 @@ public class ReportController {
     }
 
     @ApiOperation(value = "Get Rate Winnable Report")
-    @GetMapping(value = "/get-rate-winnable-report")
+    @GetMapping(value = "/rate-winnable-report")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_ADMIN_AUTHENTICATIION +")")
     public @ResponseBody
     JsonResult getRateWinnable(@RequestParam("year") int year) {
@@ -60,7 +60,7 @@ public class ReportController {
     }
 
     @ApiOperation(value = "Get Rate Winnable Level Report")
-    @GetMapping(value = "/get-rate-winnable-level-report")
+    @GetMapping(value = "/rate-winnable-level-report")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_ADMIN_AUTHENTICATIION +")")
     public @ResponseBody
     JsonResult getRateWinnableLevel(@RequestParam("year") int year) {
@@ -68,7 +68,7 @@ public class ReportController {
     }
 
     @ApiOperation(value = "Get Publish Course Report")
-    @GetMapping(value = "/get-publish-course-report")
+    @GetMapping(value = "/publish-course-report")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_ADMIN_AUTHENTICATIION +")")
     public @ResponseBody
     JsonResult getPublishCourseReport() {
@@ -76,7 +76,7 @@ public class ReportController {
     }
 
     @ApiOperation(value = "Get Course Status Report")
-    @GetMapping(value = "/get-course-status-report")
+    @GetMapping(value = "/course-status-report")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_ADMIN_AUTHENTICATIION +")")
     public @ResponseBody
     JsonResult getCourseStatusReport() {

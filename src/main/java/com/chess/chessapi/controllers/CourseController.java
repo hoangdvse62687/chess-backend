@@ -28,7 +28,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @RestController
-@RequestMapping(value = "/course")
 @Api(value = "Course Management")
 public class CourseController {
     @Autowired
@@ -53,7 +52,7 @@ public class CourseController {
     private UserHasCourseService userHasCourseService;
 
     @ApiOperation(value = "Create course")
-    @PostMapping("/create-course")
+    @PostMapping("/courses")
     @PreAuthorize("hasAnyAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult createCourse(@Valid @RequestBody CourseCreateViewModel course, BindingResult bindingResult){
         String message = "";
@@ -82,7 +81,7 @@ public class CourseController {
     }
 
     @ApiOperation(value = "Get course pagination")
-    @GetMapping("/get-course-pagination")
+    @GetMapping("/courses")
     public @ResponseBody JsonResult getCoursePaginationByStatusId(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
             ,String statusId,String nameCourse,String sortBy,String sortDirection){
         if(nameCourse == null){
@@ -114,7 +113,7 @@ public class CourseController {
     }
 
     @ApiOperation(value = "remove course")
-    @PutMapping("/change-status-to-drafting")
+    @PutMapping("/courses/status-to-drafting")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult changeStatusToDrafting(@Valid @RequestBody CourseRemoveViewModel courseRemoveViewModel
             , BindingResult bindingResult){
@@ -150,7 +149,7 @@ public class CourseController {
     }
 
     @ApiOperation(value = "update course status")
-    @PutMapping("/update-course-status")
+    @PutMapping("/courses/status")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_ADMIN_AUTHENTICATIION+")")
     public @ResponseBody JsonResult updateCourseStatus(@Valid @RequestBody CourseUpdateStatusViewModel courseUpdateStatusViewModel
             , BindingResult bindingResult){
@@ -180,8 +179,8 @@ public class CourseController {
     }
 
     @ApiOperation(value = "get course detail by course id")
-    @GetMapping("/get-by-id")
-    public @ResponseBody JsonResult getCourseDetailByCourseId(@RequestParam("courseId") long courseId){
+    @GetMapping("/courses/{id}")
+    public @ResponseBody JsonResult getCourseDetailByCourseId(@PathVariable("id") long courseId){
         Course course = this.courseService.getCourseById(courseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Course","id",courseId));
         //get detail
@@ -203,7 +202,7 @@ public class CourseController {
     }
 
     @ApiOperation(value = "update course")
-    @PutMapping("/update-course")
+    @PutMapping("/courses")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult updateCourse(@Valid @RequestBody Course course, BindingResult bindingResult){
         boolean hasPermissionModify = this.courseService.checkPermissionModifyCourse(course.getCourseId());
@@ -232,7 +231,7 @@ public class CourseController {
     }
 
     @ApiOperation(value = "get courses by lesson id")
-    @GetMapping("/get-courses-by-lesson-id")
+    @GetMapping("/courses/lesson-id")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult getCoursesByLessonId(@RequestParam("lessonId") long lessonId){
         //check permission only author lesson can view course implement to lesson
@@ -245,7 +244,7 @@ public class CourseController {
     }
 
     @ApiOperation(value = "publish course")
-    @PutMapping("/publish-course")
+    @PutMapping("/courses/publish")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult publishCourse(@Valid @RequestBody CoursePublishViewModel coursePublishViewModel
             , BindingResult bindingResult){
@@ -280,7 +279,7 @@ public class CourseController {
     }
 
     @ApiOperation(value = "Enroll course")
-    @PostMapping("/enroll")
+    @PostMapping("/courses/enroll")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
     public @ResponseBody JsonResult enrollCourse(@RequestBody @Valid EnrollCourseViewModel enrollCourseViewModel, BindingResult bindingResult){
         String message = "";
@@ -316,7 +315,7 @@ public class CourseController {
     }
 
     @ApiOperation(value = "get course paginations by category id")
-    @GetMapping("/get-course-paginations-by-category-id")
+    @GetMapping("/courses/category-id")
     public @ResponseBody JsonResult getCoursePaginationByCourseId(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
             ,@RequestParam("categoryId") long categoryId,String statusId,String nameCourse,String sortBy,String sortDirection){
 
@@ -349,20 +348,20 @@ public class CourseController {
     }
 
     @ApiOperation(value = "Get review pagination")
-    @GetMapping("/get-review-pagination")
+    @GetMapping("/courses/reviews")
     public @ResponseBody JsonResult getReviewPagination(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
             ,@RequestParam("courseId") long courseId){
         return new JsonResult(null,this.reviewService.getReviewPaginationByCourse(page,pageSize,courseId));
     }
 
     @ApiOperation(value = "Get course overview")
-    @GetMapping("/get-course-overview")
+    @GetMapping("/courses/overview")
     public @ResponseBody JsonResult getCourseOverView(@RequestParam("courseId") long courseId){
         return new JsonResult(null,this.reviewService.getCourseOverview(courseId));
     }
 
     @ApiOperation(value = "Review on course")
-    @PostMapping("/create-review")
+    @PostMapping("/courses/review")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
     public @ResponseBody JsonResult createReview(@RequestBody @Valid ReviewCreateViewModel reviewCreateViewModel,BindingResult bindingResult){
         String message = "";
@@ -395,7 +394,7 @@ public class CourseController {
     }
 
     @ApiOperation(value = "update review on course")
-    @PutMapping("/update-review")
+    @PutMapping("/courses/review")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
     public @ResponseBody JsonResult updateReview(@RequestBody @Valid ReviewUpdateViewModel reviewUpdateViewModel,BindingResult bindingResult){
         String message = "";
@@ -427,7 +426,7 @@ public class CourseController {
     }
 
     @ApiOperation(value = "remove review on course")
-    @PutMapping("/remove-review")
+    @DeleteMapping("/courses/review")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
     public @ResponseBody JsonResult removeReview(@RequestBody @Valid ReviewRemoveViewModel reviewRemoveViewModel,BindingResult bindingResult){
         String message = "";
@@ -459,7 +458,7 @@ public class CourseController {
     }
 
     @ApiOperation(value = "Get course by user id")
-    @GetMapping("/get-course-paginations-by-userid")
+    @GetMapping("/courses/userid")
     public @ResponseBody JsonResult getCoursePaginationsByUserId(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize,
             @RequestParam("userId") long userId,String statusId,String nameCourse,String sortBy,String sortDirection){
         if(sortDirection == null){

@@ -18,7 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @RestController
-@RequestMapping(value = "/point-log")
+@RequestMapping(value = "/point-logs")
 @Api(value = "Point Log Management")
 public class PointLogController {
     @Autowired
@@ -28,7 +28,7 @@ public class PointLogController {
     private UserService userService;
 
     @ApiOperation(value = "Get current user point log pagination")
-        @GetMapping("/get-current-user-point-log-pagination")
+        @GetMapping("/current-user")
     @PreAuthorize("hasAnyAuthority("+ AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
     public @ResponseBody
     JsonResult getCurrentUserPointLogPagination(@RequestParam("page") int page, @RequestParam("pageSize") int pageSize

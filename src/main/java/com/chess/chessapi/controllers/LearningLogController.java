@@ -26,7 +26,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @RestController
-@RequestMapping(value = "/learning-log")
 @Api(value = "Learning Log Management")
 public class LearningLogController {
     @Autowired
@@ -36,7 +35,7 @@ public class LearningLogController {
     private UserService userService;
 
     @ApiOperation(value = "Create learning log")
-    @PostMapping(value = "/create-learning-log")
+    @PostMapping(value = "/learning-logs")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
     public @ResponseBody JsonResult createLearningLog(@Valid @RequestBody LearningLogCreateViewModel learningLogCreateViewModel, BindingResult bindingResult){
         String message = "";
@@ -64,7 +63,7 @@ public class LearningLogController {
     }
 
     @ApiOperation(value = "Update learning log")
-    @PutMapping(value = "/update-learning-log")
+    @PutMapping(value = "/learning-logs")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
     public @ResponseBody JsonResult updateLearningLog(@Valid @RequestBody LearningLogUpdateViewModel learningLogUpdateViewModel, BindingResult bindingResult){
         LearningLog learningLog = this.learningLogService.getById(learningLogUpdateViewModel.getLearningLogId())
@@ -92,9 +91,9 @@ public class LearningLogController {
     }
 
     @ApiOperation(value = "get learning log of current user by courseId")
-    @GetMapping("/get-current-user-learning-log-by-course-id")
+    @GetMapping("/learning-logs/current-user/{courseId}")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
-    public @ResponseBody JsonResult getLearningLogByCourseId(@RequestParam("courseId") long courseId){
+    public @ResponseBody JsonResult getLearningLogByCourseId(@PathVariable("courseId") long courseId){
         UserPrincipal userPrincipal = this.userService.getCurrentUser();
         return new JsonResult(null,this.learningLogService.getAllByCourseId(courseId,userPrincipal.getId()));
     }

@@ -32,14 +32,13 @@ import java.util.logging.Logger;
 
 
 @RestController
-@RequestMapping(value = "/user")
 @Api(value = "User Management")
 public class UserController {
     @Autowired
     private UserService userService;
 
     @ApiOperation(value = "Get an current user detail")
-    @GetMapping(value = "/get-current-user-detail")
+    @GetMapping(value = "/users/current-user-detail")
     @PreAuthorize("isAuthenticated()")
     public @ResponseBody JsonResult getCurrentUserDetail(@CurrentUser UserPrincipal userPrincipal) {
         User user = this.userService.getUserById(userPrincipal.getId())
@@ -49,14 +48,14 @@ public class UserController {
     }
 
     @ApiOperation(value = "Get an current user ")
-    @GetMapping(value = "/get-current-user")
+    @GetMapping(value = "/users/current-user")
     @PreAuthorize("isAuthenticated()")
     public @ResponseBody JsonResult getCurrentUser(@CurrentUser UserPrincipal userPrincipal) {
         return new JsonResult("",userPrincipal);
     }
 
     @ApiOperation(value = "Register an user")
-    @PutMapping(value = "/register")
+    @PutMapping(value = "/users/register")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_REGISTRATION_AUTHENTICATIION +")")
     public @ResponseBody JsonResult register(@Valid @RequestBody UserUpdateViewModel userUpdateViewModel, BindingResult bindingResult, @Context HttpServletRequest request){
         String message = "";
@@ -79,7 +78,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "Update profile user ")
-    @PutMapping(value = "/update-profile")
+    @PutMapping(value = "/users/profile")
     @PreAuthorize("isAuthenticated()")
     public @ResponseBody JsonResult updateProfile(@Valid @RequestBody UserUpdateViewModel userUpdateViewModel, BindingResult bindingResult, @Context HttpServletRequest request){
         if(!this.userService.checkPermissionModify(userUpdateViewModel.getUserId())){
@@ -111,7 +110,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "Get user pagination")
-    @GetMapping(value = "/get-users-pagination")
+    @GetMapping(value = "/users")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_ADMIN_AUTHENTICATIION+")")
     public @ResponseBody JsonResult getUsers(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
             ,String email, String role, String isActive,String isReview){
@@ -142,8 +141,8 @@ public class UserController {
     }
 
     @ApiOperation(value = "Get an user by id")
-    @GetMapping(value = "/get-by-id")
-    public @ResponseBody JsonResult getUserById(@RequestParam("userId") long userId){
+    @GetMapping(value = "/users/{id}")
+    public @ResponseBody JsonResult getUserById(@PathVariable("id") long userId){
         User user = this.userService.getUserById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User","id",userId));
         this.userService.getUserDetails(user);
@@ -151,7 +150,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "Update user status")
-    @PutMapping(value = "/update-status")
+    @PutMapping(value = "/users/status")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_ADMIN_AUTHENTICATIION+")")
     public @ResponseBody JsonResult updateStatus(@RequestBody UserUpdateStatusViewModel userUpdateStatusViewModel, @Context HttpServletRequest request){
         Boolean isSuccess = true;

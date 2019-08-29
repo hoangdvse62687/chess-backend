@@ -5,8 +5,10 @@ import com.chess.chessapi.entities.LearningLog;
 import com.chess.chessapi.entities.Lesson;
 import com.chess.chessapi.entities.User;
 import com.chess.chessapi.repositories.LearningLogRepository;
+import com.chess.chessapi.utils.ManualCastUtils;
 import com.chess.chessapi.utils.TimeUtils;
 import com.chess.chessapi.viewmodels.LearningLogCreateViewModel;
+import com.chess.chessapi.viewmodels.LearningLogViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,8 +29,7 @@ public class LearningLogService {
         Lesson lesson = new Lesson();
         lesson.setLessonId(learningLogCreateViewModel.getLessonId());
         learningLog.setLesson(lesson);
-//        learningLog.setPassed(learningLog.isPassed());
-        learningLog.setPassed(true);
+        learningLog.setPassed(learningLog.isPassed());
         User user = new User();
         user.setUserId(userId);
         learningLog.setUser(user);
@@ -42,8 +43,8 @@ public class LearningLogService {
         this.learningLogRepository.save(learningLog);
     }
 
-    public List<Long> getAllByCourseId(long courseId,long userId){
-        return this.learningLogRepository.findAllByCourseIdAndUserId(courseId,userId);
+    public List<LearningLogViewModel> getAllByCourseId(long courseId, long userId){
+        return ManualCastUtils.castListObjectsToLearningLogViewModel(this.learningLogRepository.findAllByCourseIdAndUserId(courseId,userId));
     }
 
     public void deleteAllByLessonId(long lessonId){

@@ -160,7 +160,10 @@ public class ManualCastUtils implements Serializable {
     public static final int GAMEHISTORY_VIEW_MODEL_POINT_INDEX = 4;
     public static final int GAMEHISTORY_VIEW_MODEL_STATUS_INDEX = 5;
     //END GAME HISTORY DEFINED
-
+    //LEARNING LOG DEFINED
+    public static final int LEARNINGLOG_ID_INDEX = 0;
+    public static final int LEARNINGLOG_IS_PASSED_INDEX = 1;
+    //END LEARNING LOG DEFINED
     public static User castObjectToUserByFindCustom(Object object)
             throws NumberFormatException{
         if(object == null){
@@ -171,7 +174,7 @@ public class ManualCastUtils implements Serializable {
         user.setUserId(Long.parseLong(data[USER_ID_INDEX].toString()));
         user.setEmail(data[USER_EMAIL_INDEX].toString());
         user.setRoleId(Long.parseLong(data[USER_ROLE_INDEX].toString()));
-        user.setActive(Integer.parseInt(data[USER_ISACTIVE_INDEX].toString()) == 1 ? true : false);
+        user.setActive(parseBoolean(data[USER_ISACTIVE_INDEX].toString()));
         return user;
     }
 
@@ -432,7 +435,7 @@ public class ManualCastUtils implements Serializable {
             notification.setObjectAvatar(data[NOTIFICATION_OBJECT_AVATAR_INDEX].toString());
             notification.setObjectTypeId(Long.parseLong(data[NOTIFICATION_OBJECT_TYPE_ID_INDEX].toString()));
             notification.setContent(data[NOTIFICATION_CONTENT_INDEX].toString());
-            notification.setViewed(data[NOTIFICATION_IS_VIEWED_INDEX].toString().equals("1") ? true : false);
+            notification.setViewed(parseBoolean(data[NOTIFICATION_IS_VIEWED_INDEX].toString()));
             notification.setCreateDate(Timestamp.valueOf(data[NOTIFICATION_CREATED_DATE_INDEX].toString()));
             notification.setRoleTarget(Long.parseLong(data[NOTIFICATION_ROLE_TARGET_INDEX].toString()));
             result.add(notification);
@@ -559,6 +562,18 @@ public class ManualCastUtils implements Serializable {
         courseForNotificationViewModel.setCourseName(object[COURSE_FOR_NOTIFICATION_NAME_INDEX].toString());
         courseForNotificationViewModel.setCourseImage(object[COURSE_FOR_NOTIFICATION_IMAGE_INDEX].toString());
         return courseForNotificationViewModel;
+    }
+
+    public static List<LearningLogViewModel> castListObjectsToLearningLogViewModel(List<Object[]> objects){
+        List<LearningLogViewModel> data = new ArrayList<>();
+        for(Object[] object:
+                objects){
+            LearningLogViewModel learningLogViewModel = new LearningLogViewModel();
+            learningLogViewModel.setLearningLogId(Long.parseLong(object[LEARNINGLOG_ID_INDEX].toString()));
+            learningLogViewModel.setPassed(parseBoolean(object[LEARNINGLOG_IS_PASSED_INDEX].toString()));
+            data.add(learningLogViewModel);
+        }
+        return data;
     }
     //END CAST OBJECT TO OBJECT DEFINED
 

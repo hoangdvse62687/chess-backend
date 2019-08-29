@@ -2,6 +2,8 @@ package com.chess.chessapi.security;
 
 import com.chess.chessapi.constants.AppMessage;
 import com.chess.chessapi.exceptions.AccessDeniedException;
+import org.springframework.session.data.redis.RedisOperationsSessionRepository;
+import org.springframework.session.web.http.SessionRepositoryFilter;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +48,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                     //set sesson
                     session.setAttribute(userId.toString(),userDetails);
                 }
+                if(!session.isNew()){
+                    response.setHeader("X-Auth-Token",request.getHeader("X-Auth-Token"));
+                }
+
                 UserPrincipal userPrincipal = (UserPrincipal) userDetails;
                 if(userPrincipal.isStatus()){
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
@@ -59,7 +65,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         } catch (Exception ex) {
             logger.error("Could not set user authentication in security context", ex);
         }
-
+        response.setHeader("Access-Control-Expose-Headers", "X-Auth-Token");
         filterChain.doFilter(request, response);
     }
 
