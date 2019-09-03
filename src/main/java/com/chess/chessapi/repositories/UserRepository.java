@@ -94,16 +94,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "Delete from users where id = ?1"
             ,nativeQuery = true)
     void deleteUser(long userId);
-
-    @Query(value = "Select app_id from users where id = ?1",nativeQuery = true)
-    String findAppIdByUserId(long userId);
-
-    @Query(value = "Select app_id from users where role_id = ?1",nativeQuery = true)
-    List<String> findListAppIdByRoleId(long roleId);
-
-    @Modifying
-    @Transactional
-    @Query(value = "Update users Set app_id = ?1 where id = ?2"
-            ,nativeQuery = true)
-    void updateAppIdByUserId(String token,long userId);
 }

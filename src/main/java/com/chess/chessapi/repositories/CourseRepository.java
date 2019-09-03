@@ -33,4 +33,7 @@ public interface CourseRepository extends JpaRepository<Course,Long> {
 
     @Query(value = "Select c.id,c.name,c.image From course c where c.id = ?1",nativeQuery = true)
     Object findCourseDetailForNotificationByCourseId(Long listCourseId);
+
+    @Query(value = "Select point From course where id = ?1",nativeQuery = true)
+    Long findRewardPointById(long courseId);
 }

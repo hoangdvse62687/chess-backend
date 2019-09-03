@@ -4,13 +4,16 @@ import com.chess.chessapi.constants.AppMessage;
 import com.chess.chessapi.constants.AppRole;
 import com.chess.chessapi.entities.LearningLog;
 import com.chess.chessapi.exceptions.AccessDeniedException;
+import com.chess.chessapi.exceptions.BadRequestException;
 import com.chess.chessapi.exceptions.ResourceNotFoundException;
 import com.chess.chessapi.models.CreateResponse;
 import com.chess.chessapi.models.JsonResult;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.services.LearningLogService;
 import com.chess.chessapi.services.UserService;
+import com.chess.chessapi.viewmodels.LearningLogCreateResponse;
 import com.chess.chessapi.viewmodels.LearningLogCreateViewModel;
+import com.chess.chessapi.viewmodels.LearningLogUpdateResponse;
 import com.chess.chessapi.viewmodels.LearningLogUpdateViewModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -40,15 +43,15 @@ public class LearningLogController {
     public @ResponseBody JsonResult createLearningLog(@Valid @RequestBody LearningLogCreateViewModel learningLogCreateViewModel, BindingResult bindingResult){
         String message = "";
         boolean isSuccess = true;
-        long savedId = 0;
+        LearningLogCreateResponse learningLogCreateResponse = new LearningLogCreateResponse();
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
-            isSuccess = false;
+            throw new BadRequestException(message);
         }else{
             try{
                 UserPrincipal userPrincipal = this.userService.getCurrentUser();
-                savedId = this.learningLogService.create(learningLogCreateViewModel,userPrincipal.getId());
+                learningLogCreateResponse = this.learningLogService.create(learningLogCreateViewModel,userPrincipal.getId());
                 message =  AppMessage.getMessageSuccess(AppMessage.CREATE,AppMessage.LEARNING_LOG);
             }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.CREATE,AppMessage.LEARNING_LOG);
@@ -56,10 +59,8 @@ public class LearningLogController {
                 Logger.getLogger(LearningLogController.class.getName()).log(Level.SEVERE,null,ex);
             }
         }
-        CreateResponse createResponse = new CreateResponse();
-        createResponse.setSavedId(savedId);
-        createResponse.setSuccess(isSuccess);
-        return new JsonResult(message,createResponse);
+        learningLogCreateResponse.setSuccess(isSuccess);
+        return new JsonResult(message,learningLogCreateResponse);
     }
 
     @ApiOperation(value = "Update learning log")
@@ -73,13 +74,15 @@ public class LearningLogController {
         }
         String message = "";
         boolean isSuccess = true;
+        LearningLogUpdateResponse learningLogUpdateResponse = new LearningLogUpdateResponse();
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
-            isSuccess = false;
+            throw new BadRequestException(message);
         }else{
             try{
-                this.learningLogService.update(learningLog,learningLogUpdateViewModel.isPassed());
+                learningLogUpdateResponse.setComplete(this.learningLogService
+                        .update(learningLog,learningLogUpdateViewModel.isPassed()));
                 message =  AppMessage.getMessageSuccess(AppMessage.CREATE,AppMessage.LEARNING_LOG);
             }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.CREATE,AppMessage.LEARNING_LOG);
@@ -87,7 +90,8 @@ public class LearningLogController {
                 Logger.getLogger(LearningLogController.class.getName()).log(Level.SEVERE,null,ex);
             }
         }
-        return new JsonResult(message,isSuccess);
+        learningLogUpdateResponse.setSuccess(isSuccess);
+        return new JsonResult(message,learningLogUpdateResponse);
     }
 
     @ApiOperation(value = "get learning log of current user by courseId")

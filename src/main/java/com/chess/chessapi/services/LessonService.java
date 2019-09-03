@@ -11,6 +11,7 @@ import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.utils.ManualCastUtils;
 import com.chess.chessapi.utils.TimeUtils;
 import com.chess.chessapi.viewmodels.*;
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -64,6 +65,8 @@ public class LessonService {
     private final String UPDATE_LESSON_NOTIFICATION_MESSAGE = " đã cập nhật bài học ";
     private final String CREATE_EXECERCISE_NOTIFICATION_MESSAGE = " đã thêm bài tập mới ";
     private final String UPDATE_EXECERCISE_NOTIFICATION_MESSAGE = " đã cập nhật bài tập ";
+
+    private Gson gson = new Gson();
 
     //PUBLIC METHOD DEFINED
     public Optional<Lesson> getById(long id){
@@ -146,9 +149,10 @@ public class LessonService {
         //update lesson
         this.updateLesson(lessonViewModel.getLessonId(),lessonViewModel.getName(),lessonViewModel.getDescription(),UPDATE_LESSON_NOTIFICATION_MESSAGE);
 
+        String stepJson = gson.toJson(lessonViewModel.getInteractiveLesson().getSteps());
         //update interactive lesson info
         this.interactiveLessonService.update(lessonViewModel.getInteractiveLesson().getInteractiveLessonId()
-                ,lessonViewModel.getInteractiveLesson().getInitCode(),ManualCastUtils.castListStepToJson(lessonViewModel.getInteractiveLesson().getSteps()));
+                ,lessonViewModel.getInteractiveLesson().getInitCode(),stepJson);
 
     }
 
@@ -156,10 +160,10 @@ public class LessonService {
     public void updateExerciseLesson(ExerciseLessonUpdateViewModel lessonViewModel){
         //update lesson
         this.updateLesson(lessonViewModel.getLessonId(),lessonViewModel.getName(),lessonViewModel.getDescription(),UPDATE_EXECERCISE_NOTIFICATION_MESSAGE);
-
+        String exerciseJson = gson.toJson(lessonViewModel.getExercise().getAnswer());
         //update interactive lesson info
         this.exerciseService.update(lessonViewModel.getExercise().getExerciseId(),lessonViewModel.getExercise().getQuestion()
-                ,ManualCastUtils.castAnswerToJson(lessonViewModel.getExercise().getAnswer()));
+                ,exerciseJson);
 
     }
 

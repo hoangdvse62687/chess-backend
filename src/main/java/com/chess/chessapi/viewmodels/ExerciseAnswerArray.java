@@ -6,7 +6,7 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExerciseAnwserArray {
+public class ExerciseAnswerArray {
     private String fen;
     private int answerType;
 

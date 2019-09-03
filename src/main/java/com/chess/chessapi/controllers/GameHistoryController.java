@@ -5,6 +5,7 @@ import com.chess.chessapi.constants.AppRole;
 import com.chess.chessapi.constants.GameHistoryStatus;
 import com.chess.chessapi.entities.GameHistory;
 import com.chess.chessapi.exceptions.AccessDeniedException;
+import com.chess.chessapi.exceptions.BadRequestException;
 import com.chess.chessapi.exceptions.ResourceNotFoundException;
 import com.chess.chessapi.models.CreateResponse;
 import com.chess.chessapi.models.JsonResult;
@@ -47,7 +48,7 @@ public class GameHistoryController {
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
-            isSuccess = false;
+            throw new BadRequestException(message);
         }else{
             try{
                 UserPrincipal userPrincipal = this.userService.getCurrentUser();
@@ -78,7 +79,7 @@ public class GameHistoryController {
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
-            isSuccess = false;
+            throw new BadRequestException(message);
         }else{
             try{
                 GameHistory gameHistory = this.gameHistoryService.getById(gameHistoryUpdateViewModel.getGameHistoryId())

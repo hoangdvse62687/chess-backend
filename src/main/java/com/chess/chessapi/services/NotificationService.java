@@ -4,12 +4,14 @@ import com.chess.chessapi.constants.AppRole;
 import com.chess.chessapi.constants.Common;
 import com.chess.chessapi.entities.Notification;
 import com.chess.chessapi.entities.User;
+import com.chess.chessapi.models.ClientIdRedis;
+import com.chess.chessapi.models.FirebaseNotification;
 import com.chess.chessapi.models.PagedList;
 import com.chess.chessapi.repositories.NotificationRepository;
-import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.utils.ManualCastUtils;
 import com.chess.chessapi.utils.TimeUtils;
 import com.chess.chessapi.viewmodels.NotificationPaginationsViewModel;
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -18,14 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.StoredProcedureQuery;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Enumeration;
 import java.util.List;
 
 @Service
@@ -37,10 +36,12 @@ public class NotificationService {
     private EntityManager em;
 
     @Autowired
-    private UserService userService;
+    private RedisClientIdService redisClientIdService;
 
     private final String targetURL = "https://fcm.googleapis.com/fcm/send";
     private final String SERVER_KEY = "AAAA_Ah8T8Y:APA91bG1UrCHo6_fYUf_Mj4WLDNkzgsbp7PEHliJ3-5zIbeen00KwuhCJY4EM6aTI3x26Fx8PZyPHIiZBkKswz5ctRlGthd8Ug_gqT3xo0H-0EyKZnEZZqwSHOuP5dExyuSEuMxpadfS";
+
+    private Gson gson = new Gson();
     //public method
     public Notification create(Notification notification){
         return notificationRepository.save(notification);
@@ -73,11 +74,13 @@ public class NotificationService {
         notification.setRoleTarget(AppRole.ROLE_ADMIN);
         this.create(notification);
 
-        List<String> listAppIds = this.userService.findListAppIdByRoleId(AppRole.ROLE_ADMIN);
-        for (String appIds:
+        List<String> listAppIds = this.redisClientIdService.findAllClientIdByRole(AppRole.ROLE_ADMIN);
+        for (String appId:
                 listAppIds) {
-            if(appIds != null && !appIds.isEmpty()){
-                String jsonInput = ManualCastUtils.castToNotificationJson(notification,appIds);
+            if(appId != null && !appId.isEmpty()){
+                FirebaseNotification<Notification> notificationFirebaseNotification = this.castToNotification(notification);
+                notificationFirebaseNotification.setTo(appId);
+                String jsonInput = gson.toJson(notificationFirebaseNotification);
                 this.sendPost(jsonInput);
             }
         }
@@ -101,9 +104,15 @@ public class NotificationService {
         notification.setObjectName(objectName);
         this.create(notification);
 
-        String appId = this.userService.findAppIdByUserId(userId);
-        if(appId != null && !appId.isEmpty()){
-            String jsonInput = ManualCastUtils.castToNotificationJson(notification,appId);
+        ClientIdRedis clientIdRedis = this.redisClientIdService.find(userId);
+        String appId = "";
+        if(clientIdRedis != null){
+            appId = clientIdRedis.getClientId();
+        }
+        if(!appId.isEmpty()){
+            FirebaseNotification<Notification> notificationFirebaseNotification = this.castToNotification(notification);
+            notificationFirebaseNotification.setTo(appId);
+            String jsonInput = gson.toJson(notificationFirebaseNotification);
             this.sendPost(jsonInput);
         }
     }
@@ -113,8 +122,12 @@ public class NotificationService {
         this.notificationRepository.updateIsViewed(notificationIds);
     }
 
-    public void updateNotificationTokenId(long userId,String token){
-        this.userService.updateAppIdByUserId(token,userId);
+    public void updateNotificationTokenId(long userId,String role,String token){
+        ClientIdRedis clientIdRedis = new ClientIdRedis();
+        clientIdRedis.setClientId(token);
+        clientIdRedis.setUserId(userId);
+        clientIdRedis.setRoleId(Long.parseLong(role));
+        this.redisClientIdService.save(clientIdRedis);
     }
     //end public method
 
@@ -123,6 +136,17 @@ public class NotificationService {
         long totalPages = (long) Math.ceil(totalElements / (double) pageSize);
         List<Notification> data = ManualCastUtils.castListObjectToNotification(rawData);
         return new PagedList<Notification>(Math.toIntExact(totalPages),totalElements,data);
+    }
+    private FirebaseNotification<Notification> castToNotification(Notification notification){
+        FirebaseNotification<Notification> notificationFirebaseNotification = new FirebaseNotification<>();
+
+        com.chess.chessapi.models.Notification notificationHeader = new com.chess.chessapi.models.Notification();
+        notificationHeader.setBody("Bạn nhận được tin nhắn từ cols");
+        notificationHeader.setTitle("Cols Automatic Notification");
+
+        notificationFirebaseNotification.setNotification(notificationHeader);
+        notificationFirebaseNotification.setData(notification);
+        return notificationFirebaseNotification;
     }
 
     private void sendPost(String jsonInputString){

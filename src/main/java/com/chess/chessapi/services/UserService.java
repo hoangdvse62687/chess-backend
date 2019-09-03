@@ -21,7 +21,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,6 +57,9 @@ public class UserService {
 
     @Autowired
     private PointLogService pointLogService;
+
+    @Autowired
+    private RedisUserPrincipleService redisUserPrincipleService;
 
     public UserPrincipal getCurrentUser(){
         UserPrincipal user = null;
@@ -101,7 +103,7 @@ public class UserService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
-    public void updateProfile(User user,HttpServletRequest request){
+    public void updateProfile(User user){
         this.userRepository.updateProfile(user.getUserId(),user.getFullName(),user.getAchievement()
                 ,user.getAvatar(),TimeUtils.getCurrentTime());
 
@@ -110,7 +112,7 @@ public class UserService {
 
         this.certificatesService.updateCertifications(oldCetificates,user.getCertificates(),user.getUserId());
 
-        this.updateUserDetailsOnSession(user,false,request);
+        this.updateUserDetailsOnRedis(user,false,false);
     }
 
     public PagedList<UserPaginationViewModel> getPagination(int page, int pageSize, String email, String role, String isActive,String isReviewed){
@@ -136,9 +138,10 @@ public class UserService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
-    public void updateStatus(User user,long userId,boolean isActive,HttpServletRequest request){
+    public void updateStatus(User user,long userId,boolean isActive){
         if(!user.isReviewed() && !isActive){
             this.userRepository.deleteUser(user.getUserId());
+            this.redisUserPrincipleService.deleteById(user.getUserId());
         }else{
             this.userRepository.updateStatus(userId,isActive,true);
             if(user.getRoleId() != AppRole.ROLE_ADMIN){
@@ -146,14 +149,14 @@ public class UserService {
                 this.notificationService.sendNotificationToUser(isActive ? AppMessage.UPDATE_USER_STATUS_ACTIVE : AppMessage.UPDATE_USER_STATUS_INACTIVE,
                         user.getEmail(),user.getAvatar(),ObjectType.USER,userId,userId,user.getRoleId());
                 //send email
-                Mail mail = new Mail(AppMessage.ACCEPT_INSTRUCTOR_REQUEST_SUBJECT,user.getEmail(),
-                        this.mailContentBuilderUtils.build(user.getFullName(),AppMessage.ACCEPT_INSTRUCTOR_REQUEST_CONTENT
+                Mail mail = new Mail(isActive ? AppMessage.ACCEPT_REQUEST_SUBJECT : AppMessage.REJECT_REQUEST_SUBJECT,user.getEmail(),
+                        this.mailContentBuilderUtils.build(user.getFullName(),isActive ? AppMessage.ACCEPT_REQUEST_CONTENT : AppMessage.REJECT_REQUEST_CONTENT
                                 ,MailContentBuilderUtils.SOURCE_LINK_GO_TO_PROFILE,MailContentBuilderUtils.SOURCE_NAME_GO_TO_PROFILE));
                 this.mailService.sendMessage(mail);
             }
 
             user.setActive(isActive);
-            this.updateUserDetailsOnSession(user,true,request);
+            this.updateUserDetailsOnRedis(user,true,isActive);
         }
     }
 
@@ -214,18 +217,6 @@ public class UserService {
         return this.userRepository.existsById(userId);
     }
 
-    public String findAppIdByUserId(long userId){
-        return this.userRepository.findAppIdByUserId(userId);
-    }
-
-    public List<String> findListAppIdByRoleId(long roleId){
-        return this.userRepository.findListAppIdByRoleId(roleId);
-    }
-
-    public void updateAppIdByUserId(String token,long userId){
-        this.userRepository.updateAppIdByUserId(token,userId);
-    }
-
     // private method
     private void setUserRoleAuthentication(User user,HttpServletRequest request){
         List<GrantedAuthority> authorities = Collections.
@@ -244,16 +235,13 @@ public class UserService {
         session.setAttribute(Long.toString(user.getUserId()),userDetails);
     }
 
-    private void updateUserDetailsOnSession(User user,boolean isUpdateStatus,HttpServletRequest request){
-        HttpSession session = request.getSession();
-        if(!isUpdateStatus){//use current status of user in session
-            UserPrincipal userPrincipal = (UserPrincipal) session.getAttribute(Long.toString(user.getUserId()));
-            if(userPrincipal != null){
-                user.setActive(userPrincipal.isStatus());
-            }
+    private void updateUserDetailsOnRedis(User user,boolean isUpdateStatus,boolean status){
+
+        if(isUpdateStatus){
+            user.setActive(status);
         }
 
-        session.setAttribute(Long.toString(user.getUserId()),UserPrincipal.create(user));
+        this.redisUserPrincipleService.update(UserPrincipal.create(user));
     }
     private void registerLearner(User user){
         user.setActive(Status.ACTIVE);

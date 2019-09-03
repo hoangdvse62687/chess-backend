@@ -118,9 +118,6 @@ public class User {
     @Column(name = "provider_id")
     private String providerId;
 
-    @Column(name = "app_id")
-    private String appId;
-
     public long getUserId() {
         return userId;
     }
@@ -305,13 +302,5 @@ public class User {
 
     public void setModifiedDate(Timestamp modifiedDate) {
         this.modifiedDate = modifiedDate;
-    }
-
-    public String getAppId() {
-        return appId;
-    }
-
-    public void setAppId(String appId) {
-        this.appId = appId;
     }
 }

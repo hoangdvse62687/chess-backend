@@ -31,4 +31,7 @@ public interface CourseHasLessonRepository extends JpaRepository<CourseHasLesson
 
     @Query(value = "Select course_id From course_has_lesson where lesson_id = ?1",nativeQuery = true)
     List<Long> findListCourseIdByLessonId(long lessonId);
+
+    @Query(value = "Select lesson_id From course_has_lesson where course_id = ?1",nativeQuery = true)
+    List<Long> findByCourseId(long courseId);
 }

@@ -5,6 +5,7 @@ import com.chess.chessapi.constants.AppRole;
 import com.chess.chessapi.constants.Status;
 import com.chess.chessapi.entities.*;
 import com.chess.chessapi.exceptions.AccessDeniedException;
+import com.chess.chessapi.exceptions.BadRequestException;
 import com.chess.chessapi.exceptions.ResourceNotFoundException;
 import com.chess.chessapi.models.CreateResponse;
 import com.chess.chessapi.models.JsonResult;
@@ -61,7 +62,7 @@ public class CourseController {
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
-            isSuccess = false;
+            throw new BadRequestException(message);
         }else{
             UserPrincipal userPrincipal = this.userService.getCurrentUser();
             try{
@@ -125,7 +126,7 @@ public class CourseController {
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
-            isSuccess = false;
+            throw new BadRequestException(message);
         }else {
             try{
                 if(hasPermissionModify){
@@ -159,7 +160,7 @@ public class CourseController {
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
-            isSuccess = false;
+            throw new BadRequestException(message);
         }else {
             try{
                 //Get course modify
@@ -212,7 +213,7 @@ public class CourseController {
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
-            isSuccess = false;
+            throw new BadRequestException(message);
         }else{
             try{
                 if(hasPermissionModify){
@@ -253,7 +254,7 @@ public class CourseController {
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
-            isSuccess = false;
+            throw new BadRequestException(message);
         }else {
             boolean hasPermissionModify = this.courseService.checkPermissionUpdateStatusCourse(coursePublishViewModel.getCourseId());
             try{
@@ -287,7 +288,7 @@ public class CourseController {
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
-            isSuccess = false;
+            throw new BadRequestException(message);
         }else{
             Course course = this.courseService.getCourseById(enrollCourseViewModel.getCourseId())
                     .orElseThrow(() -> new ResourceNotFoundException("Course","id",enrollCourseViewModel.getCourseId()));
@@ -370,7 +371,7 @@ public class CourseController {
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
-            isSuccess = false;
+            throw new BadRequestException(message);
         }else{
             try{
                 UserPrincipal userPrincipal = this.userService.getCurrentUser();
@@ -406,7 +407,7 @@ public class CourseController {
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
-            isSuccess = false;
+            throw new BadRequestException(message);
         }else{
             try{
                 UserPrincipal userPrincipal = this.userService.getCurrentUser();
@@ -438,7 +439,7 @@ public class CourseController {
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
-            isSuccess = false;
+            throw new BadRequestException(message);
         }else{
             try{
                 UserPrincipal userPrincipal = this.userService.getCurrentUser();

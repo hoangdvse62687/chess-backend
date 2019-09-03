@@ -4,6 +4,7 @@ import com.chess.chessapi.constants.AppMessage;
 import com.chess.chessapi.constants.AppRole;
 import com.chess.chessapi.entities.Lesson;
 import com.chess.chessapi.exceptions.AccessDeniedException;
+import com.chess.chessapi.exceptions.BadRequestException;
 import com.chess.chessapi.exceptions.ResourceNotFoundException;
 import com.chess.chessapi.models.CreateResponse;
 import com.chess.chessapi.models.JsonResult;
@@ -74,7 +75,7 @@ public class LessonController {
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
-            isSuccess = false;
+            throw new BadRequestException(message);
         }else{
             try{
                 UserPrincipal userPrincipal = this.userService.getCurrentUser();
@@ -109,7 +110,7 @@ public class LessonController {
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
-            isSuccess = false;
+            throw new BadRequestException(message);
         }else{
             try{
                 UserPrincipal userPrincipal = this.userService.getCurrentUser();
@@ -146,7 +147,7 @@ public class LessonController {
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
-            isSuccess = false;
+            throw new BadRequestException(message);
         }else{
             try{
                 this.lessonService.updateInteractiveLesson(interactiveLessonUpdateViewModel);
@@ -180,7 +181,7 @@ public class LessonController {
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
-            isSuccess = false;
+            throw new BadRequestException(message);
         }else{
             try{
                 this.lessonService.updateExerciseLesson(exerciseLessonUpdateViewModel);
@@ -211,7 +212,7 @@ public class LessonController {
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
-            isSuccess = false;
+            throw new BadRequestException(message);
         }else{
             try{
                 UserPrincipal userPrincipal = this.userService.getCurrentUser();
@@ -247,7 +248,7 @@ public class LessonController {
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
-            isSuccess = false;
+            throw new BadRequestException(message);
         }else{
             try{
                 this.lessonService.updateUninteractiveLesson(uninteractiveLessonUpdateViewModel);

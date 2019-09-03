@@ -1,8 +1,6 @@
 package com.chess.chessapi.entities;
 
-import com.chess.chessapi.models.Step;
-import com.chess.chessapi.models.StepSuggest;
-import com.chess.chessapi.viewmodels.ExerciseAnwserArray;
+import com.chess.chessapi.viewmodels.ExerciseAnswerArray;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -14,8 +12,6 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "exercise")
@@ -36,7 +32,7 @@ public class Exercise {
     @Type(type = "json")
     @Column(name = "answer",columnDefinition = "json")
     @NotNull(message = "Steps must not be null")
-    private ExerciseAnwserArray answer = new ExerciseAnwserArray();
+    private ExerciseAnswerArray answer = new ExerciseAnswerArray();
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="lesson_id")
@@ -59,11 +55,11 @@ public class Exercise {
         this.question = question;
     }
 
-    public ExerciseAnwserArray getAnswer() {
+    public ExerciseAnswerArray getAnswer() {
         return answer;
     }
 
-    public void setAnswer(ExerciseAnwserArray answer) {
+    public void setAnswer(ExerciseAnswerArray answer) {
         this.answer = answer;
     }
 

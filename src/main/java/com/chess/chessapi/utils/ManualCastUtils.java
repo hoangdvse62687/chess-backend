@@ -2,7 +2,6 @@ package com.chess.chessapi.utils;
 
 import com.chess.chessapi.constants.Status;
 import com.chess.chessapi.entities.*;
-import com.chess.chessapi.models.Step;
 import com.chess.chessapi.models.StepSuggest;
 import com.chess.chessapi.viewmodels.*;
 import org.springframework.data.domain.Page;
@@ -577,89 +576,6 @@ public class ManualCastUtils implements Serializable {
     }
     //END CAST OBJECT TO OBJECT DEFINED
 
-    //CASTE OBJECT TO JSON DEFINED
-    public static String castListStepToJson(List<Step> steps){
-        if(steps == null || steps.isEmpty()){
-            return LEFT_SQUARE_BRACKET + " " + RIGHT_SQUARE_BRACKET;
-        }
-        String result = "";
-        for (Step step:
-             steps) {
-            result += LEFT_ANGLE_BRACKET + D_QUOT  + STEP_JSON_PARSER_ID + D_QUOT + COLON + D_QUOT +step.getId()+ D_QUOT
-                    + COMMA + D_QUOT + STEP_JSON_PARSER_MOVE + D_QUOT + COLON + D_QUOT +step.getMove() + D_QUOT
-                    + COMMA + D_QUOT + STEP_JSON_PARSER_CONTENT + D_QUOT + COLON + D_QUOT +step.getContent() + D_QUOT
-                    + COMMA + D_QUOT + STEP_JSON_PARSER_MOVE_DIRECTION + D_QUOT + COLON + D_QUOT +step.getMoveDirection() + D_QUOT
-                    + COMMA + D_QUOT + STEP_JSON_PARSER_FEN + D_QUOT + COLON + D_QUOT +step.getFen() + D_QUOT
-                    + COMMA + D_QUOT + STEP_JSON_PARSER_PRE_ID + D_QUOT + COLON + D_QUOT +step.getPreId() + D_QUOT
-                    + RIGHT_ANGLE_BRACKET + COMMA;
-        }
-
-        return LEFT_SQUARE_BRACKET + result.substring(0,result.length() - 1) + RIGHT_SQUARE_BRACKET;
-    }
-
-    public static String castAnswerToJson(ExerciseAnwserArray exerciseAnwserArray){
-        if(exerciseAnwserArray == null){
-            return LEFT_ANGLE_BRACKET + " " + RIGHT_ANGLE_BRACKET;
-        }
-        String result = "";
-        String answerArr = "";
-        for (List<StepSuggest> stepSuggest:
-                exerciseAnwserArray.getAnswerArr()) {
-            answerArr += castListStepSuggestToJson(stepSuggest);
-        }
-
-        answerArr = LEFT_SQUARE_BRACKET + answerArr + RIGHT_SQUARE_BRACKET;
-
-        result += LEFT_ANGLE_BRACKET + D_QUOT  + STEP_JSON_PARSER_ANSWERARR + D_QUOT + COLON + answerArr
-                + COMMA + D_QUOT + STEP_JSON_PARSER_ANSWERTYPE + D_QUOT + COLON + D_QUOT + exerciseAnwserArray.getAnswerType() + D_QUOT
-                + COMMA + D_QUOT + STEP_JSON_PARSER_FEN + D_QUOT + COLON + D_QUOT + exerciseAnwserArray.getFen() + D_QUOT
-                + RIGHT_ANGLE_BRACKET + COMMA;
-
-        return result.substring(0,result.length() - 1);
-    }
-
-    public static String castToNotificationJson(Notification notification,String to){
-        if(notification == null){
-            return LEFT_ANGLE_BRACKET + " " + RIGHT_ANGLE_BRACKET;
-        }
-        String notificationJson = LEFT_ANGLE_BRACKET + D_QUOT  + NOTIFICATION_ID + D_QUOT + COLON + D_QUOT + notification.getNotificationId() + D_QUOT
-                + COMMA + D_QUOT + NOTIFICATION_OBJECT_ID_ + D_QUOT + COLON + D_QUOT + notification.getObjectId() + D_QUOT
-                + COMMA + D_QUOT + NOTIFICATION_OBJECT_NAME + D_QUOT + COLON + D_QUOT + notification.getObjectName() + D_QUOT
-                + COMMA + D_QUOT + NOTIFICATION_OBJECT_AVATAR + D_QUOT + COLON + D_QUOT + notification.getObjectAvatar() + D_QUOT
-                + COMMA + D_QUOT + NOTIFICATION_OBJECT_TYPE_ID + D_QUOT + COLON + D_QUOT + notification.getObjectTypeId() + D_QUOT
-                + COMMA + D_QUOT + NOTIFICATION_CONTENT + D_QUOT + COLON + D_QUOT + notification.getContent() + D_QUOT
-                + COMMA + D_QUOT + NOTIFICATION_IS_VIEWED + D_QUOT + COLON + D_QUOT + notification.isViewed()+ D_QUOT
-                + COMMA + D_QUOT + NOTIFICATION_CREATED_DATE + D_QUOT + COLON + D_QUOT + notification.getCreateDate().toString() + D_QUOT
-                + COMMA + D_QUOT + NOTIFICATION_ROLE_TARGET + D_QUOT + COLON + D_QUOT + notification.getRoleTarget() + D_QUOT
-                + RIGHT_ANGLE_BRACKET;
-
-        return LEFT_ANGLE_BRACKET + D_QUOT  + NOTIFICATION + D_QUOT + COLON + notificationJson
-                + COMMA + D_QUOT + NOTIFICATION_TO + D_QUOT + COLON + D_QUOT + to + D_QUOT
-                + RIGHT_ANGLE_BRACKET;
-    }
-
-    public static String castListStepSuggestToJson(List<StepSuggest> steps){
-        if(steps == null || steps.isEmpty()){
-            return LEFT_SQUARE_BRACKET + " " + RIGHT_SQUARE_BRACKET;
-        }
-        String result = "";
-        for (StepSuggest step:
-                steps) {
-            result += LEFT_ANGLE_BRACKET + D_QUOT  + STEP_JSON_PARSER_ID + D_QUOT + COLON + D_QUOT +step.getId()+ D_QUOT
-                    + COMMA + D_QUOT + STEP_JSON_PARSER_MOVE + D_QUOT + COLON + D_QUOT +step.getMove() + D_QUOT
-                    + COMMA + D_QUOT + STEP_JSON_PARSER_CONTENT + D_QUOT + COLON + D_QUOT +step.getContent() + D_QUOT
-                    + COMMA + D_QUOT + STEP_JSON_PARSER_MOVE_DIRECTION + D_QUOT + COLON + D_QUOT +step.getMoveDirection() + D_QUOT
-                    + COMMA + D_QUOT + STEP_JSON_PARSER_FEN + D_QUOT + COLON + D_QUOT +step.getFen() + D_QUOT
-                    + COMMA + D_QUOT + STEP_JSON_PARSER_PRE_ID + D_QUOT + COLON + D_QUOT +step.getPreId() + D_QUOT
-                    + COMMA + D_QUOT + STEP_JSON_PARSER_RIGHTRESPONSE + D_QUOT + COLON + D_QUOT +step.getRightResponse() + D_QUOT
-                    + COMMA + D_QUOT + STEP_JSON_PARSER_WRONGRRESPONSE + D_QUOT + COLON + D_QUOT +step.getWrongResponse() + D_QUOT
-                    + RIGHT_ANGLE_BRACKET + COMMA;
-        }
-
-        return LEFT_SQUARE_BRACKET + result.substring(0,result.length() - 1) + RIGHT_SQUARE_BRACKET;
-    }
-    //END CASTE OBJECT TO JSON DEFINED
-
     //PRIVATE DEFINED
     private static String handleNullValueObject(Object object,Class clazz){
         if(object != null){
@@ -674,7 +590,7 @@ public class ManualCastUtils implements Serializable {
     }
 
     private static boolean parseBoolean(String strBoolean){
-        return strBoolean.equals("1") ? true : false;
+        return strBoolean.equals("1") || strBoolean.toLowerCase().equals("true") ? true : false;
     }
     //END PRIVATE DEFINED
 }

@@ -1,15 +1,9 @@
 package com.chess.chessapi.viewmodels;
 
-import com.chess.chessapi.models.Step;
-import com.chess.chessapi.models.StepSuggest;
-import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.Length;
 
-import javax.persistence.Column;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ExerciseCreateViewModel {
 
@@ -19,7 +13,7 @@ public class ExerciseCreateViewModel {
 
     @NotNull(message = "Answer must not be null")
     @Valid
-    private ExerciseAnwserArray answer = new ExerciseAnwserArray();
+    private ExerciseAnswerArray answer = new ExerciseAnswerArray();
 
 
     public String getQuestion() {
@@ -30,11 +24,11 @@ public class ExerciseCreateViewModel {
         this.question = question;
     }
 
-    public ExerciseAnwserArray getAnswer() {
+    public ExerciseAnswerArray getAnswer() {
         return answer;
     }
 
-    public void setAnswer(ExerciseAnwserArray answer) {
+    public void setAnswer(ExerciseAnswerArray answer) {
         this.answer = answer;
     }
 }

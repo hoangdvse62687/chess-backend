@@ -2,8 +2,7 @@ package com.chess.chessapi.security;
 
 import com.chess.chessapi.constants.AppMessage;
 import com.chess.chessapi.exceptions.AccessDeniedException;
-import org.springframework.session.data.redis.RedisOperationsSessionRepository;
-import org.springframework.session.web.http.SessionRepositoryFilter;
+import com.chess.chessapi.services.RedisUserPrincipleService;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +27,9 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
 
+    @Autowired
+    private RedisUserPrincipleService redisUserPrincipleService;
+
     private static final Logger logger = LoggerFactory.getLogger(TokenAuthenticationFilter.class);
 
     @Override
@@ -38,21 +40,14 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
                 Long userId = tokenProvider.getUserIdFromToken(jwt);
 
-                UserDetails userDetails;
-                HttpSession session = request.getSession();
-                //check user login is on session
-                if(session.getAttribute(userId.toString()) != null){
-                    userDetails = (UserDetails) session.getAttribute(userId.toString());
-                }else{
-                    userDetails = customUserDetailsService.loadUserById(userId);
-                    //set sesson
-                    session.setAttribute(userId.toString(),userDetails);
-                }
-                if(!session.isNew()){
-                    response.setHeader("X-Auth-Token",request.getHeader("X-Auth-Token"));
+                UserDetails userDetails = this.redisUserPrincipleService.find(userId);
+                if( userDetails == null){
+                    userDetails = this.customUserDetailsService.loadUserById(userId);
                 }
 
                 UserPrincipal userPrincipal = (UserPrincipal) userDetails;
+                this.redisUserPrincipleService.save(userPrincipal);
+
                 if(userPrincipal.isStatus()){
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -65,7 +60,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         } catch (Exception ex) {
             logger.error("Could not set user authentication in security context", ex);
         }
-        response.setHeader("Access-Control-Expose-Headers", "X-Auth-Token");
+
         filterChain.doFilter(request, response);
     }
 

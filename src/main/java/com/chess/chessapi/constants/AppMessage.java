@@ -48,8 +48,10 @@ public class AppMessage implements Serializable {
     //END NOTIFICATION DEFINE
 
     //MAIL DEFINED
-    public static final String ACCEPT_INSTRUCTOR_REQUEST_SUBJECT = "Instructor Approved";
-    public static final String ACCEPT_INSTRUCTOR_REQUEST_CONTENT = "Chúc Mừng. Tài khoản của bạn đã được duyệt trở thành giảng viên!";
+    public static final String ACCEPT_REQUEST_SUBJECT = "Account Active";
+    public static final String ACCEPT_REQUEST_CONTENT = "Chúc Mừng. Tài khoản của bạn đã được kich hoat!";
+    public static final String REJECT_REQUEST_SUBJECT = "Account Inactive";
+    public static final String REJECT_REQUEST_CONTENT = "Tài khoản của bạn đã bi ngung hoat dong!";
     public static final String PUBLISH_COURSE_REQUEST_SUBJECT  = " Course Published";
     public static final String PUBLISH_COURSE_REQUEST_CONTENT_PUBLISH = " đã được publish trên trang chủ.";
     public static final String PUBLISH_COURSE_REQUEST_CONTENT_REJECT = " đã bị từ chối publish trên trang chủ." +

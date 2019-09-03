@@ -39,4 +39,13 @@ public interface UserHasCourseRepository extends JpaRepository<UserHasCourse,Lon
 
     @Query(value = "Select If(count(id) > 0 ,1,0) From user_has_course Where user_id = ?2 and course_id = ?1",nativeQuery = true)
     Long isEnrolled(long courseId,long userId);
+
+    @Query(value = "Select * From user_has_course where user_id = ?1 and course_id = ?2 " +
+            "Order by id Asc LIMIT 1",nativeQuery = true)
+    UserHasCourse findByCourseIdAndUserId(long userId,long courseId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "Update user_has_course Set status_id = ?3 where course_id = ?1 and user_id =?2",nativeQuery = true)
+    void updateStatusByCourseIdAndUserId(long courseId, long userId,long statusId);
 }

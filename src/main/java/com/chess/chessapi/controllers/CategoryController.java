@@ -3,6 +3,7 @@ package com.chess.chessapi.controllers;
 import com.chess.chessapi.constants.AppMessage;
 import com.chess.chessapi.constants.AppRole;
 import com.chess.chessapi.entities.Category;
+import com.chess.chessapi.exceptions.BadRequestException;
 import com.chess.chessapi.exceptions.ResourceNotFoundException;
 import com.chess.chessapi.models.CreateResponse;
 import com.chess.chessapi.models.JsonResult;
@@ -37,8 +38,12 @@ public class CategoryController {
     @ApiOperation(value = "get category detail by id")
     @GetMapping("/categories/{id}")
     public @ResponseBody JsonResult getCategoryById(@PathVariable("id") long categoryId){
-        Category category = this.categoryService.getCategoryById(categoryId)
-                .orElseThrow(() -> new ResourceNotFoundException("Category","id",categoryId));
+        Category category = this.categoryService.getCategoryById(categoryId);
+
+        if(category == null){
+            throw new ResourceNotFoundException("Category","id",categoryId);
+        }
+
         return new JsonResult(null,category);
     }
 
@@ -46,8 +51,12 @@ public class CategoryController {
     @DeleteMapping("/categories/{id}")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_ADMIN_AUTHENTICATIION+")")
     public @ResponseBody JsonResult removeCategoryById(@PathVariable("id") long categoryId){
-        Category category = this.categoryService.getCategoryById(categoryId)
-                .orElseThrow(() -> new ResourceNotFoundException("Category","id",categoryId));
+        Category category = this.categoryService.getCategoryById(categoryId);
+
+        if(category == null){
+            throw new ResourceNotFoundException("Category","id",categoryId);
+        }
+
         Boolean isSuccess = true;
         String message = "";
         try{
@@ -71,7 +80,7 @@ public class CategoryController {
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
-            isSuccess = false;
+            throw new BadRequestException(message);
         }else {
             try {
                 savedId = this.categoryService.create(category);

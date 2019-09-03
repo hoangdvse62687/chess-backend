@@ -2,6 +2,7 @@ package com.chess.chessapi.controllers;
 
 import com.chess.chessapi.constants.AppMessage;
 import com.chess.chessapi.constants.AppRole;
+import com.chess.chessapi.exceptions.BadRequestException;
 import com.chess.chessapi.exceptions.ResourceNotFoundException;
 import com.chess.chessapi.models.JsonResult;
 import com.chess.chessapi.security.UserPrincipal;
@@ -76,7 +77,7 @@ public class NotificationController {
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
-            isSuccess = false;
+            throw new BadRequestException(message);
         }else {
             try{
                 this.notificationService.updateIsView(updateIsViewedNotification.getNotificationIds());
@@ -97,7 +98,7 @@ public class NotificationController {
     public JsonResult updateNotificationToken(@RequestBody NotificationTokenUpdateViewModel notificationTokenUpdateViewModel){
         UserPrincipal userPrincipal = this.userService.getCurrentUser();
 
-        this.notificationService.updateNotificationTokenId(userPrincipal.getId(),notificationTokenUpdateViewModel.getToken());
+        this.notificationService.updateNotificationTokenId(userPrincipal.getId(),userPrincipal.getRole(),notificationTokenUpdateViewModel.getToken());
         return new JsonResult("",true);
     }
 }
