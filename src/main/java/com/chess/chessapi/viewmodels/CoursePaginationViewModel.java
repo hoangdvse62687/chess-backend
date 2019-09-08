@@ -9,8 +9,7 @@ public class CoursePaginationViewModel {
     private String courseDescription;
     private String courseImage;
     private Timestamp courseCreatedDate;
-    private Float point;
-    private Float requiredPoint;
+    private int requiredElo;
     private long statusId;
     private UserDetailViewModel author;
     private boolean isEnrolled;
@@ -56,14 +55,6 @@ public class CoursePaginationViewModel {
         this.courseCreatedDate = courseCreatedDate;
     }
 
-    public Float getPoint() {
-        return point;
-    }
-
-    public void setPoint(Float point) {
-        this.point = point;
-    }
-
     public long getStatusId() {
         return statusId;
     }
@@ -96,14 +87,6 @@ public class CoursePaginationViewModel {
         isEnrolled = enrolled;
     }
 
-    public Float getRequiredPoint() {
-        return requiredPoint;
-    }
-
-    public void setRequiredPoint(Float requiredPoint) {
-        this.requiredPoint = requiredPoint;
-    }
-
     public List<CategoryViewModel> getListCategorys() {
         return listCategorys;
     }
@@ -134,5 +117,13 @@ public class CoursePaginationViewModel {
 
     public void setLearningProcessPercent(int learningProcessPercent) {
         this.learningProcessPercent = learningProcessPercent;
+    }
+
+    public int getRequiredElo() {
+        return requiredElo;
+    }
+
+    public void setRequiredElo(int requiredElo) {
+        this.requiredElo = requiredElo;
     }
 }

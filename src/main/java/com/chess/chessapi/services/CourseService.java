@@ -87,10 +87,6 @@ public class CourseService {
     public void enrollCourse(long userId,Course course){
         this.userHasCourseService.create(userId,course.getCourseId()
                 , TimeUtils.getCurrentTime(),Status.USER_HAS_COURSE_STATUS_IN_PROCESS);
-        this.userService.increasePoint(userId,-course.getRequiredPoint());
-        float point = course.getRequiredPoint() < 0 ? -course.getRequiredPoint() : course.getRequiredPoint();
-        String pointStr = Integer.toString((int)point);
-        this.pointLogService.create("Bạn đã tiêu hao " + pointStr + " điểm để đăng ký " + course.getName(),course.getRequiredPoint(),userId);
     }
 
     public PagedList<CoursePaginationViewModel> getCoursePaginationByStatusId(String courseName
@@ -117,6 +113,21 @@ public class CourseService {
         query.setParameter("statusId",statusId);
         query.setParameter("userId",userId);
         query.setParameter("categoryId",categoryId);
+
+        query.execute();
+        List<Object[]> rawData = query.getResultList();
+        final long totalElements = Long.parseLong(query.getOutputParameterValue("totalElements").toString());
+        return this.fillDataToPaginationCustom(rawData,totalElements,pageSize);
+    }
+
+    public PagedList<CoursePaginationViewModel> getCoursePaginationsByEloId(String courseName, String statusId
+            ,int pageIndex,int pageSize,int eloId,long userId,String sortBy,String sortDirection){
+        StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getCoursesByEloId");
+        Common.storedProcedureQueryPaginationSetup(query,pageIndex,pageSize,sortBy,sortDirection);
+        query.setParameter("courseName",courseName);
+        query.setParameter("statusId",statusId);
+        query.setParameter("userId",userId);
+        query.setParameter("eloId",eloId);
 
         query.execute();
         List<Object[]> rawData = query.getResultList();
@@ -194,7 +205,7 @@ public class CourseService {
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public void updateCourse(Course course){
          this.courseRepository.updateCourse(course.getCourseId(),course.getName(),course.getDescription(),
-                 course.getPoint(),course.getStatusId(),course.getImage(),course.getRequiredPoint(),TimeUtils.getCurrentTime());
+                 course.getStatusId(),course.getImage(),course.getRequiredElo(),TimeUtils.getCurrentTime());
          //only get old has status in-process
         List<UserHasCourse> oldUserHasCourses = this.userHasCourseService
                 .getAllByCourseIdAndStatusId(course.getCourseId(),Status.USER_HAS_COURSE_STATUS_IN_PROCESS);

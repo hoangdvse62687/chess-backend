@@ -54,7 +54,7 @@ public class LessonController {
         if(!this.lessonService.checkPermissionViewLesson(userPrincipal,lessonId)){
             throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
         }
-        Lesson lesson = this.lessonService.getById(lessonId).get();
+        Lesson lesson = this.lessonService.getById(lessonId);
         return new JsonResult("",lesson);
     }
 
@@ -62,13 +62,6 @@ public class LessonController {
     @PostMapping(value = "/interactive-lesson")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult createInteractiveLesson(@Valid @RequestBody InteractiveLessonCreateViewModel lessonViewModel, BindingResult bindingResult){
-        //if courseId are default => check permission create lesson on course
-        if(lessonViewModel.getCourseId() != 0){
-            if(!this.courseService.checkPermissionModifyCourse(lessonViewModel.getCourseId())){
-                throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
-            }
-        }
-
         String message = "";
         boolean isSuccess = true;
         long savedId = 0;
@@ -78,6 +71,13 @@ public class LessonController {
             throw new BadRequestException(message);
         }else{
             try{
+                //if courseId are default => check permission create lesson on course
+                if(lessonViewModel.getCourseId() != 0){
+                    if(!this.courseService.checkPermissionModifyCourse(lessonViewModel.getCourseId())){
+                        throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
+                    }
+                }
+
                 UserPrincipal userPrincipal = this.userService.getCurrentUser();
                 savedId = this.lessonService.createInteractiveLesson(lessonViewModel,userPrincipal.getId());
                 message =  AppMessage.getMessageSuccess(AppMessage.CREATE,AppMessage.INTERACTIVE_LESSON);
@@ -97,13 +97,6 @@ public class LessonController {
     @PostMapping(value = "/exercise-lesson")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult createExerciseLesson(@Valid @RequestBody ExerciseLessonCreateViewModel lessonViewModel, BindingResult bindingResult){
-        //if courseId are default => check permission create lesson on course
-        if(lessonViewModel.getCourseId() != 0){
-            if(!this.courseService.checkPermissionModifyCourse(lessonViewModel.getCourseId())){
-                throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
-            }
-        }
-
         String message = "";
         boolean isSuccess = true;
         long savedId = 0;
@@ -113,6 +106,13 @@ public class LessonController {
             throw new BadRequestException(message);
         }else{
             try{
+                //if courseId are default => check permission create lesson on course
+                if(lessonViewModel.getCourseId() != 0){
+                    if(!this.courseService.checkPermissionModifyCourse(lessonViewModel.getCourseId())){
+                        throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
+                    }
+                }
+
                 UserPrincipal userPrincipal = this.userService.getCurrentUser();
                 savedId = this.lessonService.createExerciseLesson(lessonViewModel,userPrincipal.getId());
                 message =  AppMessage.getMessageSuccess(AppMessage.CREATE,AppMessage.EXERCISE);
@@ -132,16 +132,6 @@ public class LessonController {
     @PutMapping(value = "/interactive-lesson")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult updateInteractiveLesson(@Valid @RequestBody InteractiveLessonUpdateViewModel interactiveLessonUpdateViewModel, BindingResult bindingResult){
-
-        if(!this.lessonService.checkPermissionModifyLesson(interactiveLessonUpdateViewModel.getLessonId())){
-            throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
-        }
-
-
-        if(!this.lessonService.isExist(interactiveLessonUpdateViewModel.getLessonId())){
-            new ResourceNotFoundException("Lesson","id",interactiveLessonUpdateViewModel.getLessonId());
-        }
-
         String message = "";
         boolean isSuccess = true;
         if(bindingResult.hasErrors()){
@@ -150,6 +140,15 @@ public class LessonController {
             throw new BadRequestException(message);
         }else{
             try{
+                if(!this.lessonService.checkPermissionModifyLesson(interactiveLessonUpdateViewModel.getLessonId())){
+                    throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
+                }
+
+
+                if(!this.lessonService.isExist(interactiveLessonUpdateViewModel.getLessonId())){
+                    new ResourceNotFoundException("Lesson","id",interactiveLessonUpdateViewModel.getLessonId());
+                }
+
                 this.lessonService.updateInteractiveLesson(interactiveLessonUpdateViewModel);
                 message =  AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.INTERACTIVE_LESSON);
             }catch (DataIntegrityViolationException ex){
@@ -167,15 +166,6 @@ public class LessonController {
     public @ResponseBody JsonResult updateExerciseLesson(@Valid @RequestBody ExerciseLessonUpdateViewModel exerciseLessonUpdateViewModel
             , BindingResult bindingResult){
 
-        if(!this.lessonService.checkPermissionModifyLesson(exerciseLessonUpdateViewModel.getLessonId())){
-            throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
-        }
-
-
-        if(!this.lessonService.isExist(exerciseLessonUpdateViewModel.getLessonId())){
-            new ResourceNotFoundException("Lesson","id",exerciseLessonUpdateViewModel.getLessonId());
-        }
-
         String message = "";
         boolean isSuccess = true;
         if(bindingResult.hasErrors()){
@@ -184,6 +174,15 @@ public class LessonController {
             throw new BadRequestException(message);
         }else{
             try{
+                if(!this.lessonService.checkPermissionModifyLesson(exerciseLessonUpdateViewModel.getLessonId())){
+                    throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
+                }
+
+
+                if(!this.lessonService.isExist(exerciseLessonUpdateViewModel.getLessonId())){
+                    new ResourceNotFoundException("Lesson","id",exerciseLessonUpdateViewModel.getLessonId());
+                }
+
                 this.lessonService.updateExerciseLesson(exerciseLessonUpdateViewModel);
                 message =  AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.EXERCISE);
             }catch (DataIntegrityViolationException ex){
@@ -199,13 +198,6 @@ public class LessonController {
     @PostMapping(value = "/uninteractive-lesson")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult createUninteractiveLesson(@Valid @RequestBody UninteractiveLessonCreateViewModel lessonViewModel, BindingResult bindingResult){
-        //if courseId are default => check permission create lesson on course
-        if(lessonViewModel.getCourseId() != 0){
-            if(!this.courseService.checkPermissionModifyCourse(lessonViewModel.getCourseId())){
-                throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
-            }
-        }
-
         String message = "";
         boolean isSuccess = true;
         long savedId = 0;
@@ -215,6 +207,13 @@ public class LessonController {
             throw new BadRequestException(message);
         }else{
             try{
+                //if courseId are default => check permission create lesson on course
+                if(lessonViewModel.getCourseId() != 0){
+                    if(!this.courseService.checkPermissionModifyCourse(lessonViewModel.getCourseId())){
+                        throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
+                    }
+                }
+
                 UserPrincipal userPrincipal = this.userService.getCurrentUser();
                 savedId = this.lessonService.createUninteractiveLesson(lessonViewModel,userPrincipal.getId());
                 message =  AppMessage.getMessageSuccess(AppMessage.CREATE,AppMessage.UNINTERACTIVE_LESSON);
@@ -234,15 +233,6 @@ public class LessonController {
     @PutMapping(value = "/uninteractive-lesson")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult updateUninteractiveLesson(@Valid @RequestBody UninteractiveLessonUpdateViewModel uninteractiveLessonUpdateViewModel, BindingResult bindingResult){
-
-        if(!this.lessonService.checkPermissionModifyLesson(uninteractiveLessonUpdateViewModel.getLessonId())){
-            throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
-        }
-
-        if(!this.lessonService.isExist(uninteractiveLessonUpdateViewModel.getLessonId())){
-            new ResourceNotFoundException("Lesson","id",uninteractiveLessonUpdateViewModel.getLessonId());
-        }
-
         String message = "";
         boolean isSuccess = true;
         if(bindingResult.hasErrors()){
@@ -251,6 +241,14 @@ public class LessonController {
             throw new BadRequestException(message);
         }else{
             try{
+                if(!this.lessonService.checkPermissionModifyLesson(uninteractiveLessonUpdateViewModel.getLessonId())){
+                    throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
+                }
+
+                if(!this.lessonService.isExist(uninteractiveLessonUpdateViewModel.getLessonId())){
+                    new ResourceNotFoundException("Lesson","id",uninteractiveLessonUpdateViewModel.getLessonId());
+                }
+
                 this.lessonService.updateUninteractiveLesson(uninteractiveLessonUpdateViewModel);
                 message =  AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.UNINTERACTIVE_LESSON);
             }catch (DataIntegrityViolationException ex){
@@ -292,13 +290,13 @@ public class LessonController {
     @DeleteMapping(value = "/lesson-course")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult removeLessonFromCourse(@RequestBody LessonCourseRemoveViewModel lessonCourseRemoveViewModel){
-        if(!this.courseService.checkPermissionModifyCourse(lessonCourseRemoveViewModel.getCourseId())){
-            throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
-        }
-
         Boolean isSuccess = true;
         String message = "";
         try{
+            if(!this.courseService.checkPermissionModifyCourse(lessonCourseRemoveViewModel.getCourseId())){
+                throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
+            }
+
             this.courseHasLessonService.removeLessonFromCourse(lessonCourseRemoveViewModel.getLessonId(),lessonCourseRemoveViewModel.getCourseId());
             message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.LESSON);
         }catch (DataIntegrityViolationException ex){
@@ -317,8 +315,11 @@ public class LessonController {
             throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
         }
 
-        Lesson lesson = this.lessonService.getById(lessonId)
-                .orElseThrow(() -> new ResourceNotFoundException("Lesson","id",lessonId));
+        Lesson lesson = this.lessonService.getById(lessonId);
+
+        if(lesson == null){
+            throw new ResourceNotFoundException("Lesson","id",lessonId);
+        }
 
         Boolean isSuccess = true;
         String message = "";
@@ -348,8 +349,11 @@ public class LessonController {
             new ResourceNotFoundException("Course","id",mappingLessonCourseViewModel.getCourseId());
         }
 
-        Lesson lesson = this.lessonService.getById(mappingLessonCourseViewModel.getLessonId())
-                .orElseThrow(() -> new ResourceNotFoundException("Lesson","id",mappingLessonCourseViewModel.getLessonId()));
+        Lesson lesson = this.lessonService.getById(mappingLessonCourseViewModel.getLessonId());
+
+        if(lesson == null){
+            throw new ResourceNotFoundException("Lesson","id",mappingLessonCourseViewModel.getLessonId());
+        }
 
         Boolean isSuccess = true;
         String message = "";

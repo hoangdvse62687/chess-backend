@@ -2,16 +2,21 @@ package com.chess.chessapi.services;
 
 import com.chess.chessapi.constants.EntitiesFieldName;
 import com.chess.chessapi.constants.GameHistoryStatus;
+import com.chess.chessapi.constants.KFactor;
 import com.chess.chessapi.entities.GameHistory;
 import com.chess.chessapi.entities.User;
+import com.chess.chessapi.models.GameHistoryCreateResponse;
 import com.chess.chessapi.models.PagedList;
+import com.chess.chessapi.models.PredictionEloStockfish;
 import com.chess.chessapi.repositories.GameHistoryRepository;
+import com.chess.chessapi.utils.EloRatingUtils;
 import com.chess.chessapi.utils.ManualCastUtils;
 import com.chess.chessapi.utils.TimeUtils;
 import com.chess.chessapi.viewmodels.GameHistoryCreateViewModel;
 import com.chess.chessapi.viewmodels.GameHistoryUpdateViewModel;
 import com.chess.chessapi.viewmodels.GameHistoryViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -40,10 +45,11 @@ public class GameHistoryService {
     private final String POINT = " điểm ";
     private final String WHEN_PLAYING_BOT = "khi chơi cờ với máy cấp độ ";
     private final String RECEIVE = ". Và nhận được ";
+    private final String LOSSE = ".Và mất ";
 
     //PUBLIC METHOD DEFINED
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
-    public long create(GameHistoryCreateViewModel gameHistoryCreateViewModel,long userId){
+    public GameHistoryCreateResponse create(GameHistoryCreateViewModel gameHistoryCreateViewModel, long userId){
         GameHistory gameHistory = new GameHistory();
         gameHistory.setColor(gameHistory.getColor());
         gameHistory.setGameTime(gameHistoryCreateViewModel.getGameTime());
@@ -56,49 +62,45 @@ public class GameHistoryService {
         user.setUserId(userId);
         gameHistory.setUser(user);
 
-        this.handleDataCreateUpdate(userId,gameHistory);
 
         GameHistory savedGameHistory = this.gameHistoryRepository.save(gameHistory);
-        return savedGameHistory.getGamehistoryId();
+
+        GameHistoryCreateResponse gameHistoryCreateResponse = new GameHistoryCreateResponse();
+        gameHistoryCreateResponse.setSavedId(savedGameHistory.getGamehistoryId());
+        PredictionEloStockfish predictionEloStockfish = new PredictionEloStockfish();
+        float userElo = this.userService.getELOByUserId(userId);
+        predictionEloStockfish.setPredictionWinningElo(this.getUserEloPointByStatus(userElo,gameHistory.getLevel()
+                ,GameHistoryStatus.WIN,gameHistory.getUser().getUserId()));
+        predictionEloStockfish.setPredictionLoseElo(this.getUserEloPointByStatus(userElo,gameHistory.getLevel()
+                ,GameHistoryStatus.LOSE,gameHistory.getUser().getUserId()));
+        gameHistoryCreateResponse.setPredictionEloStockfish(predictionEloStockfish);
+        return gameHistoryCreateResponse;
     }
 
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
-    public void update(GameHistory gameHistory,GameHistoryUpdateViewModel gameHistoryUpdateViewModel, long userId){
-        User user = new User();
-        user.setUserId(userId);
-        gameHistory.setUser(user);
-        gameHistory.setStatus(gameHistoryUpdateViewModel.getStatus());
-        gameHistory.setPoint(gameHistoryUpdateViewModel.getPoint());
-        gameHistory.setRecord(gameHistoryUpdateViewModel.getRecord());
+    public void update(GameHistory gameHistory, long userId){
 
         this.handleDataCreateUpdate(userId,gameHistory);
 
         this.gameHistoryRepository.save(gameHistory);
     }
+
     public PagedList<GameHistoryViewModel> getPagination(int page, int pageSize, long userId){
         PageRequest pageable = PageRequest.of(page - 1,pageSize, Sort.by(EntitiesFieldName.GAME_HISTORY_START_TIME).descending());
 
         return this.fillDataToPaginationCustom(this.gameHistoryRepository.findAllByUserId(pageable,userId));
     }
 
-    public boolean checkPointBet(long userId,int status,float pointRequired){
-        boolean result = true;
-        float userPoint = this.userService.getPointByUserId(userId);
-        if(status == GameHistoryStatus.BET){
-            if(userPoint < pointRequired){
-                return false;
-            }
-        }
-        return result;
-    }
-
     public Optional<GameHistory> getById(long gameHistoryId){
         return this.gameHistoryRepository.findById(gameHistoryId);
     }
-    //END PUBLIC METHOD DEFINED
 
-    //PRIVATE METHOD DEFINED
-    private String getContentPointLog(int status,float point,int level) {
+    public int getUserEloPointByStatus(float userElo,int level,int status,long userId){
+        return EloRatingUtils.getEloByStockfishLevel(userElo
+                ,level,status, KFactor.getKFactor(userElo,this.isUnderThirtyGame(userId)));
+    }
+
+    public String getContentPointLog(int status,float point,int level) {
         String content = "";
         point = point < 0 ? -point : point;
         String pointStr = Integer.toString((int)point);
@@ -110,7 +112,7 @@ public class GameHistoryService {
                 content = DRAWN_MESSAGE + level + RECEIVE + pointStr + POINT;
                 break;
             case GameHistoryStatus.LOSE:
-                content = LOSE_MESSAGE + level + RECEIVE + pointStr + POINT;
+                content = LOSE_MESSAGE + level + LOSSE + pointStr + POINT;
                 break;
             case GameHistoryStatus.WIN:
                 content = WIN_MESSAGE + level + RECEIVE + pointStr + POINT;
@@ -120,18 +122,31 @@ public class GameHistoryService {
         return content;
     }
 
-    private void handleDataCreateUpdate(long userId, GameHistory gameHistory){
-        //update point user
-        float pointUpdate = gameHistory.getStatus() == GameHistoryStatus.BET ? -gameHistory.getPoint()
-                : gameHistory.getPoint();
+    public boolean isLearnerInGame(long userId){
+        Integer status = this.gameHistoryRepository.findLastGameHistoryStatusByUserId(userId);
+        if(status == null){
+            return false;
+        }
+        if(status == GameHistoryStatus.BET){
+            return true;
+        }
+        return false;
+    }
 
-        this.userService.increasePoint(userId,pointUpdate);
+    public GameHistory getLastestGameHistoryByUserId(long userId){
+        return this.gameHistoryRepository.findLastGameHistoryByUserId(userId);
+    }
+    //END PUBLIC METHOD DEFINED
+
+    //PRIVATE METHOD DEFINED
+    private void handleDataCreateUpdate(long userId, GameHistory gameHistory){
+
+        this.userService.increasePoint(userId,gameHistory.getPoint());
 
         //write point log
         String content = this.getContentPointLog(gameHistory.getStatus(),
                 gameHistory.getPoint(),gameHistory.getLevel());
-        this.pointLogService.create(content,gameHistory.getPoint(),
-                userId);
+        this.pointLogService.create(content,(int)gameHistory.getPoint(),userId);
     }
 
     private PagedList<GameHistoryViewModel> fillDataToPaginationCustom(Page<Object> rawData){
@@ -139,6 +154,11 @@ public class GameHistoryService {
         final int totalPages = rawData.getTotalPages();
         final long totalElements = rawData.getTotalElements();
         return new PagedList<GameHistoryViewModel>(totalPages,totalElements,content);
+    }
+
+    private boolean isUnderThirtyGame(long userId){
+        int counter = this.gameHistoryRepository.countByUserId(userId);
+        return counter > 30 ? true : false;
     }
     //END PRIVATE METHOD DEFINED
 }

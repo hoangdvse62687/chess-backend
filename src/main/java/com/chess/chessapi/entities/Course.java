@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -49,6 +50,21 @@ import java.util.List;
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageSize",type = Integer.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "statusId",type = String.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "categoryId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "userId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortBy",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortDirection",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalElements",type = Long.class)
+                }
+        ),
+        @NamedStoredProcedureQuery(
+                name = "getCoursesByEloId",
+                procedureName = "get_courses_by_elo_id",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseName",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageIndex",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageSize",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "statusId",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "eloId",type = Integer.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "userId",type = Long.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortBy",type = String.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortDirection",type = String.class),
@@ -110,12 +126,10 @@ public class Course {
     @Column(name = "created_date")
     private Timestamp createdDate;
 
-    @Min(value =0,message = "Point should equal or larger than 0")
-    private float point;
-
-    @Min(value =0,message = "Required Point should equal or larger than 0")
-    @Column(name = "required_point")
-    private float requiredPoint;
+    @Min(value =0,message = "Required Elo should equal or larger than 0")
+    @Max(value = 5,message = "Required Elo should less than 5")
+    @Column(name = "required_elo")
+    private int requiredElo;
 
     @Column(name = "status_id")
     private Long statusId;
@@ -200,14 +214,6 @@ public class Course {
 
     public void setCreatedDate(Timestamp createdDate) {
         this.createdDate = createdDate;
-    }
-
-    public Float getPoint() {
-        return point;
-    }
-
-    public void setPoint(Float point) {
-        this.point = point;
     }
 
     public Long getStatusId() {
@@ -316,10 +322,6 @@ public class Course {
         this.tutors = tutors;
     }
 
-    public void setPoint(float point) {
-        this.point = point;
-    }
-
     public List<Long> getListLogExerciseIds() {
         return listLogExerciseIds;
     }
@@ -328,12 +330,12 @@ public class Course {
         this.listLogExerciseIds = listLogExerciseIds;
     }
 
-    public float getRequiredPoint() {
-        return requiredPoint;
+    public int getRequiredElo() {
+        return requiredElo;
     }
 
-    public void setRequiredPoint(float requiredPoint) {
-        this.requiredPoint = requiredPoint;
+    public void setRequiredElo(int requiredElo) {
+        this.requiredElo = requiredElo;
     }
 
     public Timestamp getModifiedDate() {

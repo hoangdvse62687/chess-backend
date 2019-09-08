@@ -101,9 +101,6 @@ public class CategoryController {
     @PutMapping("/categories")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_ADMIN_AUTHENTICATIION+")")
     public @ResponseBody JsonResult updateCategory(@RequestBody @Valid CategoryViewModel category, BindingResult bindingResult){
-        if(!this.categoryService.isExist(category.getCategoryId())){
-            throw new ResourceNotFoundException("Category","id",category.getCategoryId());
-        }
 
         Boolean isSuccess = true;
         String message = "";
@@ -113,6 +110,10 @@ public class CategoryController {
             isSuccess = false;
         }else {
             try {
+                if(!this.categoryService.isExist(category.getCategoryId())){
+                    throw new ResourceNotFoundException("Category","id",category.getCategoryId());
+                }
+
                 this.categoryService.update(category);
                 message = AppMessage.getMessageSuccess(AppMessage.UPDATE, AppMessage.CATEGORY);
             } catch (DataIntegrityViolationException ex) {

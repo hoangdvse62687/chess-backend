@@ -17,7 +17,6 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
@@ -44,7 +43,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                 if( userDetails == null){
                     userDetails = this.customUserDetailsService.loadUserById(userId);
                 }
-
                 UserPrincipal userPrincipal = (UserPrincipal) userDetails;
                 this.redisUserPrincipleService.save(userPrincipal);
 

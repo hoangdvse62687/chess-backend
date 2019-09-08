@@ -1,5 +1,6 @@
 package com.chess.chessapi.utils;
 
+import com.chess.chessapi.constants.EloRatingLevel;
 import com.chess.chessapi.constants.Status;
 import com.chess.chessapi.entities.*;
 import com.chess.chessapi.models.StepSuggest;
@@ -29,16 +30,15 @@ public class ManualCastUtils implements Serializable {
     private static final int COURSE_IMAGE_INDEX = 3;
     private static final int COURSE_DESCRIPTION_INDEX = 4;
     private static final int COURSE_CREATED_DATE_INDEX = 5;
-    private static final int COURSE_POINT_INDEX = 6;
-    private static final int COURSE_REQUIRED_POINT_INDEX = 7;
-    private static final int COURSE_USERID_INDEX = 8;
-    private static final int COURSE_USER_FULLNAME_INDEX = 9;
-    private static final int COURSE_USER_AVATAR_INDEX = 10;
-    private static final int COURSE_USER_IS_ENROLLED = 11;
-    private static final int COURSE_CATEGORY_IDS= 12;
-    private static final int COURSE_RATING_INDEX= 13;
-    private static final int COURSE_TOTAL_RATING_INDEX= 14;
-    private static final int COURSE_LEARNING_PROCESS_PERCENT = 15;
+    private static final int COURSE_REQUIRED_ELO_INDEX = 6;
+    private static final int COURSE_USERID_INDEX = 7;
+    private static final int COURSE_USER_FULLNAME_INDEX = 8;
+    private static final int COURSE_USER_AVATAR_INDEX = 9;
+    private static final int COURSE_USER_IS_ENROLLED = 10;
+    private static final int COURSE_CATEGORY_IDS= 11;
+    private static final int COURSE_RATING_INDEX= 12;
+    private static final int COURSE_TOTAL_RATING_INDEX= 13;
+    private static final int COURSE_LEARNING_PROCESS_PERCENT = 14;
     //END COURSE DEFINED
 
     //LESSON DEFINED
@@ -82,30 +82,6 @@ public class ManualCastUtils implements Serializable {
     private static final int CATEGORY_VIEW_MODEL_NAME_INDEX = 1;
     //END CATEGORY VIEW MODEL DEFINED
 
-    //JSON PARSER CHARACTER DEFINED
-    private static final char COLON = ':';
-    private static final char LEFT_SQUARE_BRACKET = '[';
-    private static final char RIGHT_SQUARE_BRACKET = ']';
-    private static final String LEFT_ANGLE_BRACKET = "{";
-    private static final char RIGHT_ANGLE_BRACKET = '}';
-    private static final char D_QUOT = '"';
-    private static final char COMMA = ',';
-    private static final char LEFT_BRACKETS = '(';
-    private static final char RIGHT_BRACKETS = ')';
-    //END JSON PARSER CHARACTER DEFINED
-    //STEP JSON PARSER DEFINED
-    private static final String STEP_JSON_PARSER_ID = "id";
-    private static final String STEP_JSON_PARSER_MOVE = "move";
-    private static final String STEP_JSON_PARSER_CONTENT = "content";
-    private static final String STEP_JSON_PARSER_MOVE_DIRECTION = "moveDirection";
-    private static final String STEP_JSON_PARSER_FEN= "fen";
-    private static final String STEP_JSON_PARSER_PRE_ID= "preId";
-    private static final String STEP_JSON_PARSER_ANSWERTYPE = "answerType";
-    private static final String STEP_JSON_PARSER_ANSWERARR = "answerArr";
-    private static final String STEP_JSON_PARSER_RIGHTRESPONSE = "rightResponse";
-    private static final String STEP_JSON_PARSER_WRONGRRESPONSE = "wrongResponse";
-    //END STEP JSON PARSER DEFINED
-
     //LEARNER STATUS PUBLISH COURSE REPORT
     private static final int LEARNER_STATUS_REPORT_COURSE_NAME_INDEX = 0;
     private static final int LEARNER_STATUS_REPORT_COURSE_STATUS_INDEX = 1;
@@ -125,18 +101,6 @@ public class ManualCastUtils implements Serializable {
     private static final int NOTIFICATION_CREATED_DATE_INDEX = 7;
     private static final int NOTIFICATION_ROLE_TARGET_INDEX = 8;
     private static final int NOTIFICATION_USER_ID_INDEX = 9;
-
-    private static final String NOTIFICATION_ID = "notificationId";
-    private static final String NOTIFICATION_OBJECT_ID_ = "objectId";
-    private static final String NOTIFICATION_OBJECT_NAME = "objectName";
-    private static final String NOTIFICATION_OBJECT_AVATAR = "objectAvatar";
-    private static final String NOTIFICATION_OBJECT_TYPE_ID = "objectTypeId";
-    private static final String NOTIFICATION_CONTENT = "content";
-    private static final String NOTIFICATION_IS_VIEWED = "isViewed";
-    private static final String NOTIFICATION_CREATED_DATE = "createDate";
-    private static final String NOTIFICATION_ROLE_TARGET = "roleTarget";
-    private static final String NOTIFICATION_TO = "to";
-    private static final String NOTIFICATION = "notification";
     //END NOTIFICATION DEFINED
 
     //POINT LOG DEFINED
@@ -249,8 +213,7 @@ public class ManualCastUtils implements Serializable {
             coursePaginationViewModel.setCourseImage(handleNullValueObject(object[COURSE_IMAGE_INDEX],String.class));
             coursePaginationViewModel.setCourseDescription(handleNullValueObject(object[COURSE_DESCRIPTION_INDEX],String.class));
             coursePaginationViewModel.setCourseCreatedDate(Timestamp.valueOf(object[COURSE_CREATED_DATE_INDEX].toString()));
-            coursePaginationViewModel.setPoint(Float.parseFloat(object[COURSE_POINT_INDEX].toString()));
-            coursePaginationViewModel.setRequiredPoint(Float.parseFloat(object[COURSE_REQUIRED_POINT_INDEX].toString()));
+            coursePaginationViewModel.setRequiredElo(Integer.parseInt(object[COURSE_REQUIRED_ELO_INDEX].toString()));
 
             UserDetailViewModel author = new UserDetailViewModel();
             author.setUserId(Long.parseLong(object[COURSE_USERID_INDEX].toString()));
@@ -448,10 +411,9 @@ public class ManualCastUtils implements Serializable {
         if(courseCreateViewModel != null){
             course.setName(courseCreateViewModel.getName());
             course.setDescription(courseCreateViewModel.getDescription());
-            course.setPoint(courseCreateViewModel.getPoint());
             course.setStatusId(Status.COURSE_STATUS_DRAFTED);
             course.setImage(courseCreateViewModel.getImage());
-            course.setRequiredPoint(courseCreateViewModel.getRequiredPoint());
+            course.setRequiredElo(courseCreateViewModel.getRequiredElo());
         }
         return course;
     }
@@ -462,7 +424,6 @@ public class ManualCastUtils implements Serializable {
         courseDetailsViewModel.setName(course.getName());
         courseDetailsViewModel.setDescription(course.getDescription());
         courseDetailsViewModel.setCreatedDate(course.getCreatedDate());
-        courseDetailsViewModel.setPoint(course.getPoint());
         courseDetailsViewModel.setStatusId(course.getStatusId());
         courseDetailsViewModel.setImage(course.getImage());
         courseDetailsViewModel.setUserEnrolleds(course.getUserEnrolleds());
@@ -470,7 +431,7 @@ public class ManualCastUtils implements Serializable {
         courseDetailsViewModel.setListCategorys(course.getListCategorys());
         courseDetailsViewModel.setLessonViewModels(course.getLessonViewModels());
         courseDetailsViewModel.setListLearningLogLessonIds(course.getListLearningLogLessonIds());
-        courseDetailsViewModel.setRequiredPoint(course.getRequiredPoint());
+        courseDetailsViewModel.setRequiredElo(course.getRequiredElo());
         UserDetailViewModel author = new UserDetailViewModel();
         author.setUserId(course.getUser().getUserId());
         author.setFullName(course.getUser().getFullName());
@@ -486,19 +447,41 @@ public class ManualCastUtils implements Serializable {
         User user = new User();
         if(userUpdateViewModel != null){
             user.setUserId(userUpdateViewModel.getUserId());
-            user.setPoint(userUpdateViewModel.getPoint());
-            user.setEmail(userUpdateViewModel.getEmail());
             user.setFullName(userUpdateViewModel.getFullName());
             user.setAvatar(userUpdateViewModel.getAvatar());
-            user.setCreatedDate(userUpdateViewModel.getCreatedDate());
-            user.setActive(userUpdateViewModel.isActive());
             user.setRoleId(userUpdateViewModel.getRoleId());
             user.setAchievement(userUpdateViewModel.getAchievement());
-            user.setProvider(userUpdateViewModel.getProvider());
-            user.setProviderId(userUpdateViewModel.getProviderId());
             List<Certificate> certificates = new ArrayList();
             for (CertificateUpdateViewModel c:
                  userUpdateViewModel.getCertificates()) {
+                Certificate certificate = new Certificate();
+                if(c.getCertificateId() != 0){
+                    certificate.setCertificateId(c.getCertificateId());
+                }
+                certificate.setCertificateLink(c.getCertificateLink());
+                certificates.add(certificate);
+            }
+            user.setCertificates(certificates);
+        }
+        return user;
+    }
+
+    public static User castUserRegisterToUser(UserRegisterViewModel userRegisterViewModel,User user){
+        if(userRegisterViewModel != null){
+            user.setUserId(userRegisterViewModel.getUserId());
+            int eloSetting = EloRatingLevel.getEloById(userRegisterViewModel.getEloId());
+            if(eloSetting == 0){
+                eloSetting = EloRatingLevel.BEGINNER_ELO;
+            }
+            user.setElo(eloSetting);
+            user.setFullName(userRegisterViewModel.getFullName());
+            user.setAvatar(userRegisterViewModel.getAvatar());
+            user.setActive(userRegisterViewModel.isActive());
+            user.setRoleId(userRegisterViewModel.getRoleId());
+            user.setAchievement(userRegisterViewModel.getAchievement());
+            List<Certificate> certificates = new ArrayList();
+            for (CertificateUpdateViewModel c:
+                    userRegisterViewModel.getCertificates()) {
                 Certificate certificate = new Certificate();
                 if(c.getCertificateId() != 0){
                     certificate.setCertificateId(c.getCertificateId());

@@ -19,11 +19,13 @@ public interface CourseRepository extends JpaRepository<Course,Long> {
     @Transactional
     void updateStatus(long courseId, long statusId, Timestamp modifiedDate);
 
-    @Query(value = "Update course c Set c.name = ?2,c.description = ?3,c.point = ?4,c.status_id = ?5,c.image = ?6,c.required_point=?7,c.modified_date = ?8" +
+    @Query(value = "Update course c Set c.name = ?2,c.description = ?3,c.status_id = ?4,c.image = ?5,c.required_elo=?6" +
+            ",c.modified_date = ?7" +
             " where c.id = ?1",nativeQuery = true)
     @Modifying
     @Transactional
-    void updateCourse(long courseId,String name,String description,Float point,long statusId,String image,Float requiredPoint, Timestamp modifiedDate);
+    void updateCourse(long courseId,String name,String description,
+                      long statusId,String image,int requiredElo, Timestamp modifiedDate);
 
     @Query(value = "Select c.owner From course c where id = ?1",nativeQuery = true)
     Long findAuthorIdByCourseId(long courseId);
@@ -33,7 +35,4 @@ public interface CourseRepository extends JpaRepository<Course,Long> {
 
     @Query(value = "Select c.id,c.name,c.image From course c where c.id = ?1",nativeQuery = true)
     Object findCourseDetailForNotificationByCourseId(Long listCourseId);
-
-    @Query(value = "Select point From course where id = ?1",nativeQuery = true)
-    Long findRewardPointById(long courseId);
 }

@@ -14,6 +14,7 @@ import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.services.UserService;
 import com.chess.chessapi.utils.ManualCastUtils;
 import com.chess.chessapi.viewmodels.UserPaginationViewModel;
+import com.chess.chessapi.viewmodels.UserRegisterViewModel;
 import com.chess.chessapi.viewmodels.UserUpdateStatusViewModel;
 import com.chess.chessapi.viewmodels.UserUpdateViewModel;
 import io.swagger.annotations.Api;
@@ -58,7 +59,7 @@ public class UserController {
     @ApiOperation(value = "Register an user")
     @PutMapping(value = "/users/register")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_REGISTRATION_AUTHENTICATIION +")")
-    public @ResponseBody JsonResult register(@Valid @RequestBody UserUpdateViewModel userUpdateViewModel, BindingResult bindingResult, @Context HttpServletRequest request){
+    public @ResponseBody JsonResult register(@Valid @RequestBody UserRegisterViewModel userRegisterViewModel, BindingResult bindingResult){
         String message = "";
         User user = null;
         if(bindingResult.hasErrors()){
@@ -68,7 +69,9 @@ public class UserController {
         }else{
             try{
                 //gain redirect uri base on role
-                user = this.userService.register(ManualCastUtils.castUserUpdateToUser(userUpdateViewModel),request);
+                User userDetails = this.userService.getUserById(userRegisterViewModel.getUserId())
+                        .orElseThrow(() -> new ResourceNotFoundException("User","id",userRegisterViewModel.getUserId()));
+                user = this.userService.register(ManualCastUtils.castUserRegisterToUser(userRegisterViewModel,userDetails));
 
                 message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.USER);
             }catch (DataIntegrityViolationException ex){
@@ -83,14 +86,6 @@ public class UserController {
     @PutMapping(value = "/users/profile")
     @PreAuthorize("isAuthenticated()")
     public @ResponseBody JsonResult updateProfile(@Valid @RequestBody UserUpdateViewModel userUpdateViewModel, BindingResult bindingResult){
-        if(!this.userService.checkPermissionModify(userUpdateViewModel.getUserId())){
-            throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
-        }
-
-        if(!this.userService.isExist(userUpdateViewModel.getUserId())){
-            new ResourceNotFoundException("User","id",userUpdateViewModel.getUserId());
-        }
-
         String message = "";
         boolean isSuccess = true;
         if(bindingResult.hasErrors()){
@@ -99,6 +94,14 @@ public class UserController {
             throw new BadRequestException(message);
         }else{
             try{
+                if(!this.userService.checkPermissionModify(userUpdateViewModel.getUserId())){
+                    throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
+                }
+
+                if(!this.userService.isExist(userUpdateViewModel.getUserId())){
+                    new ResourceNotFoundException("User","id",userUpdateViewModel.getUserId());
+                }
+
                 this.userService.updateProfile(ManualCastUtils.castUserUpdateToUser(userUpdateViewModel));
 
                 message =  AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.PROFILE);

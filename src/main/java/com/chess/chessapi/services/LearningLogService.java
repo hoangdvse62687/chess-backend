@@ -3,6 +3,7 @@ package com.chess.chessapi.services;
 import com.chess.chessapi.constants.Status;
 import com.chess.chessapi.entities.*;
 import com.chess.chessapi.repositories.*;
+import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.utils.ManualCastUtils;
 import com.chess.chessapi.utils.TimeUtils;
 import com.chess.chessapi.viewmodels.LearningLogCreateResponse;
@@ -27,12 +28,6 @@ public class LearningLogService {
 
     @Autowired
     private CourseHasLessonRepository courseHasLessonRepository;
-
-    @Autowired
-    private CourseRepository courseRepository;
-
-    @Autowired
-    private UserService userService;
 
     //PUBLIC DEFINED
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
@@ -131,8 +126,6 @@ public class LearningLogService {
         }
 
         if(userHasCourse.getStatusId() != Status.USER_HAS_COURSE_STATUS_PASSED && result){
-            long rewardPoint = this.courseRepository.findRewardPointById(courseId);
-            this.userService.increasePoint(userId,rewardPoint);
             this.userHasCourseRepository.updateStatusByCourseIdAndUserId(courseId,userId,Status.USER_HAS_COURSE_STATUS_PASSED);
         }
 

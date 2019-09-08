@@ -57,17 +57,15 @@ public class Lesson {
     @Length(max = 1000,message = "Description is required not large than 1000 characters")
     private String description;
 
+    @NotNull(message = "Content must not be null")
+    @JsonIgnore
+    private String content;
+
+    @Transient
+    private Object lessonContent;
+
     @Column(name = "created_date")
     private Timestamp createdDate;
-
-    @OneToOne(mappedBy = "lesson",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    private InteractiveLesson interactiveLesson;
-
-    @OneToOne(mappedBy = "lesson",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    private UninteractiveLesson uninteractiveLesson;
-
-    @OneToOne(mappedBy = "lesson",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    private Exercise exercise;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "lesson")
     @JsonIgnore
@@ -128,22 +126,6 @@ public class Lesson {
         this.user = user;
     }
 
-    public InteractiveLesson getInteractiveLesson() {
-        return interactiveLesson;
-    }
-
-    public void setInteractiveLesson(InteractiveLesson interactiveLesson) {
-        this.interactiveLesson = interactiveLesson;
-    }
-
-    public UninteractiveLesson getUninteractiveLesson() {
-        return uninteractiveLesson;
-    }
-
-    public void setUninteractiveLesson(UninteractiveLesson uninteractiveLesson) {
-        this.uninteractiveLesson = uninteractiveLesson;
-    }
-
     public List<LearningLog> getLearningLogs() {
         return learningLogs;
     }
@@ -168,19 +150,27 @@ public class Lesson {
         this.description = description;
     }
 
-    public Exercise getExercise() {
-        return exercise;
-    }
-
-    public void setExercise(Exercise exercise) {
-        this.exercise = exercise;
-    }
-
     public Timestamp getModifiedDate() {
         return modifiedDate;
     }
 
     public void setModifiedDate(Timestamp modifiedDate) {
         this.modifiedDate = modifiedDate;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public Object getLessonContent() {
+        return lessonContent;
+    }
+
+    public void setLessonContent(Object lessonContent) {
+        this.lessonContent = lessonContent;
     }
 }

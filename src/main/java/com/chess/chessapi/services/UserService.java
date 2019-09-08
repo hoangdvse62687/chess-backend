@@ -13,6 +13,7 @@ import com.chess.chessapi.utils.TimeUtils;
 import com.chess.chessapi.viewmodels.UserDetailViewModel;
 import com.chess.chessapi.viewmodels.UserPaginationViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -28,8 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.StoredProcedureQuery;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.*;
 
 @Service
@@ -61,6 +60,8 @@ public class UserService {
     @Autowired
     private RedisUserPrincipleService redisUserPrincipleService;
 
+    private final String START_ELO_MESSAGE = "Bạn đang ở ELO ";
+    private final String CONGRATULATION_ELO_MESSAGE = ". Chức bạn luyện tập vui vẻ";
     public UserPrincipal getCurrentUser(){
         UserPrincipal user = null;
         try{
@@ -81,7 +82,7 @@ public class UserService {
     public Optional<User> getUserByEmail(String email){return userRepository.findByEmail(email);}
 
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
-    public User register(User user,HttpServletRequest request){
+    public User register(User user){
         if(user.getRoleId() == AppRole.ROLE_INSTRUCTOR){
             this.registerInstructor(user);
         }else {
@@ -92,13 +93,14 @@ public class UserService {
             this.certificatesService.create(c.getCertificateLink(),user.getUserId());
         }
 
-        this.pointLogService.create(Common.USER_GAIN_FREE_POINT_MESSAGE,Common.DEFAULT_POINT_LEARNER,user.getUserId());
+        this.pointLogService.create(START_ELO_MESSAGE + user.getElo() + CONGRATULATION_ELO_MESSAGE
+                ,user.getElo(),user.getUserId());
 
-        this.userRepository.updateRegister(user.getUserId(),user.getFullName(),user.getAchievement(),user.getPoint(),
+        this.userRepository.updateRegister(user.getUserId(),user.getFullName(),user.getAchievement(),user.getElo(),
                 user.getRoleId(),user.isActive(),user.getAvatar(),user.isReviewed(), TimeUtils.getCurrentTime());
 
-        this.setUserRoleAuthentication(user,request);
-
+        this.setUserRoleAuthentication(user);
+        this.updateUserDetailsOnRedis(user,false,false);
         return user;
     }
 
@@ -207,18 +209,18 @@ public class UserService {
     }
 
     public void increasePoint(long userId,float point){
-        this.userRepository.increasePoint(userId,point);
+        this.userRepository.increaseElo(userId,(int)point);
     }
 
-    public float getPointByUserId(long userId){
-        return this.userRepository.findPointByUserId(userId);
+    public int getELOByUserId(long userId){
+        return this.userRepository.findEloByUserId(userId);
     }
     public boolean isExist(long userId){
         return this.userRepository.existsById(userId);
     }
 
     // private method
-    private void setUserRoleAuthentication(User user,HttpServletRequest request){
+    private void setUserRoleAuthentication(User user){
         List<GrantedAuthority> authorities = Collections.
                 singletonList(new SimpleGrantedAuthority(Long.toString(user.getRoleId())));
         UserPrincipal userDetails = UserPrincipal.create(user);
@@ -227,12 +229,6 @@ public class UserService {
         authentication.setDetails(authentication);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        //
-
-        HttpSession session = request.getSession();
-
-        session.setAttribute(Long.toString(user.getUserId()),userDetails);
     }
 
     private void updateUserDetailsOnRedis(User user,boolean isUpdateStatus,boolean status){
@@ -246,14 +242,14 @@ public class UserService {
     private void registerLearner(User user){
         user.setActive(Status.ACTIVE);
         user.setRoleId(AppRole.ROLE_LEARNER);
-        user.setPoint(Common.DEFAULT_POINT_LEARNER);
+        user.setElo(user.getElo());
         user.setReviewed(true);
     }
 
     private void registerInstructor(User user){
         user.setActive(Status.INACTIVE);
         user.setRoleId(AppRole.ROLE_INSTRUCTOR);
-        user.setPoint(0);
+        user.setElo(0);
         user.setReviewed(false);
         // create notification for admin
         this.notificationService.sendNotificationToAdmin(AppMessage.CREATE_NEW_USER_AS_INSTRUCTOR,user.getEmail(),

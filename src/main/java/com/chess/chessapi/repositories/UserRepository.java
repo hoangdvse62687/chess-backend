@@ -74,20 +74,20 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Modifying
     @Transactional
-    @Query(value = "Update users u Set u.full_name = ?2,u.achievement = ?3,u.point = ?4" +
+    @Query(value = "Update users u Set u.full_name = ?2,u.achievement = ?3,u.elo = ?4" +
             ",u.role_id = ?5,u.is_active = ?6,u.avatar = ?7,u.is_reviewed = ?8,u.modified_date = ?9 Where u.id = ?1"
             ,nativeQuery = true)
-    void updateRegister(long id, String name, String achievement, float point, long role, boolean isActive, String avatar
+    void updateRegister(long id, String name, String achievement, int elo, long role, boolean isActive, String avatar
             , boolean isReviewed, Timestamp modifiedDate);
 
     @Modifying
     @Transactional
-    @Query(value = "Update users u Set u.point = u.point + ?2 Where u.id = ?1"
+    @Query(value = "Update users u Set u.elo = u.elo + ?2 Where u.id = ?1"
             ,nativeQuery = true)
-    void increasePoint(long id,float point);
+    void increaseElo(long id,int elo);
 
-    @Query(value = "Select point From users where id = ?1",nativeQuery = true)
-    Float findPointByUserId(long id);
+    @Query(value = "Select elo From users where id = ?1",nativeQuery = true)
+    Integer findEloByUserId(long id);
 
     @Modifying
     @Transactional

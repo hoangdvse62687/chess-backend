@@ -1,5 +1,6 @@
 package com.chess.chessapi.viewmodels;
 
+import com.chess.chessapi.models.Exercise;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.Valid;
@@ -15,7 +16,7 @@ public class ExerciseLessonCreateViewModel {
 
     @Valid
     @NotNull(message = "Exercise must not be null")
-    private ExerciseCreateViewModel exercise;
+    private Exercise exercise;
 
     private long courseId;
 
@@ -35,11 +36,11 @@ public class ExerciseLessonCreateViewModel {
         this.description = description;
     }
 
-    public ExerciseCreateViewModel getExercise() {
+    public Exercise getExercise() {
         return exercise;
     }
 
-    public void setExercise(ExerciseCreateViewModel exercise) {
+    public void setExercise(Exercise exercise) {
         this.exercise = exercise;
     }
 

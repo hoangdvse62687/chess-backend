@@ -1,6 +1,6 @@
 package com.chess.chessapi.viewmodels;
 
-import com.chess.chessapi.entities.InteractiveLesson;
+import com.chess.chessapi.models.InteractiveLesson;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.Valid;
@@ -16,7 +16,7 @@ public class InteractiveLessonCreateViewModel {
 
     @Valid
     @NotNull(message = "Interactive Lesson must not be null")
-    private InteractiveLessonViewModel interactiveLesson;
+    private InteractiveLesson interactiveLesson;
 
     private long courseId;
 
@@ -28,11 +28,11 @@ public class InteractiveLessonCreateViewModel {
         this.name = name;
     }
 
-    public InteractiveLessonViewModel getInteractiveLesson() {
+    public InteractiveLesson getInteractiveLesson() {
         return interactiveLesson;
     }
 
-    public void setInteractiveLesson(InteractiveLessonViewModel interactiveLesson) {
+    public void setInteractiveLesson(InteractiveLesson interactiveLesson) {
         this.interactiveLesson = interactiveLesson;
     }
 

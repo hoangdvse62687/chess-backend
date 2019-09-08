@@ -59,7 +59,7 @@ public class User {
     @Column(name = "is_active")
     private boolean isActive;
 
-    private float point;
+    private int elo;
 
     @Column(name = "role_id")
     private long roleId;
@@ -199,12 +199,12 @@ public class User {
         this.certificates = certificates;
     }
 
-    public float getPoint() {
-        return point;
+    public int getElo() {
+        return elo;
     }
 
-    public void setPoint(float point) {
-        this.point = point;
+    public void setElo(int elo) {
+        this.elo = elo;
     }
 
     @JsonIgnore

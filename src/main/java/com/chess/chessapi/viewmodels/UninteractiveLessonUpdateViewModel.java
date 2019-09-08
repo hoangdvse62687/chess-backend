@@ -1,11 +1,10 @@
 package com.chess.chessapi.viewmodels;
 
-import com.chess.chessapi.entities.UninteractiveLesson;
+import com.chess.chessapi.models.UninteractiveLesson;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
 
 public class UninteractiveLessonUpdateViewModel {
     private long lessonId;

@@ -67,11 +67,6 @@ public class LearningLogController {
     @PutMapping(value = "/learning-logs")
     @PreAuthorize("hasAuthority("+ AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
     public @ResponseBody JsonResult updateLearningLog(@Valid @RequestBody LearningLogUpdateViewModel learningLogUpdateViewModel, BindingResult bindingResult){
-        LearningLog learningLog = this.learningLogService.getById(learningLogUpdateViewModel.getLearningLogId())
-                .orElseThrow(() -> new ResourceNotFoundException("Learning log","id",learningLogUpdateViewModel.getLearningLogId()));
-        if(learningLog.getUser().getUserId() != this.userService.getCurrentUser().getId()){
-            throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
-        }
         String message = "";
         boolean isSuccess = true;
         LearningLogUpdateResponse learningLogUpdateResponse = new LearningLogUpdateResponse();
@@ -81,6 +76,11 @@ public class LearningLogController {
             throw new BadRequestException(message);
         }else{
             try{
+                LearningLog learningLog = this.learningLogService.getById(learningLogUpdateViewModel.getLearningLogId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Learning log","id",learningLogUpdateViewModel.getLearningLogId()));
+                if(learningLog.getUser().getUserId() != this.userService.getCurrentUser().getId()){
+                    throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
+                }
                 learningLogUpdateResponse.setComplete(this.learningLogService
                         .update(learningLog,learningLogUpdateViewModel.isPassed()));
                 message =  AppMessage.getMessageSuccess(AppMessage.CREATE,AppMessage.LEARNING_LOG);

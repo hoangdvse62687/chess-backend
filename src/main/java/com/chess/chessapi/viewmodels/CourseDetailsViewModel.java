@@ -1,7 +1,5 @@
 package com.chess.chessapi.viewmodels;
 
-import com.chess.chessapi.entities.Exercise;
-
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -10,8 +8,7 @@ public class CourseDetailsViewModel {
     private String name;
     private String description;
     private Timestamp createdDate;
-    private Float point;
-    private Float requiredPoint;
+    private int requiredElo;
     private Long statusId;
     private String image;
     private UserDetailViewModel author;
@@ -54,14 +51,6 @@ public class CourseDetailsViewModel {
 
     public void setCreatedDate(Timestamp createdDate) {
         this.createdDate = createdDate;
-    }
-
-    public Float getPoint() {
-        return point;
-    }
-
-    public void setPoint(Float point) {
-        this.point = point;
     }
 
     public Long getStatusId() {
@@ -152,11 +141,11 @@ public class CourseDetailsViewModel {
         this.listLogExerciseIds = listLogExerciseIds;
     }
 
-    public Float getRequiredPoint() {
-        return requiredPoint;
+    public int getRequiredElo() {
+        return requiredElo;
     }
 
-    public void setRequiredPoint(Float requiredPoint) {
-        this.requiredPoint = requiredPoint;
+    public void setRequiredElo(int requiredElo) {
+        this.requiredElo = requiredElo;
     }
 }

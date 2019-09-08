@@ -25,7 +25,7 @@ public class PointLogService {
     private EntityManager em;
 
     //PUBLIC METHOD DEFINED
-    public PointLog create(String content,Float point,long userId){
+    public PointLog create(String content,Integer point,long userId){
         PointLog pointLog = new PointLog();
         User user = new User();
         user.setUserId(userId);

@@ -1,10 +1,10 @@
 package com.chess.chessapi.viewmodels;
 
-import com.chess.chessapi.entities.UninteractiveLesson;
+import com.chess.chessapi.models.UninteractiveLesson;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
 
 public class UninteractiveLessonCreateViewModel {
     @NotNull(message = "Name must not be null")
@@ -15,7 +15,8 @@ public class UninteractiveLessonCreateViewModel {
     private String description;
 
     @NotNull(message = "Uninteractive Lesson must not be null")
-    private String content;
+    @Valid
+    private UninteractiveLesson uninteractiveLesson;
 
     private long courseId;
 
@@ -35,12 +36,12 @@ public class UninteractiveLessonCreateViewModel {
         this.courseId = courseId;
     }
 
-    public String getContent() {
-        return content;
+    public UninteractiveLesson getUninteractiveLesson() {
+        return uninteractiveLesson;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setUninteractiveLesson(UninteractiveLesson uninteractiveLesson) {
+        this.uninteractiveLesson = uninteractiveLesson;
     }
 
     public String getDescription() {

@@ -7,11 +7,10 @@ import com.chess.chessapi.entities.GameHistory;
 import com.chess.chessapi.exceptions.AccessDeniedException;
 import com.chess.chessapi.exceptions.BadRequestException;
 import com.chess.chessapi.exceptions.ResourceNotFoundException;
-import com.chess.chessapi.models.CreateResponse;
-import com.chess.chessapi.models.JsonResult;
-import com.chess.chessapi.models.PagedList;
+import com.chess.chessapi.models.*;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.services.GameHistoryService;
+import com.chess.chessapi.services.RedisChessGameService;
 import com.chess.chessapi.services.UserService;
 import com.chess.chessapi.viewmodels.GameHistoryCreateViewModel;
 import com.chess.chessapi.viewmodels.GameHistoryUpdateViewModel;
@@ -38,13 +37,18 @@ public class GameHistoryController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private RedisChessGameService redisChessGameService;
+
+    private final String LEARNER_IN_GAME_DONT_HAVE_PERMISSION_CREATE = "Bạn đang trong trận đấu vui lòng hoàn tất trước khi tiếp tục ván đấu khác";
+
     @ApiOperation(value = "Create game history")
     @PostMapping("/game-history")
     @PreAuthorize("hasAnyAuthority("+ AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
     public @ResponseBody JsonResult createGameHistory(@RequestBody @Valid GameHistoryCreateViewModel gameHistoryCreateViewModel, BindingResult bindingResult){
         String message = "";
         boolean isSuccess = true;
-        long savedId = 0;
+        GameHistoryCreateResponse gameHistoryCreateResponse = new GameHistoryCreateResponse();
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
@@ -52,11 +56,10 @@ public class GameHistoryController {
         }else{
             try{
                 UserPrincipal userPrincipal = this.userService.getCurrentUser();
-                if(!this.gameHistoryService.checkPointBet(userPrincipal.getId(),GameHistoryStatus.BET
-                        ,gameHistoryCreateViewModel.getPoint())){
-                    throw new AccessDeniedException(AppMessage.POINT_DENY_MESSAGE);
+                if(this.gameHistoryService.isLearnerInGame(userPrincipal.getId())){
+                    throw new AccessDeniedException(LEARNER_IN_GAME_DONT_HAVE_PERMISSION_CREATE);
                 }
-                savedId = this.gameHistoryService.create(gameHistoryCreateViewModel,userPrincipal.getId());
+                gameHistoryCreateResponse = this.gameHistoryService.create(gameHistoryCreateViewModel,userPrincipal.getId());
                 message = AppMessage.getMessageSuccess(AppMessage.CREATE,AppMessage.GAME_HISTORY);
             }catch (DataIntegrityViolationException ex){
                 message = AppMessage.getMessageFail(AppMessage.CREATE,AppMessage.GAME_HISTORY);
@@ -64,40 +67,8 @@ public class GameHistoryController {
                 Logger.getLogger(GameHistoryController.class.getName()).log(Level.SEVERE,null,ex);
             }
         }
-        CreateResponse createResponse = new CreateResponse();
-        createResponse.setSuccess(isSuccess);
-        createResponse.setSavedId(savedId);
-        return new JsonResult(message,createResponse);
-    }
-
-    @ApiOperation(value = "Update game history")
-    @PutMapping("/game-history")
-    @PreAuthorize("hasAnyAuthority("+ AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
-    public @ResponseBody JsonResult updateGameHistory(@RequestBody @Valid GameHistoryUpdateViewModel gameHistoryUpdateViewModel, BindingResult bindingResult){
-        String message = "";
-        boolean isSuccess = true;
-        if(bindingResult.hasErrors()){
-            FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
-            message = fieldError.getDefaultMessage();
-            throw new BadRequestException(message);
-        }else{
-            try{
-                GameHistory gameHistory = this.gameHistoryService.getById(gameHistoryUpdateViewModel.getGameHistoryId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Game History","id",gameHistoryUpdateViewModel.getGameHistoryId()));
-                UserPrincipal userPrincipal = this.userService.getCurrentUser();
-                if(!this.gameHistoryService.checkPointBet(userPrincipal.getId(),gameHistoryUpdateViewModel.getStatus()
-                        ,gameHistoryUpdateViewModel.getPoint())){
-                    throw new AccessDeniedException(AppMessage.POINT_DENY_MESSAGE);
-                }
-                gameHistoryService.update(gameHistory,gameHistoryUpdateViewModel,userPrincipal.getId());
-                message = AppMessage.getMessageSuccess(AppMessage.CREATE,AppMessage.GAME_HISTORY);
-            }catch (DataIntegrityViolationException ex){
-                message = AppMessage.getMessageFail(AppMessage.CREATE,AppMessage.GAME_HISTORY);
-                isSuccess = false;
-                Logger.getLogger(GameHistoryController.class.getName()).log(Level.SEVERE,null,ex);
-            }
-        }
-        return new JsonResult(message,isSuccess);
+        gameHistoryCreateResponse.setSuccess(isSuccess);
+        return new JsonResult(message,gameHistoryCreateResponse);
     }
 
     @ApiOperation(value = "Get current user game history paginations")
@@ -113,5 +84,22 @@ public class GameHistoryController {
             throw new ResourceNotFoundException("Page","number",page);
         }
         return new JsonResult(null,data);
+    }
+
+    @ApiOperation(value = "Get current user game history on redis")
+    @GetMapping("/current-user/redis-data")
+    @PreAuthorize("hasAnyAuthority("+ AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
+    public @ResponseBody JsonResult getDataOnRedis(){
+        UserPrincipal userPrincipal = this.userService.getCurrentUser();
+        ChessGame chessGame = null;
+        try {
+            GameHistory gameHistory = this.gameHistoryService.getLastestGameHistoryByUserId(userPrincipal.getId());
+            if(gameHistory != null){
+                chessGame = this.redisChessGameService.find(gameHistory.getGamehistoryId());
+            }
+        }catch (Exception ex){
+            Logger.getLogger(GameHistoryController.class.getName()).log(Level.SEVERE,null,ex);
+        }
+        return new JsonResult(null,chessGame);
     }
 }

@@ -36,7 +36,7 @@ public class PointLog {
     @NotNull(message = "Content is required not null")
     private String content;
 
-    private float point;
+    private int point;
 
     @Column(name = "created_date")
     @NotNull(message = "Created date is required not null")
@@ -63,11 +63,11 @@ public class PointLog {
         this.content = content;
     }
 
-    public float getPoint() {
+    public int getPoint() {
         return point;
     }
 
-    public void setPoint(float point) {
+    public void setPoint(int point) {
         this.point = point;
     }
 

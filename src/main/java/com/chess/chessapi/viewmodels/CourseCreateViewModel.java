@@ -2,6 +2,7 @@ package com.chess.chessapi.viewmodels;
 
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -17,11 +18,9 @@ public class CourseCreateViewModel {
     @Length(max = 1000,message = "Description is required not larger than 1000 characters")
     private String description;
 
-    @Min(value =0,message = "Point should equal or larger than 0")
-    private float point;
-
-    @Min(value =0,message = "Required Point should equal or larger than 0")
-    private float requiredPoint;
+    @Min(value =0,message = "Required Elo should equal or larger than 0")
+    @Max(value = 5,message = "Required Elo should less than 5")
+    private int requiredElo;
 
     @NotNull(message = "Image must not be null")
     @Length(max = 255,message = "Image must not be larger than 255 characters")
@@ -46,14 +45,6 @@ public class CourseCreateViewModel {
         this.description = description;
     }
 
-    public Float getPoint() {
-        return point;
-    }
-
-    public void setPoint(Float point) {
-        this.point = point;
-    }
-
     public String getImage() {
         return image;
     }
@@ -70,15 +61,11 @@ public class CourseCreateViewModel {
         this.listCategoryIds = listCategoryIds;
     }
 
-    public void setPoint(float point) {
-        this.point = point;
+    public int getRequiredElo() {
+        return requiredElo;
     }
 
-    public float getRequiredPoint() {
-        return requiredPoint;
-    }
-
-    public void setRequiredPoint(float requiredPoint) {
-        this.requiredPoint = requiredPoint;
+    public void setRequiredElo(int requiredElo) {
+        this.requiredElo = requiredElo;
     }
 }

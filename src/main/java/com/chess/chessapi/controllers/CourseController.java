@@ -2,6 +2,7 @@ package com.chess.chessapi.controllers;
 
 import com.chess.chessapi.constants.AppMessage;
 import com.chess.chessapi.constants.AppRole;
+import com.chess.chessapi.constants.EloRatingLevel;
 import com.chess.chessapi.constants.Status;
 import com.chess.chessapi.entities.*;
 import com.chess.chessapi.exceptions.AccessDeniedException;
@@ -119,8 +120,6 @@ public class CourseController {
     public @ResponseBody JsonResult changeStatusToDrafting(@Valid @RequestBody CourseRemoveViewModel courseRemoveViewModel
             , BindingResult bindingResult){
 
-        boolean hasPermissionModify = this.courseService.checkPermissionUpdateStatusCourse(courseRemoveViewModel.getCourseId());
-
         String message = "";
         Boolean isSuccess = true;
         if(bindingResult.hasErrors()){
@@ -129,6 +128,8 @@ public class CourseController {
             throw new BadRequestException(message);
         }else {
             try{
+                boolean hasPermissionModify = this.courseService.checkPermissionUpdateStatusCourse(courseRemoveViewModel.getCourseId());
+
                 if(hasPermissionModify){
                     if(this.courseService.isExist(courseRemoveViewModel.getCourseId())){
                         this.courseService.updateStatus(courseRemoveViewModel.getCourseId(),Status.COURSE_STATUS_DRAFTED);
@@ -206,8 +207,6 @@ public class CourseController {
     @PutMapping("/courses")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
     public @ResponseBody JsonResult updateCourse(@Valid @RequestBody Course course, BindingResult bindingResult){
-        boolean hasPermissionModify = this.courseService.checkPermissionModifyCourse(course.getCourseId());
-
         String message = "";
         boolean isSuccess = true;
         if(bindingResult.hasErrors()){
@@ -216,6 +215,7 @@ public class CourseController {
             throw new BadRequestException(message);
         }else{
             try{
+                boolean hasPermissionModify = this.courseService.checkPermissionModifyCourse(course.getCourseId());
                 if(hasPermissionModify){
                     this.courseService.updateCourse(course);
                     message =  AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.COURSE);
@@ -293,8 +293,8 @@ public class CourseController {
             Course course = this.courseService.getCourseById(enrollCourseViewModel.getCourseId())
                     .orElseThrow(() -> new ResourceNotFoundException("Course","id",enrollCourseViewModel.getCourseId()));
             UserPrincipal userPrincipal = this.userService.getCurrentUser();
-            float calculatePointUpdate = this.userService.getPointByUserId(userPrincipal.getId());
-            if(calculatePointUpdate < course.getRequiredPoint()){
+            int userElo = this.userService.getELOByUserId(userPrincipal.getId());
+            if(userElo < EloRatingLevel.getEloById(course.getRequiredElo())){
                 throw new AccessDeniedException(AppMessage.POINT_DENY_MESSAGE);
             }
             boolean isEnrolled = this.userHasCourseService.isEnrolled(course.getCourseId(),userPrincipal.getId());
@@ -317,7 +317,7 @@ public class CourseController {
 
     @ApiOperation(value = "get course paginations by category id")
     @GetMapping("/courses/category-id")
-    public @ResponseBody JsonResult getCoursePaginationByCourseId(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
+    public @ResponseBody JsonResult getCoursePaginationByCategoryId(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
             ,@RequestParam("categoryId") long categoryId,String statusId,String nameCourse,String sortBy,String sortDirection){
 
         if(nameCourse == null){
@@ -340,6 +340,39 @@ public class CourseController {
                 userId = userPrincipal.getId();
             }
             data = courseService.getCoursePaginationsByCategoryId(nameCourse,statusId,page,pageSize,categoryId,userId,sortBy,sortDirection);
+        }catch (IllegalArgumentException ex){
+            Logger.getLogger(CourseController.class.getName()).log(Level.SEVERE,null,ex);
+            throw new ResourceNotFoundException("Page","number",page);
+        }
+
+        return new JsonResult(null,data);
+    }
+
+    @ApiOperation(value = "get course paginations by elo id")
+    @GetMapping("/courses/elo-id")
+    public @ResponseBody JsonResult getCoursePaginationByEloId(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
+            ,@RequestParam("eloId") int eloId,String statusId,String nameCourse,String sortBy,String sortDirection){
+
+        if(nameCourse == null){
+            nameCourse = "";
+        }
+        if(sortDirection == null){
+            sortDirection = "";
+        }
+        if(sortBy == null){
+            sortBy = "";
+        }
+        if(statusId == null){
+            statusId = "";
+        }
+        PagedList<CoursePaginationViewModel> data = null;
+        try{
+            UserPrincipal userPrincipal = this.userService.getCurrentUser();
+            long userId = 0;
+            if(userPrincipal != null){
+                userId = userPrincipal.getId();
+            }
+            data = courseService.getCoursePaginationsByEloId(nameCourse,statusId,page,pageSize,eloId,userId,sortBy,sortDirection);
         }catch (IllegalArgumentException ex){
             Logger.getLogger(CourseController.class.getName()).log(Level.SEVERE,null,ex);
             throw new ResourceNotFoundException("Page","number",page);
@@ -401,15 +434,16 @@ public class CourseController {
         String message = "";
         boolean isSuccess = true;
 
-        if(!this.reviewService.isExist(reviewUpdateViewModel.getReviewId())){
-            throw new ResourceNotFoundException("Review","id",reviewUpdateViewModel.getReviewId());
-        }
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
             throw new BadRequestException(message);
         }else{
             try{
+                if(!this.reviewService.isExist(reviewUpdateViewModel.getReviewId())){
+                    throw new ResourceNotFoundException("Review","id",reviewUpdateViewModel.getReviewId());
+                }
+
                 UserPrincipal userPrincipal = this.userService.getCurrentUser();
                 if(!this.reviewService.checkPermissionModifyReview(reviewUpdateViewModel.getReviewId()
                         ,userPrincipal.getId(),reviewUpdateViewModel.getCourseId())){
@@ -433,15 +467,16 @@ public class CourseController {
         String message = "";
         boolean isSuccess = true;
 
-        if(!this.reviewService.isExist(reviewRemoveViewModel.getReviewId())){
-            throw new ResourceNotFoundException("Review","id",reviewRemoveViewModel.getReviewId());
-        }
         if(bindingResult.hasErrors()){
             FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
             message = fieldError.getDefaultMessage();
             throw new BadRequestException(message);
         }else{
             try{
+                if(!this.reviewService.isExist(reviewRemoveViewModel.getReviewId())){
+                    throw new ResourceNotFoundException("Review","id",reviewRemoveViewModel.getReviewId());
+                }
+
                 UserPrincipal userPrincipal = this.userService.getCurrentUser();
                 if(!this.reviewService.checkPermissionModifyReview(reviewRemoveViewModel.getReviewId()
                         ,userPrincipal.getId(),reviewRemoveViewModel.getCourseId())){

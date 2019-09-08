@@ -17,8 +17,8 @@ public interface LessonRepository extends JpaRepository<Lesson,Long> {
     @Query(value = "Select If(count(l.owner) > 0,l.owner,0) From lesson l where l.id = ?1",nativeQuery = true)
     Long findLessonAuthorByLessonId(long lessonId);
 
-    @Query(value = "Update lesson l Set l.name = ?2,l.description = ?3,l.modified_date = ?4 where id = ?1",nativeQuery = true)
+    @Query(value = "Update lesson l Set l.name = ?2,l.content = ?3,l.description = ?4,l.modified_date = ?5 where id = ?1",nativeQuery = true)
     @Modifying
     @Transactional
-    void update(long lessonId, String name, String description, Timestamp modifiedDate);
+    void update(long lessonId, String name,String content, String description, Timestamp modifiedDate);
 }
