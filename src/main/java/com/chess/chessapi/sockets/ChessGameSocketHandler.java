@@ -102,21 +102,28 @@ public class ChessGameSocketHandler implements WebSocketHandler {
                 //setup next trigger end chess game
                 Timestamp taskTimeTrigger = TimeUtils.getCurrentTime();
                 long estimateTimeTrigger = 0;
+                int statusIfEnd = GameHistoryStatus.BET;
                 if(chessGame.getNextTurnPlayer() == TURN_PLAYER_1){
                     chessGame.getPlayer1().setSecondCountDown(chessGame.getPlayer1().getSecondCountDown()
                             - TimeUtils.getDurationSecond(chessGame.getLastAccessed(),TimeUtils.getCurrentTime()));
                     estimateTimeTrigger = chessGame.getPlayer1().getSecondCountDown();
+                    statusIfEnd = GameHistoryStatus.LOSE;
                 }else{
                     chessGame.getPlayer2().setSecondCountDown(chessGame.getPlayer2().getSecondCountDown()
                             - TimeUtils.getDurationSecond(chessGame.getLastAccessed(),TimeUtils.getCurrentTime()));
                     estimateTimeTrigger = chessGame.getPlayer2().getSecondCountDown();
+                    statusIfEnd = GameHistoryStatus.WIN;
                 }
-                chessGame.setLastAccessed(TimeUtils.getCurrentTime());
-                taskTimeTrigger.setTime(chessGame.getLastAccessed().getTime()
-                        + TimeUnit.SECONDS.toMillis(estimateTimeTrigger));
-                this.cronJobSchedulerService.createJobTask(TimeUtils.toCron(taskTimeTrigger)
-                        ,chessGame.getGameHistoryId().toString(), ChessGameJobListener.LISTENER_NAME);
-                this.redisChessGameService.update(chessGame);
+                if(estimateTimeTrigger <= 0){
+                    updateEloPlayer(chessGame,statusIfEnd);
+                }else{
+                    chessGame.setLastAccessed(TimeUtils.getCurrentTime());
+                    taskTimeTrigger.setTime(chessGame.getLastAccessed().getTime()
+                            + TimeUnit.SECONDS.toMillis(estimateTimeTrigger));
+                    this.cronJobSchedulerService.createJobTask(TimeUtils.toCron(taskTimeTrigger)
+                            ,chessGame.getGameHistoryId().toString(), ChessGameJobListener.LISTENER_NAME);
+                    this.redisChessGameService.update(chessGame);
+                }
             }
         }catch (Exception ex){
             ex.printStackTrace();
@@ -184,18 +191,22 @@ public class ChessGameSocketHandler implements WebSocketHandler {
         }
         // status is result player 1 win , lose or drawn with player 2
         if(isEnd){
-            GameHistory gameHistory = this.gameHistoryService.getById(chessGame.getGameHistoryId()).get();
-            gameHistory.setStatus(chessGameMove.getStatus());
-            float userElo = this.userService.getELOByUserId(gameHistory.getUser().getUserId());
-            gameHistory.setPoint(this.gameHistoryService.getUserEloPointByStatus(userElo,gameHistory.getLevel()
-                    ,gameHistory.getStatus(),gameHistory.getUser().getUserId()));
-            this.gameHistoryService.update(gameHistory,gameHistory.getUser().getUserId());
-            this.redisChessGameService.deleteById(gameHistory.getGamehistoryId());
-            return new JsonResult(this.gameHistoryService.getContentPointLog
-                    (gameHistory.getStatus(),gameHistory.getPoint(),gameHistory.getLevel()),null);
+            return updateEloPlayer(chessGame,chessGameMove.getStatus());
         }else{
             this.redisChessGameService.update(chessGame);
         }
         return null;
+    }
+
+    private JsonResult updateEloPlayer(ChessGame chessGame,int status){
+        GameHistory gameHistory = this.gameHistoryService.getById(chessGame.getGameHistoryId()).get();
+        gameHistory.setStatus(status);
+        float userElo = this.userService.getELOByUserId(gameHistory.getUser().getUserId());
+        gameHistory.setPoint(this.gameHistoryService.getUserEloPointByStatus(userElo,gameHistory.getLevel()
+                ,gameHistory.getStatus(),gameHistory.getUser().getUserId()));
+        this.gameHistoryService.update(gameHistory,gameHistory.getUser().getUserId());
+        this.redisChessGameService.deleteById(gameHistory.getGamehistoryId());
+        return new JsonResult(this.gameHistoryService.getContentPointLog
+                (gameHistory.getStatus(),gameHistory.getPoint(),gameHistory.getLevel()),null);
     }
 }
