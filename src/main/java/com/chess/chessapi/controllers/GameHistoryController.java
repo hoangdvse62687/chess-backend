@@ -72,7 +72,7 @@ public class GameHistoryController {
     }
 
     @ApiOperation(value = "Get current user game history paginations")
-    @GetMapping("/current-user")
+    @GetMapping("/game-history/current-user")
     @PreAuthorize("hasAnyAuthority("+ AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
     public @ResponseBody JsonResult getGameHistory(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize){
         UserPrincipal userPrincipal = this.userService.getCurrentUser();
@@ -87,7 +87,7 @@ public class GameHistoryController {
     }
 
     @ApiOperation(value = "Get current user game history on redis")
-    @GetMapping("/current-user/redis-data")
+    @GetMapping("/game-history/current-user/redis-data")
     @PreAuthorize("hasAnyAuthority("+ AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
     public @ResponseBody JsonResult getDataOnRedis(){
         UserPrincipal userPrincipal = this.userService.getCurrentUser();
