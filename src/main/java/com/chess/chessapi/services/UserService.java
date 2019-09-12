@@ -218,7 +218,9 @@ public class UserService {
     public boolean isExist(long userId){
         return this.userRepository.existsById(userId);
     }
-
+    public List<Long> getListLearnerByRangeElo(int minElo,int maxElo){
+        return this.userRepository.findListUserIdsByRangeElo(minElo,maxElo,AppRole.ROLE_LEARNER);
+    }
     // private method
     private void setUserRoleAuthentication(User user){
         List<GrantedAuthority> authorities = Collections.

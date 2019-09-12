@@ -2,6 +2,7 @@ package com.chess.chessapi.sockets;
 
 import com.chess.chessapi.constants.GameHistoryStatus;
 import com.chess.chessapi.entities.GameHistory;
+import com.chess.chessapi.jobs.ChessGameJobListener;
 import com.chess.chessapi.models.*;
 import com.chess.chessapi.services.CronJobSchedulerService;
 import com.chess.chessapi.services.GameHistoryService;
@@ -53,7 +54,7 @@ public class ChessGameSocketHandler implements WebSocketHandler {
                     this.redisChessGameService.save(this.initChessGame(gameHistory));
                 }else{
                     //delete auto handle trigger game and using websocket handle instead
-                    this.cronJobSchedulerService.deleteJobTask(Long.toString(gameHistory.getGamehistoryId()),ChessGameJobListener.LISTENER_NAME);
+                    this.cronJobSchedulerService.deleteJobTask(Long.toString(gameHistory.getGamehistoryId()), ChessGameJobListener.LISTENER_NAME);
                     chessGameInitResponse.setChessGame(chessGame);
                     isReconnect = true;
                 }

@@ -1,4 +1,4 @@
-package com.chess.chessapi.models;
+package com.chess.chessapi.jobs;
 
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;

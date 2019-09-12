@@ -5,6 +5,7 @@ import com.chess.chessapi.constants.AppRole;
 import com.chess.chessapi.constants.EloRatingLevel;
 import com.chess.chessapi.constants.Status;
 import com.chess.chessapi.entities.*;
+import com.chess.chessapi.exceptions.NotAcceptedDeniedException;
 import com.chess.chessapi.exceptions.AccessDeniedException;
 import com.chess.chessapi.exceptions.BadRequestException;
 import com.chess.chessapi.exceptions.ResourceNotFoundException;
@@ -194,12 +195,14 @@ public class CourseController {
         //check permission to get lesson and learning log
         UserPrincipal userPrincipal = this.userService.getCurrentUser();
         boolean isEnrolled = this.courseService.checkPermissionViewCourseDetail(courseId,userPrincipal);
-
+        boolean isCommented = false;
         if(isEnrolled){
             course.setListLearningLogLessonIds(this.learningLogService.getAllByCourseId(course.getCourseId(),userPrincipal.getId()));
+            isCommented = this.reviewService.checkIsComment(userPrincipal.getId(),courseId);
         }
         CourseDetailsViewModel courseDetailsViewModel = ManualCastUtils.castCourseToCourseDetailsViewModel(course,course.getLessonViewModels().size());
         courseDetailsViewModel.setEnrolled(isEnrolled);
+        courseDetailsViewModel.setCommented(isCommented);
         return new JsonResult("", courseDetailsViewModel);
     }
 
@@ -409,6 +412,9 @@ public class CourseController {
             try{
                 UserPrincipal userPrincipal = this.userService.getCurrentUser();
                 User user = this.userService.getUserById(userPrincipal.getId()).get();
+                if(this.reviewService.checkIsComment(user.getUserId(),reviewCreateViewModel.getCourseId())){
+                    throw new NotAcceptedDeniedException(AppMessage.NOT_ACCEPTED_MESSAGE);
+                }
                 if(!this.courseService.checkPermissionReviewCourse(reviewCreateViewModel.getCourseId(),userPrincipal)){
                     throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
                 }
@@ -461,34 +467,27 @@ public class CourseController {
     }
 
     @ApiOperation(value = "remove review on course")
-    @DeleteMapping("/courses/review")
+    @DeleteMapping("/courses/review/{review-id}")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
-    public @ResponseBody JsonResult removeReview(@RequestBody @Valid ReviewRemoveViewModel reviewRemoveViewModel,BindingResult bindingResult){
+    public @ResponseBody JsonResult removeReview(@PathVariable("review-id") long reviewId){
         String message = "";
         boolean isSuccess = true;
 
-        if(bindingResult.hasErrors()){
-            FieldError fieldError = (FieldError)bindingResult.getAllErrors().get(0);
-            message = fieldError.getDefaultMessage();
-            throw new BadRequestException(message);
-        }else{
-            try{
-                if(!this.reviewService.isExist(reviewRemoveViewModel.getReviewId())){
-                    throw new ResourceNotFoundException("Review","id",reviewRemoveViewModel.getReviewId());
-                }
+        try{
+            Review review = this.reviewService.getById(reviewId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Review","id",reviewId));
 
-                UserPrincipal userPrincipal = this.userService.getCurrentUser();
-                if(!this.reviewService.checkPermissionModifyReview(reviewRemoveViewModel.getReviewId()
-                        ,userPrincipal.getId(),reviewRemoveViewModel.getCourseId())){
-                    throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
-                }
-                this.reviewService.remove(reviewRemoveViewModel.getReviewId());
-                message =  AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.REVIEW);
-            }catch (DataIntegrityViolationException ex){
-                message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.REVIEW);
-                isSuccess = false;
-                Logger.getLogger(CourseController.class.getName()).log(Level.SEVERE,null,ex);
+            UserPrincipal userPrincipal = this.userService.getCurrentUser();
+            if(!this.reviewService.checkPermissionModifyReview(review.getReviewId()
+                    ,userPrincipal.getId(),review.getCourse().getCourseId())){
+                throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
             }
+            this.reviewService.remove(reviewId);
+            message =  AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.REVIEW);
+        }catch (DataIntegrityViolationException ex){
+            message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.REVIEW);
+            isSuccess = false;
+            Logger.getLogger(CourseController.class.getName()).log(Level.SEVERE,null,ex);
         }
         return new JsonResult(message,isSuccess);
     }
@@ -512,6 +511,22 @@ public class CourseController {
         PagedList<CoursePaginationViewModel> data = null;
         try{
             data = this.courseService.getCoursePaginationsByUserId(nameCourse,page,pageSize,userId,sortBy,sortDirection,statusId);
+        }catch (IllegalArgumentException ex){
+            Logger.getLogger(CourseController.class.getName()).log(Level.SEVERE,null,ex);
+            throw new ResourceNotFoundException("Page","number",page);
+        }
+
+        return new JsonResult(null,data);
+    }
+
+    @ApiOperation(value = "Get course by user id")
+    @GetMapping("/courses/suggestion")
+    @PreAuthorize("hasAuthority("+AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
+    public @ResponseBody JsonResult getCourseSuggestionPaginations(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize){
+        PagedList<CoursePaginationViewModel> data = null;
+        try{
+            UserPrincipal userPrincipal = this.userService.getCurrentUser();
+            data = this.courseService.getCourseSuggestion(page,pageSize,userPrincipal.getId());
         }catch (IllegalArgumentException ex){
             Logger.getLogger(CourseController.class.getName()).log(Level.SEVERE,null,ex);
             throw new ResourceNotFoundException("Page","number",page);

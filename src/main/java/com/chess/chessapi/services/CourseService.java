@@ -2,6 +2,8 @@ package com.chess.chessapi.services;
 
 import com.chess.chessapi.constants.*;
 import com.chess.chessapi.entities.*;
+import com.chess.chessapi.models.CourseSuggestionRedis;
+import com.chess.chessapi.models.CourseUserFilterData;
 import com.chess.chessapi.models.Mail;
 import com.chess.chessapi.models.PagedList;
 import com.chess.chessapi.repositories.CourseRepository;
@@ -53,7 +55,7 @@ public class CourseService {
     private CategoryService categoryService;
 
     @Autowired
-    private PointLogService pointLogService;
+    private RedisCourseSuggestionService redisCourseSuggestionService;
 
     //Public method
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
@@ -285,6 +287,50 @@ public class CourseService {
         return ManualCastUtils.castObjectsToCourseForNotificationViewModel
                 (this.courseRepository.findCourseDetailForNotificationByCourseId(listCourseIds));
     }
+
+    public List<Long> getListCoursePulishedIdsByEloId(int eloId){
+        return this.courseRepository.findListCourseIdsByEloId(eloId,Status.COURSE_STATUS_PUBLISHED);
+    }
+
+    public PagedList<CoursePaginationViewModel> getCourseSuggestion(int pageIndex,int pageSize,long userId){
+        int userEloId = EloRatingLevel.getIdByEloRange(this.userService.getELOByUserId(userId));
+        CourseSuggestionRedis data = this.redisCourseSuggestionService.find(userId);
+        List<CourseUserFilterData> suggestions = new ArrayList<>();
+        if(data != null){
+            suggestions = data.getCourseUserFilterData();
+        }
+        int isListNull = 1;
+        String listCourseIdArr = "";
+        if(suggestions != null && !suggestions.isEmpty()){
+            isListNull = 0;
+            for (CourseUserFilterData item:
+                    suggestions) {
+                listCourseIdArr += item.getCourseId() + ",";
+            }
+            if(listCourseIdArr.length() > 0){
+                listCourseIdArr.substring(0,listCourseIdArr.length()-1);
+            }
+        }
+
+        StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getCourseSuggestionPaginations");
+        query.setParameter("listCourseIdStr",listCourseIdArr);
+        query.setParameter("userId",userId);
+        query.setParameter("userEloId",userEloId);
+        query.setParameter("isListNull",isListNull);
+        query.setParameter("totalElements",Long.parseLong("0"));
+        query.setParameter("statusId",Status.COURSE_STATUS_PUBLISHED);
+        query.setParameter("pageIndex",(pageIndex - 1) * pageSize);
+        query.setParameter("pageSize",pageSize);
+
+        query.execute();
+        List<Object[]> rawData = query.getResultList();
+        final long totalElements = Long.parseLong(query.getOutputParameterValue("totalElements").toString());
+        PagedList<CoursePaginationViewModel> paginations = this.fillDataToPaginationCustom(rawData,totalElements,pageSize);
+        if(isListNull != 1){
+            this.sortCourseSuggestionByArray(paginations,suggestions);
+        }
+        return paginations;
+    }
     //End Pulbic method
 
     //Private method
@@ -304,6 +350,16 @@ public class CourseService {
 
         return Boolean.parseBoolean(storedProcedureQuery.getOutputParameterValue("isEnrolled").toString());
     }
-
+    private void sortCourseSuggestionByArray(PagedList<CoursePaginationViewModel> data,List<CourseUserFilterData> suggestions){
+        List<CoursePaginationViewModel> sortedData = new ArrayList<>();
+        suggestions.forEach((suggestion) -> {
+            data.getContent().forEach((item) -> {
+                if(item.getCourseId() == suggestion.getCourseId()){
+                    sortedData.add(item);
+                }
+            });
+        });
+        data.setContent(sortedData);
+    }
     //Public method
 }

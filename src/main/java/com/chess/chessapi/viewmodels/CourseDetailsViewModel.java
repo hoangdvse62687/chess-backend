@@ -20,6 +20,7 @@ public class CourseDetailsViewModel {
     private int totalLesson;
     private boolean isEnrolled;
     private List<Long> listLogExerciseIds;
+    private boolean isCommented;
 
     public long getCourseId() {
         return courseId;
@@ -147,5 +148,13 @@ public class CourseDetailsViewModel {
 
     public void setRequiredElo(int requiredElo) {
         this.requiredElo = requiredElo;
+    }
+
+    public boolean isCommented() {
+        return isCommented;
+    }
+
+    public void setCommented(boolean commented) {
+        isCommented = commented;
     }
 }

@@ -1,7 +1,8 @@
-package com.chess.chessapi.models;
+package com.chess.chessapi.jobs;
 
 import com.chess.chessapi.constants.GameHistoryStatus;
 import com.chess.chessapi.entities.GameHistory;
+import com.chess.chessapi.models.ChessGame;
 import com.chess.chessapi.services.GameHistoryService;
 import com.chess.chessapi.services.RedisChessGameService;
 import com.chess.chessapi.services.UserService;

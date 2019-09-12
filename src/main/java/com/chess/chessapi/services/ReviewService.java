@@ -23,6 +23,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.StoredProcedureQuery;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ReviewService {
@@ -102,6 +103,18 @@ public class ReviewService {
 
     public boolean isExist(long reviewId){
         return this.reviewRepository.existsById(reviewId);
+    }
+
+    public boolean checkIsComment(long userId,long courseId){
+        return this.reviewRepository.checkIsComment(userId,courseId);
+    }
+
+    public Integer getRatingByUserIdAndCourseId(long userId,long courseId){
+        return this.reviewRepository.findRatingByUserIdAndCourseId(userId,courseId);
+    }
+
+    public Optional<Review> getById(long reviewId){
+        return this.reviewRepository.findById(reviewId);
     }
     //END PUBLIC DEFINED
 

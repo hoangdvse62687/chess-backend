@@ -25,4 +25,10 @@ public interface ReviewRepository extends JpaRepository<Review,Long> {
     @Transactional
     @Query(value = "Delete From review Where id = ?1",nativeQuery = true)
     void remove(long reviewId);
+
+    @Query(value = "Select If(count(id) > 0,'true','false') From review where user_id = ?1 and course_id = ?2",nativeQuery = true)
+    Boolean checkIsComment(long userId,long courseId);
+
+    @Query(value = "Select If(count(id) > 0,rating,0) From review where user_id = ?1 and course_id = ?2",nativeQuery = true)
+    Integer findRatingByUserIdAndCourseId(long userId,long course);
 }

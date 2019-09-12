@@ -1,8 +1,8 @@
 package com.chess.chessapi.services;
 
 import com.chess.chessapi.factories.AutowiringSpringBeanJobFactory;
-import com.chess.chessapi.models.ChessGameJob;
-import com.chess.chessapi.models.ChessGameJobListener;
+import com.chess.chessapi.jobs.ChessGameJob;
+import com.chess.chessapi.jobs.ChessGameJobListener;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.KeyMatcher;

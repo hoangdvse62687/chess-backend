@@ -109,6 +109,20 @@ import java.util.List;
                 name = "getCourseStatusReport",
                 procedureName = "get_course_status_report"
         ),
+        @NamedStoredProcedureQuery(
+                name = "getCourseSuggestionPaginations",
+                procedureName = "get_course_suggestion_paginations",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "listCourseIdStr",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "userId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "userEloId",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "isListNull",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "statusId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageIndex",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageSize",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalElements",type = Long.class)
+                }
+        ),
 })
 public class Course {
     @Id
