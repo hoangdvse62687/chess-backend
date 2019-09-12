@@ -54,6 +54,9 @@ public class CourseController {
     @Autowired
     private UserHasCourseService userHasCourseService;
 
+    @Autowired
+    private SuggestionAlgorithmService suggestionAlgorithmService;
+
     @ApiOperation(value = "Create course")
     @PostMapping("/courses")
     @PreAuthorize("hasAnyAuthority("+ AppRole.ROLE_INSTRUCTOR_AUTHENTICATIION+")")
@@ -297,13 +300,14 @@ public class CourseController {
                     .orElseThrow(() -> new ResourceNotFoundException("Course","id",enrollCourseViewModel.getCourseId()));
             UserPrincipal userPrincipal = this.userService.getCurrentUser();
             int userElo = this.userService.getELOByUserId(userPrincipal.getId());
-            if(userElo < EloRatingLevel.getEloById(course.getRequiredElo())){
-                throw new AccessDeniedException(AppMessage.POINT_DENY_MESSAGE);
+            if(EloRatingLevel.getIdByEloRange(userElo) < course.getRequiredElo()){
+                throw new AccessDeniedException(AppMessage.ELO_DENY_MESSAGE);
             }
             boolean isEnrolled = this.userHasCourseService.isEnrolled(course.getCourseId(),userPrincipal.getId());
             if(course.getStatusId() == Status.COURSE_STATUS_PUBLISHED && !isEnrolled){
                 try {
                     this.courseService.enrollCourse(userPrincipal.getId(),course);
+                    this.suggestionAlgorithmService.executeItemFilterSuggestionAlgorithm(course,userElo);
                     message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.ENROLL);
                 }catch (DataIntegrityViolationException ex){
                     message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.ENROLL);

@@ -14,7 +14,7 @@ public class CourseSuggestionJob implements Job {
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         if(this.suggestionAlgorithmService != null){
-            this.suggestionAlgorithmService.executeSuggestionAlgorithm();
+            this.suggestionAlgorithmService.executeUserFilterSuggestionAlgorithm();
         }
     }
 }

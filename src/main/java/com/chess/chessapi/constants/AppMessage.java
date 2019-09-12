@@ -34,7 +34,7 @@ public class AppMessage implements Serializable {
 
     //PERMISSION DEFINE
     public static final String PERMISSION_DENY_MESSAGE = "you don't have permission to do this action";
-    public static final String POINT_DENY_MESSAGE = "your point currently don't have enough to do this action";
+    public static final String ELO_DENY_MESSAGE = "your elo currently don't have enough to do this action";
     public static final String NOT_ACCEPTED_MESSAGE = "Bạn đã comment khóa học này";
     //END PERMISION DEFINE
 

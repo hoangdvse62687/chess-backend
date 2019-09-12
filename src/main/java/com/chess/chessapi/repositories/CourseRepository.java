@@ -38,4 +38,7 @@ public interface CourseRepository extends JpaRepository<Course,Long> {
 
     @Query(value = "Select id From course where required_elo = ?1 and status_id = ?2",nativeQuery = true)
     List<Long> findListCourseIdsByEloId(int eloId,long statusId);
+
+    @Query(value = "Select count(id) From course where required_elo = ?1",nativeQuery = true)
+    Integer countByEloId(int eloId);
 }

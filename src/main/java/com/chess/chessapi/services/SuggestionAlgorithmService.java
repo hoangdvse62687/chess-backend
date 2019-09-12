@@ -1,7 +1,11 @@
 package com.chess.chessapi.services;
 
 import com.chess.chessapi.constants.EloRatingLevel;
+import com.chess.chessapi.entities.Course;
 import com.chess.chessapi.models.*;
+import com.chess.chessapi.security.UserPrincipal;
+import com.chess.chessapi.viewmodels.CategoryViewModel;
+import com.chess.chessapi.viewmodels.CoursePaginationViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +27,50 @@ public class SuggestionAlgorithmService {
     @Autowired
     private RedisCourseSuggestionService redisCourseSuggestionService;
 
-    public void executeSuggestionAlgorithm(){
+    private final int QUANTITY_USED_USER_FILTER = 5;
+
+    public void executeItemFilterSuggestionAlgorithm(Course enrollCourse,int userElo){
+        int userEloId = EloRatingLevel.getIdByEloRange(userElo);
+        UserPrincipal userPrincipal = this.userService.getCurrentUser();
+        if(enrollCourse.getRequiredElo() == userEloId){
+            //get all course in elo id
+            List<CoursePaginationViewModel> courses = courseService.getCoursePaginationsByEloId("","",1,this.courseService.countByEloId(userEloId)
+                    ,userEloId,userPrincipal.getId(),"","").getContent();
+            if(courses != null){
+                //finding index of course enrolling
+                int index = 0;
+                for (int i = 0; i < courses.size();i++) {
+                    if(courses.get(i).getCourseId() == enrollCourse.getCourseId()){
+                        index = i;
+                        break;
+                    }
+                }
+
+                CoursePaginationViewModel currentEnrolLingCourse = courses.get(index);
+                int counterComment = 0;
+                List<CourseUserFilterData> results = new ArrayList<>();
+                for(int i = 0; i < courses.size();i++){
+                    if(i != index){
+                        ItemFilterSuggestion B = new ItemFilterSuggestion();
+                        B.setRating(courses.get(i).getRating());
+                        B.setSameAuthor(courses.get(i).getAuthor().getUserId()
+                                == currentEnrolLingCourse.getAuthor().getUserId() ? 1 : 0);
+                        B.setSameCategories(this.checkCategory(currentEnrolLingCourse.getListCategorys()
+                                ,courses.get(i).getListCategorys()));
+                        if(this.reviewService.checkIsComment(userPrincipal.getId(),courses.get(i).getCourseId())){
+                            counterComment++;
+                        }
+                        double result = this.itemFiltering(currentEnrolLingCourse.getRating(),B);
+                        results.add(new CourseUserFilterData(courses.get(i).getCourseId(),result));
+                    }
+                }
+                this.saveItemFilterSuggestionOnRedis(userPrincipal.getId(),results,counterComment);
+            }
+
+        }
+    }
+
+    public void executeUserFilterSuggestionAlgorithm(){
         SuggestionAlgorithmData suggestionAlgorithmData = new SuggestionAlgorithmData();
         //init data for start algorithm
         suggestionAlgorithmData.setAllUserBeginner(this.getListUserIdByRangeElo(0,EloRatingLevel.BEGINNER_ELO));
@@ -57,20 +104,71 @@ public class SuggestionAlgorithmService {
         this.executeUserBasedFiltering(suggestionAlgorithmData.getAllUserMajor(),suggestionAlgorithmData.getAllCourseMajor());
         this.executeUserBasedFiltering(suggestionAlgorithmData.getAllUserMaster(),suggestionAlgorithmData.getAllCourseMaster());
 
-        this.saveOnRedis(suggestionAlgorithmData.getAllUserBeginner());
-        this.saveOnRedis(suggestionAlgorithmData.getAllUserMinor());
-        this.saveOnRedis(suggestionAlgorithmData.getAllUserIntermediate());
-        this.saveOnRedis(suggestionAlgorithmData.getAllUserMajor());
-        this.saveOnRedis(suggestionAlgorithmData.getAllUserMaster());
+        this.saveUserFilterSuggestionOnRedis(suggestionAlgorithmData.getAllUserBeginner());
+        this.saveUserFilterSuggestionOnRedis(suggestionAlgorithmData.getAllUserMinor());
+        this.saveUserFilterSuggestionOnRedis(suggestionAlgorithmData.getAllUserIntermediate());
+        this.saveUserFilterSuggestionOnRedis(suggestionAlgorithmData.getAllUserMajor());
+        this.saveUserFilterSuggestionOnRedis(suggestionAlgorithmData.getAllUserMaster());
     }
 
-    private void saveOnRedis(List<UserSuggestionAlgorithm> suggestionAlgorithmData){
+    private double checkCategory(List<CategoryViewModel> A,List<CategoryViewModel> B){
+        if(A == null || B == null || A.isEmpty()){
+            return 0;
+        }
+
+        double counterSame = 0;
+        double counterA = A.size();
+        for (CategoryViewModel bCategory:
+             B) {
+            for (CategoryViewModel aCategory:
+                 A) {
+                if(aCategory.getCategoryId() == bCategory.getCategoryId()){
+                    counterSame++;
+                }
+            }
+        }
+
+        return counterSame / counterA;
+    }
+
+    private void saveItemFilterSuggestionOnRedis(Long userId,List<CourseUserFilterData> data, int counterComment){
+        CourseSuggestionRedis courseSuggestionRedis = new CourseSuggestionRedis();
+        Collections.sort(data);
+        courseSuggestionRedis.setCourseItemFilterData(data);
+
+        CourseSuggestionRedis dataOnRedis = this.redisCourseSuggestionService.find(userId);
+        if(dataOnRedis == null){
+            this.redisCourseSuggestionService.save(courseSuggestionRedis);
+        }else{
+            dataOnRedis.setCourseItemFilterData(courseSuggestionRedis.getCourseItemFilterData());
+            if(counterComment > QUANTITY_USED_USER_FILTER){
+                dataOnRedis.setUsedCourseItemFilterData(false);
+            }else{
+                dataOnRedis.setUsedCourseItemFilterData(true);
+            }
+            this.redisCourseSuggestionService.update(dataOnRedis);
+        }
+    }
+
+    private void saveUserFilterSuggestionOnRedis(List<UserSuggestionAlgorithm> suggestionAlgorithmData){
         suggestionAlgorithmData.forEach((user) -> {
             CourseSuggestionRedis courseSuggestionRedis = new CourseSuggestionRedis();
             courseSuggestionRedis.setUserId(user.getUserId());
             Collections.sort(user.getUserFilterScore());
             courseSuggestionRedis.setCourseUserFilterData(user.getUserFilterScore());
-            this.redisCourseSuggestionService.save(courseSuggestionRedis);
+
+            CourseSuggestionRedis dataOnRedis = this.redisCourseSuggestionService.find(user.getUserId());
+            if(dataOnRedis == null){
+                this.redisCourseSuggestionService.save(courseSuggestionRedis);
+            }else{
+                dataOnRedis.setCourseUserFilterData(courseSuggestionRedis.getCourseUserFilterData());
+                if(user.getReviewSuggestionAlgorithms().size() > QUANTITY_USED_USER_FILTER){
+                    dataOnRedis.setUsedCourseItemFilterData(false);
+                }else{
+                    dataOnRedis.setUsedCourseItemFilterData(true);
+                }
+                this.redisCourseSuggestionService.update(dataOnRedis);
+            }
         });
     }
 
@@ -159,5 +257,18 @@ public class SuggestionAlgorithmService {
             return 0;
         }
         return sumProduct / sumSimilar;
+    }
+
+    private double itemFiltering(Double ratingA,ItemFilterSuggestion B){
+        if(B == null){
+            return 0;
+        }
+        double Per = ((B.getSameAuthor() + B.getSameCategories()) + (ratingA * B.getRating()));
+        double Der = Math.sqrt(ratingA * ratingA + 3) *
+                Math.sqrt(B.getSameAuthor() * B.getSameAuthor() + B.getSameCategories() * B.getSameCategories() + B.getRating() * B.getRating());
+        if(Der == 0){
+            return 0;
+        }
+        return Per/Der;
     }
 }

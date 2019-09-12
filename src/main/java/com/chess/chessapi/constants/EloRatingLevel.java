@@ -44,11 +44,11 @@ public class EloRatingLevel implements Serializable {
         if(elo < BEGINNER_ELO){
             id = BEGINNER_ID;
         }
-        else if(BEGINNER_ELO < elo && elo < MINOR_ELO){
+        else if(BEGINNER_ELO <= elo && elo < MINOR_ELO){
             id = MINOR_ID;
-        }else if(MINOR_ELO < elo && elo < INTERMEDIATE_ELO){
+        }else if(MINOR_ELO <= elo && elo < INTERMEDIATE_ELO){
             id = INTERMEDIATE_ID;
-        }else if(INTERMEDIATE_ELO < elo && elo < MAJOR_ELO){
+        }else if(INTERMEDIATE_ELO <= elo && elo < MAJOR_ELO){
             id = MAJOR_ID;
         }else{
             id = MASTER_ID;

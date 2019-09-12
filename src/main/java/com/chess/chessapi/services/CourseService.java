@@ -297,7 +297,11 @@ public class CourseService {
         CourseSuggestionRedis data = this.redisCourseSuggestionService.find(userId);
         List<CourseUserFilterData> suggestions = new ArrayList<>();
         if(data != null){
-            suggestions = data.getCourseUserFilterData();
+            if(data.isUsedCourseItemFilterData()){
+                suggestions = data.getCourseItemFilterData();
+            }else{
+                suggestions = data.getCourseUserFilterData();
+            }
         }
         int isListNull = 1;
         String listCourseIdArr = "";
@@ -330,6 +334,10 @@ public class CourseService {
             this.sortCourseSuggestionByArray(paginations,suggestions);
         }
         return paginations;
+    }
+
+    public Integer countByEloId(int eloId){
+        return this.courseRepository.countByEloId(eloId);
     }
     //End Pulbic method
 
