@@ -97,4 +97,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = "Select id From users where elo > ?1 and elo <= ?2 and role_id = ?3",nativeQuery = true)
     List<Long> findListUserIdsByRangeElo(int minElo,int maxElo,long roleId);
+
+    @Query(value = "Select id From users where role_id = ?1",nativeQuery = true)
+    List<Long> findAllListUserIdsByRole(long roleId);
 }

@@ -221,6 +221,10 @@ public class UserService {
     public List<Long> getListLearnerByRangeElo(int minElo,int maxElo){
         return this.userRepository.findListUserIdsByRangeElo(minElo,maxElo,AppRole.ROLE_LEARNER);
     }
+
+    List<Long> getAllListLearnerIds(){
+        return this.userRepository.findAllListUserIdsByRole(AppRole.ROLE_LEARNER);
+    }
     // private method
     private void setUserRoleAuthentication(User user){
         List<GrantedAuthority> authorities = Collections.

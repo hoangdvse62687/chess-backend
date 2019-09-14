@@ -14,7 +14,7 @@ public class EloRatingLevel implements Serializable {
     public static final int INTERMEDIATE_ELO = 1200;
     public static final int MAJOR_ELO = 1400;
     public static final int MASTER_ELO = 1600;
-
+    public static final int MAXIMUM_ELO = 3600;
     public static int getEloById(int id){
         int elo = 0;
 

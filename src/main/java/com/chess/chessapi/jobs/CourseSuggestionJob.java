@@ -15,6 +15,7 @@ public class CourseSuggestionJob implements Job {
     public void execute(JobExecutionContext context) throws JobExecutionException {
         if(this.suggestionAlgorithmService != null){
             this.suggestionAlgorithmService.executeUserFilterSuggestionAlgorithm();
+            this.suggestionAlgorithmService.executeItemFilterSuggestionAlgorithm();
         }
     }
 }

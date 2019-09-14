@@ -1,9 +1,9 @@
 package com.chess.chessapi.services;
 
 import com.chess.chessapi.constants.EloRatingLevel;
+import com.chess.chessapi.constants.Status;
 import com.chess.chessapi.entities.Course;
 import com.chess.chessapi.models.*;
-import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.viewmodels.CategoryViewModel;
 import com.chess.chessapi.viewmodels.CoursePaginationViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,44 +29,54 @@ public class SuggestionAlgorithmService {
 
     private final int QUANTITY_USED_USER_FILTER = 5;
 
-    public void executeItemFilterSuggestionAlgorithm(Course enrollCourse,int userElo){
-        int userEloId = EloRatingLevel.getIdByEloRange(userElo);
-        UserPrincipal userPrincipal = this.userService.getCurrentUser();
-        if(enrollCourse.getRequiredElo() == userEloId){
-            //get all course in elo id
-            List<CoursePaginationViewModel> courses = courseService.getCoursePaginationsByEloId("","",1,this.courseService.countByEloId(userEloId)
-                    ,userEloId,userPrincipal.getId(),"","").getContent();
-            if(courses != null){
-                //finding index of course enrolling
-                int index = 0;
-                for (int i = 0; i < courses.size();i++) {
-                    if(courses.get(i).getCourseId() == enrollCourse.getCourseId()){
-                        index = i;
-                        break;
-                    }
+    public void executeItemFilterSuggestionAlgorithm(){
+        List<Long> userIds = this.userService.getAllListLearnerIds();
+        if(userIds != null){
+            for (Long userId:
+                 userIds) {
+                Course lastCourse = this.courseService.getLastCourseEnrollByUserId(userId);
+                if(lastCourse != null){
+                    int userElo = this.userService.getELOByUserId(userId);
+                    this.executeItemFilterSuggestionAlgorithm(lastCourse,userElo,userId);
                 }
+            }
+        }
+    }
 
-                CoursePaginationViewModel currentEnrolLingCourse = courses.get(index);
-                int counterComment = 0;
-                List<CourseUserFilterData> results = new ArrayList<>();
-                for(int i = 0; i < courses.size();i++){
-                    if(i != index){
-                        ItemFilterSuggestion B = new ItemFilterSuggestion();
-                        B.setRating(courses.get(i).getRating());
-                        B.setSameAuthor(courses.get(i).getAuthor().getUserId()
-                                == currentEnrolLingCourse.getAuthor().getUserId() ? 1 : 0);
-                        B.setSameCategories(this.checkCategory(currentEnrolLingCourse.getListCategorys()
-                                ,courses.get(i).getListCategorys()));
-                        if(this.reviewService.checkIsComment(userPrincipal.getId(),courses.get(i).getCourseId())){
-                            counterComment++;
-                        }
-                        double result = this.itemFiltering(currentEnrolLingCourse.getRating(),B);
-                        results.add(new CourseUserFilterData(courses.get(i).getCourseId(),result));
-                    }
+    public void executeItemFilterSuggestionAlgorithm(Course lastCourse,int userElo,long userId){
+        int userEloId = EloRatingLevel.getIdByEloRange(userElo);
+        //get all course in elo id
+        List<CoursePaginationViewModel> courses = courseService.getListCourseSuggestionByEloIdAndStatusId
+                (userEloId, Status.COURSE_STATUS_PUBLISHED,userId);
+        if(courses != null){
+            //finding index of course enrolling
+            int index = 0;
+            for (int i = 0; i < courses.size();i++) {
+                if(courses.get(i).getCourseId() == lastCourse.getCourseId()){
+                    index = i;
+                    break;
                 }
-                this.saveItemFilterSuggestionOnRedis(userPrincipal.getId(),results,counterComment);
             }
 
+            CoursePaginationViewModel currentEnrolLingCourse = courses.get(index);
+            int counterComment = 0;
+            List<CourseUserFilterData> results = new ArrayList<>();
+            for(int i = 0; i < courses.size();i++){
+                if(i != index){
+                    ItemFilterSuggestion B = new ItemFilterSuggestion();
+                    B.setRating(courses.get(i).getRating());
+                    B.setSameAuthor(courses.get(i).getAuthor().getUserId()
+                            == currentEnrolLingCourse.getAuthor().getUserId() ? 1 : 0);
+                    B.setSameCategories(this.checkCategory(currentEnrolLingCourse.getListCategorys()
+                            ,courses.get(i).getListCategorys()));
+                    if(this.reviewService.checkIsComment(userId,courses.get(i).getCourseId())){
+                        counterComment++;
+                    }
+                    double result = this.itemFiltering(currentEnrolLingCourse.getRating(),B);
+                    results.add(new CourseUserFilterData(courses.get(i).getCourseId(),result));
+                }
+            }
+            this.saveItemFilterSuggestionOnRedis(userId,results,counterComment);
         }
     }
 
@@ -77,7 +87,7 @@ public class SuggestionAlgorithmService {
         suggestionAlgorithmData.setAllUserMinor(this.getListUserIdByRangeElo(EloRatingLevel.BEGINNER_ELO,EloRatingLevel.MINOR_ELO));
         suggestionAlgorithmData.setAllUserIntermediate(this.getListUserIdByRangeElo(EloRatingLevel.MINOR_ELO,EloRatingLevel.INTERMEDIATE_ELO));
         suggestionAlgorithmData.setAllUserMajor(this.getListUserIdByRangeElo(EloRatingLevel.INTERMEDIATE_ELO,EloRatingLevel.MAJOR_ELO));
-        suggestionAlgorithmData.setAllUserMaster(this.getListUserIdByRangeElo(EloRatingLevel.MAJOR_ELO,EloRatingLevel.MASTER_ELO));
+        suggestionAlgorithmData.setAllUserMaster(this.getListUserIdByRangeElo(EloRatingLevel.MAJOR_ELO,EloRatingLevel.MAXIMUM_ELO));
 
         suggestionAlgorithmData.setAllCourseBeginner(this.courseService.getListCoursePulishedIdsByEloId(EloRatingLevel.BEGINNER_ID));
         suggestionAlgorithmData.setAllCourseMinor(this.courseService.getListCoursePulishedIdsByEloId(EloRatingLevel.MINOR_ID));
@@ -135,6 +145,7 @@ public class SuggestionAlgorithmService {
         CourseSuggestionRedis courseSuggestionRedis = new CourseSuggestionRedis();
         Collections.sort(data);
         courseSuggestionRedis.setCourseItemFilterData(data);
+        courseSuggestionRedis.setUserId(userId);
 
         CourseSuggestionRedis dataOnRedis = this.redisCourseSuggestionService.find(userId);
         if(dataOnRedis == null){

@@ -307,7 +307,7 @@ public class CourseController {
             if(course.getStatusId() == Status.COURSE_STATUS_PUBLISHED && !isEnrolled){
                 try {
                     this.courseService.enrollCourse(userPrincipal.getId(),course);
-                    this.suggestionAlgorithmService.executeItemFilterSuggestionAlgorithm(course,userElo);
+                    this.suggestionAlgorithmService.executeItemFilterSuggestionAlgorithm(course,userElo,userPrincipal.getId());
                     message = AppMessage.getMessageSuccess(AppMessage.UPDATE,AppMessage.ENROLL);
                 }catch (DataIntegrityViolationException ex){
                     message = AppMessage.getMessageFail(AppMessage.UPDATE,AppMessage.ENROLL);

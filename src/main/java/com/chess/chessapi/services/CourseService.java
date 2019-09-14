@@ -336,8 +336,13 @@ public class CourseService {
         return paginations;
     }
 
-    public Integer countByEloId(int eloId){
-        return this.courseRepository.countByEloId(eloId);
+    public List<CoursePaginationViewModel> getListCourseSuggestionByEloIdAndStatusId(int eloId,long statusId,long userId){
+        List<Object[]> rawData = this.courseRepository.findListCourseSuggestionByEloIdAndStatusId(eloId,statusId,userId);
+        return ManualCastUtils.castListObjectToCourseFromGetCoursePaginations(rawData,this.categoryService.getAllCategory());
+    }
+
+    public Course getLastCourseEnrollByUserId(long userId){
+        return this.courseRepository.findLastCourseEnrollByUserId(userId);
     }
     //End Pulbic method
 
