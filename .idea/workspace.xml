@@ -9,14 +9,7 @@
   <component name="ChangeListManager">
     <list default="true" id="bf71be33-19e0-42a5-b1d1-432f8a4f6965" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/constants/EloRatingLevel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/constants/EloRatingLevel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/controllers/CourseController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/controllers/CourseController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/jobs/CourseSuggestionJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/jobs/CourseSuggestionJob.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/CourseRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/CourseRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/UserRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/CourseService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/CourseService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/SuggestionAlgorithmService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/SuggestionAlgorithmService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/UserService.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/.gradle/" />
@@ -84,10 +77,11 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/SuggestionAlgorithmService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="174">
-              <caret line="95" column="57" lean-forward="true" selection-start-line="95" selection-start-column="57" selection-end-line="95" selection-end-column="57" />
+            <state relative-caret-position="260">
+              <caret line="274" column="21" selection-start-line="274" selection-start-column="21" selection-end-line="274" selection-end-column="21" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="method#executeUserFilterSuggestionAlgorithm#0;class#SuggestionAlgorithmService#0" />
                 <element signature="method#checkCategory#0;class#SuggestionAlgorithmService#0" />
               </folding>
             </state>
@@ -97,8 +91,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/UserService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="212">
-              <caret line="221" column="50" lean-forward="true" selection-start-line="221" selection-start-column="50" selection-end-line="221" selection-end-column="50" />
+            <state relative-caret-position="3128">
+              <caret line="221" column="50" selection-start-line="221" selection-start-column="50" selection-end-line="221" selection-end-column="50" />
               <folding>
                 <element signature="e#9028#9029#0" expanded="true" />
                 <element signature="e#9094#9095#0" expanded="true" />
@@ -107,11 +101,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/configs/QuartzConfig.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="53" column="59" lean-forward="true" selection-start-line="53" selection-start-column="59" selection-end-line="53" selection-end-column="59" />
+            <state relative-caret-position="493">
+              <caret line="49" selection-start-line="49" selection-end-line="49" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -119,11 +113,20 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/CourseService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="225">
-              <caret line="319" column="40" lean-forward="true" selection-start-line="319" selection-start-column="40" selection-end-line="319" selection-end-column="40" />
+            <state relative-caret-position="243">
+              <caret line="366" column="60" lean-forward="true" selection-start-line="366" selection-start-column="60" selection-end-line="366" selection-end-column="60" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/constants/EloRatingLevel.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="663">
+              <caret line="39" column="5" selection-start-line="39" selection-start-column="5" selection-end-line="39" selection-end-column="5" />
             </state>
           </provider>
         </entry>
@@ -226,10 +229,10 @@
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/jobs/CourseSuggestionJob.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/controllers/CourseController.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/CourseRepository.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/CourseService.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/constants/EloRatingLevel.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/SuggestionAlgorithmService.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/configs/QuartzConfig.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/CourseService.java" />
       </list>
     </option>
   </component>
@@ -295,6 +298,15 @@
               <item name="java" type="462c0819:PsiDirectoryNode" />
               <item name="chessapi" type="462c0819:PsiDirectoryNode" />
               <item name="configs" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="chessapi" type="b2602c69:ProjectViewProjectNode" />
+              <item name="chess-backend" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="chessapi" type="462c0819:PsiDirectoryNode" />
+              <item name="constants" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="chessapi" type="b2602c69:ProjectViewProjectNode" />
@@ -653,11 +665,15 @@
       <workItem from="1568301651928" duration="7666000" />
       <workItem from="1568362497442" duration="193000" />
       <workItem from="1568431121962" duration="8947000" />
+      <workItem from="1568440783209" duration="492000" />
+      <workItem from="1568447652797" duration="513000" />
+      <workItem from="1568449550831" duration="49000" />
+      <workItem from="1568618013360" duration="260000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="849678000" />
+    <option name="totallyTimeSpent" value="850992000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -670,8 +686,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49918166" visible="true" weight="0.2912254" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49918166" visible="true" weight="0.30937973" />
       <window_info id="Structure" order="1" sideWeight="0.5008183" side_tool="true" weight="0.19288956" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -772,6 +789,16 @@
   <component name="debuggerHistoryManager">
     <expressions id="watch">
       <expression>
+        <expression-string>courses.get(i).getAuthor().getUserId()                             == currentEnrolLingCourse.getAuthor().getUserId() ? 1 : 0</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>EloRatingLevel.getIdByEloRange(1000)</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
         <expression-string>this.redisCourseSuggestionService.findAll()</expression-string>
         <language-id>JAVA</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
@@ -808,11 +835,6 @@
       </expression>
       <expression>
         <expression-string>EloRatingLevel.getIdByEloRange(1200)</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>EloRatingLevel.getIdByEloRange(1200) &gt;= course.getRequiredElo()</expression-string>
         <language-id>JAVA</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -1171,17 +1193,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/UserService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="212">
-          <caret line="221" column="50" lean-forward="true" selection-start-line="221" selection-start-column="50" selection-end-line="221" selection-end-column="50" />
-          <folding>
-            <element signature="e#9028#9029#0" expanded="true" />
-            <element signature="e#9094#9095#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/UserRepository.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="385">
@@ -1189,38 +1200,50 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/constants/EloRatingLevel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="16" column="39" selection-start-line="16" selection-start-column="28" selection-end-line="16" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/CourseService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="319" column="40" lean-forward="true" selection-start-line="319" selection-start-column="40" selection-end-line="319" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/SuggestionAlgorithmService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="174">
-          <caret line="95" column="57" lean-forward="true" selection-start-line="95" selection-start-column="57" selection-end-line="95" selection-end-column="57" />
+        <state relative-caret-position="260">
+          <caret line="274" column="21" selection-start-line="274" selection-start-column="21" selection-end-line="274" selection-end-column="21" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#executeUserFilterSuggestionAlgorithm#0;class#SuggestionAlgorithmService#0" />
             <element signature="method#checkCategory#0;class#SuggestionAlgorithmService#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/UserService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3128">
+          <caret line="221" column="50" selection-start-line="221" selection-start-column="50" selection-end-line="221" selection-end-column="50" />
+          <folding>
+            <element signature="e#9028#9029#0" expanded="true" />
+            <element signature="e#9094#9095#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/configs/QuartzConfig.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="53" column="59" lean-forward="true" selection-start-line="53" selection-start-column="59" selection-end-line="53" selection-end-column="59" />
+        <state relative-caret-position="493">
+          <caret line="49" selection-start-line="49" selection-end-line="49" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/constants/EloRatingLevel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="663">
+          <caret line="39" column="5" selection-start-line="39" selection-start-column="5" selection-end-line="39" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/CourseService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="243">
+          <caret line="366" column="60" lean-forward="true" selection-start-line="366" selection-start-column="60" selection-end-line="366" selection-end-column="60" />
         </state>
       </provider>
     </entry>

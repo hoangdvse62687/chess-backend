@@ -367,7 +367,7 @@ public class CourseService {
         List<CoursePaginationViewModel> sortedData = new ArrayList<>();
         suggestions.forEach((suggestion) -> {
             data.getContent().forEach((item) -> {
-                if(item.getCourseId() == suggestion.getCourseId()){
+                if(item.getCourseId() == suggestion.getCourseId() && !item.isEnrolled()){
                     sortedData.add(item);
                 }
             });
