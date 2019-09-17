@@ -34,7 +34,7 @@ public class ChessGameJob implements Job {
                 //player 1 is the player and player2 is the bot
                 GameHistory gameHistory = this.gameHistoryService.getById(chessGame.getGameHistoryId()).get();
                 if(gameHistory.getStatus() == GameHistoryStatus.BET){
-                    float userElo = this.userService.getELOByUserId(gameHistory.getUser().getUserId());
+                    float userElo = this.userService.getPointByUserId(gameHistory.getUser().getUserId());
                     if(chessGame.getNextTurnPlayer() == ChessGameSocketHandler.TURN_PLAYER_1){
                         gameHistory.setStatus(GameHistoryStatus.LOSE);
                     }else{

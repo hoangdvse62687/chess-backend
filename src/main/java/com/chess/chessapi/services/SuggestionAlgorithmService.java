@@ -36,7 +36,7 @@ public class SuggestionAlgorithmService {
                  userIds) {
                 Course lastCourse = this.courseService.getLastCourseEnrollByUserId(userId);
                 if(lastCourse != null){
-                    int userElo = this.userService.getELOByUserId(userId);
+                    int userElo = this.userService.getPointByUserId(userId);
                     this.executeItemFilterSuggestionAlgorithm(lastCourse,userElo,userId);
                 }
             }
@@ -223,7 +223,7 @@ public class SuggestionAlgorithmService {
 
     private List<UserSuggestionAlgorithm> getListUserIdByRangeElo(int minElo,int maxElo){
         List<UserSuggestionAlgorithm> users = new ArrayList<>();
-        List<Long> listUsers = this.userService.getListLearnerByRangeElo(minElo, maxElo);
+        List<Long> listUsers = this.userService.getListLearnerByRangePoint(minElo, maxElo);
         listUsers.forEach((item) ->{
             users.add(new UserSuggestionAlgorithm(item));
         });

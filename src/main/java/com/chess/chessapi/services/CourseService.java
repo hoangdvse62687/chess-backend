@@ -293,7 +293,7 @@ public class CourseService {
     }
 
     public PagedList<CoursePaginationViewModel> getCourseSuggestion(int pageIndex,int pageSize,long userId){
-        int userEloId = EloRatingLevel.getIdByEloRange(this.userService.getELOByUserId(userId));
+        int userEloId = EloRatingLevel.getIdByEloRange(this.userService.getPointByUserId(userId));
         CourseSuggestionRedis data = this.redisCourseSuggestionService.find(userId);
         List<CourseUserFilterData> suggestions = new ArrayList<>();
         if(data != null){

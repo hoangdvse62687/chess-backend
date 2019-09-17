@@ -74,20 +74,20 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Modifying
     @Transactional
-    @Query(value = "Update users u Set u.full_name = ?2,u.achievement = ?3,u.elo = ?4" +
+    @Query(value = "Update users u Set u.full_name = ?2,u.achievement = ?3,u.point = ?4" +
             ",u.role_id = ?5,u.is_active = ?6,u.avatar = ?7,u.is_reviewed = ?8,u.modified_date = ?9 Where u.id = ?1"
             ,nativeQuery = true)
-    void updateRegister(long id, String name, String achievement, int elo, long role, boolean isActive, String avatar
+    void updateRegister(long id, String name, String achievement, int point, long role, boolean isActive, String avatar
             , boolean isReviewed, Timestamp modifiedDate);
 
     @Modifying
     @Transactional
-    @Query(value = "Update users u Set u.elo = u.elo + ?2 Where u.id = ?1"
+    @Query(value = "Update users u Set u.point = u.point + ?2 Where u.id = ?1"
             ,nativeQuery = true)
-    void increaseElo(long id,int elo);
+    void increasePoint(long id,int point);
 
-    @Query(value = "Select elo From users where id = ?1",nativeQuery = true)
-    Integer findEloByUserId(long id);
+    @Query(value = "Select point From users where id = ?1",nativeQuery = true)
+    Integer findPointByUserId(long id);
 
     @Modifying
     @Transactional
@@ -95,8 +95,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
             ,nativeQuery = true)
     void deleteUser(long userId);
 
-    @Query(value = "Select id From users where elo > ?1 and elo <= ?2 and role_id = ?3",nativeQuery = true)
-    List<Long> findListUserIdsByRangeElo(int minElo,int maxElo,long roleId);
+    @Query(value = "Select id From users where point > ?1 and point <= ?2 and role_id = ?3",nativeQuery = true)
+    List<Long> findListUserIdsByRangePoint(int minPoint,int maxPoint,long roleId);
 
     @Query(value = "Select id From users where role_id = ?1",nativeQuery = true)
     List<Long> findAllListUserIdsByRole(long roleId);

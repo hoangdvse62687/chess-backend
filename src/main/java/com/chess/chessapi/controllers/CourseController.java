@@ -299,7 +299,7 @@ public class CourseController {
             Course course = this.courseService.getCourseById(enrollCourseViewModel.getCourseId())
                     .orElseThrow(() -> new ResourceNotFoundException("Course","id",enrollCourseViewModel.getCourseId()));
             UserPrincipal userPrincipal = this.userService.getCurrentUser();
-            int userElo = this.userService.getELOByUserId(userPrincipal.getId());
+            int userElo = this.userService.getPointByUserId(userPrincipal.getId());
             if(EloRatingLevel.getIdByEloRange(userElo) < course.getRequiredElo()){
                 throw new AccessDeniedException(AppMessage.ELO_DENY_MESSAGE);
             }

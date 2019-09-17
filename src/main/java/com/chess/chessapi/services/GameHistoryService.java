@@ -68,7 +68,7 @@ public class GameHistoryService {
         GameHistoryCreateResponse gameHistoryCreateResponse = new GameHistoryCreateResponse();
         gameHistoryCreateResponse.setSavedId(savedGameHistory.getGamehistoryId());
         PredictionEloStockfish predictionEloStockfish = new PredictionEloStockfish();
-        float userElo = this.userService.getELOByUserId(userId);
+        float userElo = this.userService.getPointByUserId(userId);
         predictionEloStockfish.setPredictionWinningElo(this.getUserEloPointByStatus(userElo,gameHistory.getLevel()
                 ,GameHistoryStatus.WIN,gameHistory.getUser().getUserId()));
         predictionEloStockfish.setPredictionLoseElo(this.getUserEloPointByStatus(userElo,gameHistory.getLevel()

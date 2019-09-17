@@ -473,7 +473,7 @@ public class ManualCastUtils implements Serializable {
             if(eloSetting == 0){
                 eloSetting = EloRatingLevel.BEGINNER_ELO;
             }
-            user.setElo(eloSetting);
+            user.setPoint(eloSetting);
             user.setFullName(userRegisterViewModel.getFullName());
             user.setAvatar(userRegisterViewModel.getAvatar());
             user.setActive(userRegisterViewModel.isActive());

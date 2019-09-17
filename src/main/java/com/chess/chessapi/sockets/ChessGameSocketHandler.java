@@ -202,7 +202,7 @@ public class ChessGameSocketHandler implements WebSocketHandler {
     private JsonResult updateEloPlayer(ChessGame chessGame,int status){
         GameHistory gameHistory = this.gameHistoryService.getById(chessGame.getGameHistoryId()).get();
         gameHistory.setStatus(status);
-        float userElo = this.userService.getELOByUserId(gameHistory.getUser().getUserId());
+        float userElo = this.userService.getPointByUserId(gameHistory.getUser().getUserId());
         gameHistory.setPoint(this.gameHistoryService.getUserEloPointByStatus(userElo,gameHistory.getLevel()
                 ,gameHistory.getStatus(),gameHistory.getUser().getUserId()));
         this.gameHistoryService.update(gameHistory,gameHistory.getUser().getUserId());

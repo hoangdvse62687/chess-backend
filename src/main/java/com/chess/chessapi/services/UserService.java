@@ -93,10 +93,10 @@ public class UserService {
             this.certificatesService.create(c.getCertificateLink(),user.getUserId());
         }
 
-        this.pointLogService.create(START_ELO_MESSAGE + user.getElo() + CONGRATULATION_ELO_MESSAGE
-                ,user.getElo(),user.getUserId());
+        this.pointLogService.create(START_ELO_MESSAGE + user.getPoint() + CONGRATULATION_ELO_MESSAGE
+                ,user.getPoint(),user.getUserId());
 
-        this.userRepository.updateRegister(user.getUserId(),user.getFullName(),user.getAchievement(),user.getElo(),
+        this.userRepository.updateRegister(user.getUserId(),user.getFullName(),user.getAchievement(),user.getPoint(),
                 user.getRoleId(),user.isActive(),user.getAvatar(),user.isReviewed(), TimeUtils.getCurrentTime());
 
         this.setUserRoleAuthentication(user);
@@ -209,17 +209,17 @@ public class UserService {
     }
 
     public void increasePoint(long userId,float point){
-        this.userRepository.increaseElo(userId,(int)point);
+        this.userRepository.increasePoint(userId,(int)point);
     }
 
-    public int getELOByUserId(long userId){
-        return this.userRepository.findEloByUserId(userId);
+    public int getPointByUserId(long userId){
+        return this.userRepository.findPointByUserId(userId);
     }
     public boolean isExist(long userId){
         return this.userRepository.existsById(userId);
     }
-    public List<Long> getListLearnerByRangeElo(int minElo,int maxElo){
-        return this.userRepository.findListUserIdsByRangeElo(minElo,maxElo,AppRole.ROLE_LEARNER);
+    public List<Long> getListLearnerByRangePoint(int minElo,int maxElo){
+        return this.userRepository.findListUserIdsByRangePoint(minElo,maxElo,AppRole.ROLE_LEARNER);
     }
 
     List<Long> getAllListLearnerIds(){
@@ -248,14 +248,14 @@ public class UserService {
     private void registerLearner(User user){
         user.setActive(Status.ACTIVE);
         user.setRoleId(AppRole.ROLE_LEARNER);
-        user.setElo(user.getElo());
+        user.setPoint(user.getPoint());
         user.setReviewed(true);
     }
 
     private void registerInstructor(User user){
         user.setActive(Status.INACTIVE);
         user.setRoleId(AppRole.ROLE_INSTRUCTOR);
-        user.setElo(0);
+        user.setPoint(0);
         user.setReviewed(false);
         // create notification for admin
         this.notificationService.sendNotificationToAdmin(AppMessage.CREATE_NEW_USER_AS_INSTRUCTOR,user.getEmail(),
