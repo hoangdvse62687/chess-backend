@@ -16,15 +16,20 @@ public class EloRatingUtils implements Serializable {
     }
 
     private static float eloRating(float Ra, float Rb,
-                          int K, boolean d)
+                          int K, int d)
     {
         float Pa = probability(Rb, Ra);
         float result;
-        if (d == true) {
+        if (d == GameHistoryStatus.WIN) {
+            //win
             result = K * (1 - Pa);
         }
-        else {
+        else if(d == GameHistoryStatus.LOSE){
+            //lose
             result = K * (0 - Pa);
+        }else{
+            //drawn
+            result = K * (0.5f - Pa);
         }
         return result;
     }
@@ -33,12 +38,11 @@ public class EloRatingUtils implements Serializable {
         float stockfishElo = StockfishEloRatingLevel.getElo(stockfishLevel);
         switch (status){
             case GameHistoryStatus.WIN:
-                return (int)eloRating(userElo,stockfishElo,K,true);
+                return (int)eloRating(userElo,stockfishElo,K,GameHistoryStatus.WIN);
             case GameHistoryStatus.LOSE:
-                return (int)eloRating(userElo,stockfishElo,K,false);
+                return (int)eloRating(userElo,stockfishElo,K,GameHistoryStatus.LOSE);
             default:
-                    return 0;
-
+                return (int)eloRating(userElo,stockfishElo,K,GameHistoryStatus.DRAWN);
         }
     }
 }

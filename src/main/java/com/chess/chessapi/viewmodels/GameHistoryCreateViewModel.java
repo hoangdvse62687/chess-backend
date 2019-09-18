@@ -18,9 +18,6 @@ public class GameHistoryCreateViewModel {
     @Column(name = "game_time")
     private int gameTime;
 
-    @NotNull(message = "Point must not be null")
-    private float point;
-
     public int getLevel() {
         return level;
     }
@@ -43,13 +40,5 @@ public class GameHistoryCreateViewModel {
 
     public void setGameTime(int gameTime) {
         this.gameTime = gameTime;
-    }
-
-    public float getPoint() {
-        return point;
-    }
-
-    public void setPoint(float point) {
-        this.point = point;
     }
 }

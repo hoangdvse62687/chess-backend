@@ -54,7 +54,6 @@ public class GameHistoryService {
         gameHistory.setColor(gameHistory.getColor());
         gameHistory.setGameTime(gameHistoryCreateViewModel.getGameTime());
         gameHistory.setLevel(gameHistoryCreateViewModel.getLevel());
-        gameHistory.setPoint(gameHistoryCreateViewModel.getPoint());
         gameHistory.setRecord("");
         gameHistory.setStartTime(TimeUtils.getCurrentTime());
         gameHistory.setStatus(GameHistoryStatus.BET);
@@ -73,6 +72,8 @@ public class GameHistoryService {
                 ,GameHistoryStatus.WIN,gameHistory.getUser().getUserId()));
         predictionEloStockfish.setPredictionLoseElo(this.getUserEloPointByStatus(userElo,gameHistory.getLevel()
                 ,GameHistoryStatus.LOSE,gameHistory.getUser().getUserId()));
+        predictionEloStockfish.setPredictionDrawnElo(this.getUserEloPointByStatus(userElo,gameHistory.getLevel()
+                ,GameHistoryStatus.DRAWN,gameHistory.getUser().getUserId()));
         gameHistoryCreateResponse.setPredictionEloStockfish(predictionEloStockfish);
         return gameHistoryCreateResponse;
     }
