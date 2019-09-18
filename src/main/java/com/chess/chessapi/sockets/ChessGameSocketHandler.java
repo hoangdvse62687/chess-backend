@@ -56,7 +56,7 @@ public class ChessGameSocketHandler implements WebSocketHandler {
                 ChessGame chessGame = this.redisChessGameService.find(gameHistory.getGamehistoryId());
                 //if chess game is in redis => chess game is in process,else chess game is start to init
                 if(chessGame == null){
-                    this.redisChessGameService.save(this.initChessGame(gameHistory));
+                    this.redisChessGameService.save(this.initChessBotGame(gameHistory));
                 }else{
                     //delete auto handle trigger game and using websocket handle instead
                     this.cronJobSchedulerService.deleteJobTask(Long.toString(gameHistory.getGamehistoryId()), ChessGameJobListener.LISTENER_NAME);
@@ -147,14 +147,13 @@ public class ChessGameSocketHandler implements WebSocketHandler {
         return Long.parseLong(sessionPath.substring(sessionPath.lastIndexOf('/') + 1,sessionPath.length()));
     }
 
-    private ChessGame initChessGame(GameHistory gameHistory){
+    private ChessGame initChessBotGame(GameHistory gameHistory){
         ChessGame chessGame = new ChessGame();
         chessGame.setColor(gameHistory.getColor());
         chessGame.setGameContent(gameHistory.getRecord());
         chessGame.setGameHistoryId(gameHistory.getGamehistoryId());
         chessGame.setLevel(gameHistory.getLevel());
         chessGame.setSecondGameTime(gameHistory.getGameTime());
-        chessGame.setNextTurnPlayer(TURN_PLAYER_1);
         chessGame.setLastAccessed(TimeUtils.getCurrentTime());
         chessGame.setStatus(gameHistory.getStatus());
         PlayerInfo player1 = new PlayerInfo();
@@ -165,6 +164,14 @@ public class ChessGameSocketHandler implements WebSocketHandler {
         player2.setBot(true);
         player2.setSecondCountDown(gameHistory.getGameTime());
         chessGame.setPlayer2(player2);
+
+        //player chosen color white, player plays first
+        if(gameHistory.getColor() == 0){
+            chessGame.setNextTurnPlayer(TURN_PLAYER_1);
+        }else{
+            chessGame.setNextTurnPlayer(TURN_PLAYER_2);
+        }
+
         return chessGame;
     }
 
