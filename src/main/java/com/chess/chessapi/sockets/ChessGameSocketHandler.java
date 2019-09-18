@@ -10,6 +10,8 @@ import com.chess.chessapi.services.RedisChessGameService;
 import com.chess.chessapi.services.UserService;
 import com.chess.chessapi.utils.TimeUtils;
 import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.*;
 
@@ -38,6 +40,9 @@ public class ChessGameSocketHandler implements WebSocketHandler {
 
     private final String ON_CONNECT_SUCCESS = "Kết nối thành công";
     private final String ON_CONNECT_FAIL = "Kết nối không thành công";
+
+    private static final Logger log = LoggerFactory.getLogger(ChessGameSocketHandler.class);
+
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         boolean isConnectSuccess = true;
@@ -65,6 +70,7 @@ public class ChessGameSocketHandler implements WebSocketHandler {
         }catch (Exception ex){
             isConnectSuccess = false;
             message = ON_CONNECT_FAIL;
+            log.info(ex.getMessage());
         }finally {
             chessGameInitResponse.setConnectSuccess(isConnectSuccess);
             chessGameInitResponse.setReconnect(isReconnect);
@@ -86,7 +92,7 @@ public class ChessGameSocketHandler implements WebSocketHandler {
                 }
             }
         }catch (Exception ex){
-            ex.printStackTrace();
+            log.error(ex.getMessage());
         }
     }
 
@@ -127,7 +133,7 @@ public class ChessGameSocketHandler implements WebSocketHandler {
                 }
             }
         }catch (Exception ex){
-            ex.printStackTrace();
+            log.error(ex.getMessage());
         }
     }
 

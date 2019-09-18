@@ -8,18 +8,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bf71be33-19e0-42a5-b1d1-432f8a4f6965" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/configs/QuartzConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/configs/QuartzConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/controllers/CourseController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/controllers/CourseController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/entities/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/entities/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/jobs/ChessGameJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/jobs/ChessGameJob.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/security/oauth2/CustomOAuth2UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/security/oauth2/CustomOAuth2UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/CourseService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/CourseService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/GameHistoryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/GameHistoryService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/SuggestionAlgorithmService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/SuggestionAlgorithmService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/NotificationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/NotificationService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/sockets/ChessGameSocketHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/sockets/ChessGameSocketHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/utils/ManualCastUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chess/chessapi/utils/ManualCastUtils.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/.gradle/" />
@@ -85,22 +75,19 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/configs/QuartzConfig.java">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/sockets/ChessGameSocketHandler.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="192">
-              <caret line="46" column="9" lean-forward="true" selection-start-line="46" selection-start-column="9" selection-end-line="46" selection-end-column="9" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state relative-caret-position="85">
+              <caret line="43" column="4" selection-start-line="43" selection-start-column="4" selection-end-line="43" selection-end-column="92" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/UserRepository.java">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/NotificationService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="280">
-              <caret line="81" lean-forward="true" selection-start-line="81" selection-end-line="81" />
+            <state relative-caret-position="1360">
+              <caret line="109" column="77" lean-forward="true" selection-start-line="109" selection-start-column="77" selection-end-line="109" selection-end-column="77" />
             </state>
           </provider>
         </entry>
@@ -118,9 +105,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>getCourseByCategoryId</find>
-      <find>Logger</find>
-      <find>last</find>
       <find>simpleJobTrigger</find>
       <find>schedulerFactoryBean</find>
       <find>quartzScheduler</find>
@@ -148,6 +132,9 @@
       <find>userId</find>
       <find>elo</find>
       <find>required_elo</find>
+      <find>log</find>
+      <find>log.</find>
+      <find>ex.</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -156,7 +143,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/RedisChessGameService.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/models/ChessGameJobListener.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/configs/QrtzSchedulerConfig.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/models/AutoWiringSpringBeanJobFactory.java" />
@@ -198,7 +184,6 @@
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/entities/User.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/UserService.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/CourseService.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/sockets/ChessGameSocketHandler.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/GameHistoryService.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/SuggestionAlgorithmService.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/jobs/ChessGameJob.java" />
@@ -207,6 +192,8 @@
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/controllers/CourseController.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/configs/QuartzConfig.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/UserRepository.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/sockets/ChessGameSocketHandler.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/NotificationService.java" />
       </list>
     </option>
   </component>
@@ -230,6 +217,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -322,6 +310,15 @@
               <item name="chess-backend" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="chessapi" type="462c0819:PsiDirectoryNode" />
+              <item name="sockets" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="chessapi" type="b2602c69:ProjectViewProjectNode" />
+              <item name="chess-backend" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
               <item name="resources" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
@@ -329,7 +326,6 @@
         </subPane>
       </pane>
       <pane id="Scope" />
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -662,11 +658,12 @@
       <workItem from="1568449550831" duration="49000" />
       <workItem from="1568618013360" duration="260000" />
       <workItem from="1568722803277" duration="1091000" />
+      <workItem from="1568772021104" duration="253000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="852083000" />
+    <option name="totallyTimeSpent" value="852336000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -679,9 +676,8 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49918166" visible="true" weight="0.2473525" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49918166" visible="true" weight="0.25113463" />
       <window_info id="Structure" order="1" sideWeight="0.5008183" side_tool="true" weight="0.19288956" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -841,7 +837,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/models/ReviewSuggestionAlgorithm.java" />
     <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/RedisClientIdService.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="68">
@@ -1153,13 +1148,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/sockets/ChessGameSocketHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="42">
-          <caret line="201" column="70" lean-forward="true" selection-start-line="201" selection-start-column="70" selection-end-line="201" selection-end-column="70" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/utils/ManualCastUtils.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="18">
@@ -1228,20 +1216,34 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/UserRepository.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="76" column="85" selection-start-line="76" selection-start-column="85" selection-end-line="76" selection-end-column="85" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/configs/QuartzConfig.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="46" column="9" lean-forward="true" selection-start-line="46" selection-start-column="9" selection-end-line="46" selection-end-column="9" />
+        <state relative-caret-position="187">
+          <caret line="26" column="4" selection-start-line="26" selection-start-column="4" selection-end-line="26" selection-end-column="82" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/repositories/UserRepository.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/sockets/ChessGameSocketHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="280">
-          <caret line="81" lean-forward="true" selection-start-line="81" selection-end-line="81" />
+        <state relative-caret-position="85">
+          <caret line="43" column="4" selection-start-line="43" selection-start-column="4" selection-end-line="43" selection-end-column="92" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/chess/chessapi/services/NotificationService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1360">
+          <caret line="109" column="77" lean-forward="true" selection-start-line="109" selection-start-column="77" selection-end-line="109" selection-end-column="77" />
         </state>
       </provider>
     </entry>

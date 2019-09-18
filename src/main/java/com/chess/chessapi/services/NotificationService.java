@@ -12,6 +12,8 @@ import com.chess.chessapi.utils.ManualCastUtils;
 import com.chess.chessapi.utils.TimeUtils;
 import com.chess.chessapi.viewmodels.NotificationPaginationsViewModel;
 import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -42,6 +44,7 @@ public class NotificationService {
     private final String SERVER_KEY = "AAAA_Ah8T8Y:APA91bG1UrCHo6_fYUf_Mj4WLDNkzgsbp7PEHliJ3-5zIbeen00KwuhCJY4EM6aTI3x26Fx8PZyPHIiZBkKswz5ctRlGthd8Ug_gqT3xo0H-0EyKZnEZZqwSHOuP5dExyuSEuMxpadfS";
 
     private Gson gson = new Gson();
+    private static final Logger log = LoggerFactory.getLogger(NotificationService.class);
     //public method
     public Notification create(Notification notification){
         return notificationRepository.save(notification);
@@ -172,7 +175,7 @@ public class NotificationService {
                 System.out.println(br.readLine());
             }
         }catch (Exception ex){
-           ex.printStackTrace();
+           log.info(ex.getMessage());
         }finally {
             if(connection != null){
                 connection.disconnect();
