@@ -41,16 +41,15 @@ public class EloRatingLevel implements Serializable {
 
     public static int getIdByEloRange(int elo){
         int id = 0;
-        if(elo < BEGINNER_ELO){
+        if(BEGINNER_ELO <= elo && elo < MINOR_ELO){
             id = BEGINNER_ID;
-        }
-        else if(BEGINNER_ELO <= elo && elo < MINOR_ELO){
-            id = MINOR_ID;
         }else if(MINOR_ELO <= elo && elo < INTERMEDIATE_ELO){
-            id = INTERMEDIATE_ID;
+            id = MINOR_ID;
         }else if(INTERMEDIATE_ELO <= elo && elo < MAJOR_ELO){
+            id = INTERMEDIATE_ID;
+        }else if(MAJOR_ELO <= elo && elo < MASTER_ELO){
             id = MAJOR_ID;
-        }else{
+        }else if(MASTER_ELO <= elo && elo < MAXIMUM_ELO){
             id = MASTER_ID;
         }
 
