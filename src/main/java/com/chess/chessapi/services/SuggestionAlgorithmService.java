@@ -47,8 +47,8 @@ public class SuggestionAlgorithmService {
         int userEloId = EloRatingLevel.getIdByEloRange(userElo);
         //get all course in elo id
         List<CoursePaginationViewModel> courses = courseService.getListCourseSuggestionByEloIdAndStatusId
-                (userEloId, Status.COURSE_STATUS_PUBLISHED,userId);
-        if(courses != null){
+                (userEloId == 0 ? 1 :  userEloId, Status.COURSE_STATUS_PUBLISHED,userId);
+        if(courses != null && !courses.isEmpty()){
             //finding index of course enrolling
             int index = 0;
             for (int i = 0; i < courses.size();i++) {

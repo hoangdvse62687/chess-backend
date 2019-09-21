@@ -319,7 +319,8 @@ public class CourseService {
         StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getCourseSuggestionPaginations");
         query.setParameter("listCourseIdStr",listCourseIdArr);
         query.setParameter("userId",userId);
-        query.setParameter("userEloId",userEloId);
+        //if learner out of beginner will suggestion beginner level
+        query.setParameter("userEloId",userEloId == 0 ? 1 :  userEloId);
         query.setParameter("isListNull",isListNull);
         query.setParameter("totalElements",Long.parseLong("0"));
         query.setParameter("statusId",Status.COURSE_STATUS_PUBLISHED);
@@ -333,6 +334,7 @@ public class CourseService {
         if(isListNull != 1){
             this.sortCourseSuggestionByArray(paginations,suggestions);
         }
+
         return paginations;
     }
 
@@ -367,7 +369,7 @@ public class CourseService {
         List<CoursePaginationViewModel> sortedData = new ArrayList<>();
         suggestions.forEach((suggestion) -> {
             data.getContent().forEach((item) -> {
-                if(item.getCourseId() == suggestion.getCourseId() && !item.isEnrolled()){
+                if(item.getCourseId() == suggestion.getCourseId()){
                     sortedData.add(item);
                 }
             });

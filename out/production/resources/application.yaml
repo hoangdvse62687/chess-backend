@@ -55,4 +55,4 @@ app:
       - http://localhost:8084/oauth2/redirect
   courseSuggestionJob:
     #one week will trigger to run calculator the suggestion for learner
-    frequency: 604800000
+    frequency: 86400
