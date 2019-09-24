@@ -47,8 +47,8 @@ public interface CourseRepository extends JpaRepository<Course,Long> {
     @Query(value = "Select " +
             "course.id as course_id,course.name,course.status_id,course.image,course.description,course.created_date " +
             ",course.required_elo,users.id as user_id,users.full_name,users.avatar, " +
-            "If( ?3 = 0 " +
-            ",0,If(Exists (Select id From user_has_course userHasCourse Where userHasCourse.user_id = ?3 and userHasCourse.course_id = course.id),1,0)) as isEnrolled " +
+            "If( ?2 = 0 " +
+            ",0,If(Exists (Select id From user_has_course userHasCourse Where userHasCourse.user_id = ?2 and userHasCourse.course_id = course.id),1,0)) as isEnrolled " +
             ",(Select Group_concat(categoryHasCourse.category_id) " +
             "From chessdb.category_has_course categoryHasCourse " +
             "Where categoryHasCourse.course_id = course.id) as categoryIds " +
@@ -58,13 +58,13 @@ public interface CourseRepository extends JpaRepository<Course,Long> {
             ",(Select count(r.id) " +
             "FROM review r " +
             "where r.course_id = course.id ) as totalRating " +
-            ",(Select If(count(courseHasLesson.id) > 0 , ((Select count(log.id) From chessdb.learning_log log where log.user_id = ?3 and log.course_id = course.id)/count(courseHasLesson.id)) ,0) " +
+            ",(Select If(count(courseHasLesson.id) > 0 , ((Select count(log.id) From chessdb.learning_log log where log.user_id = ?2 and log.course_id = course.id)/count(courseHasLesson.id)) ,0) " +
             "From course_has_lesson courseHasLesson " +
             "Where courseHasLesson.course_id = course.id) as learningProcessPercent " +
             "From course course " +
             "Inner Join users users " +
             "On users.id = course.owner " +
-            "Where course.required_elo = ?1 " +
-            "and course.status_id = ?2",nativeQuery = true)
-    List<Object[]> findListCourseSuggestionByEloIdAndStatusId(int eloId,long statusId,long userId);
+            "Where not Exists (Select id From user_has_course userHasCourse Where userHasCourse.user_id = ?2 and userHasCourse.course_id = course.id)" +
+            "and course.status_id = ?1",nativeQuery = true)
+    List<Object[]> findListCourseSuggestionByStatusId(long statusId,long userId);
 }

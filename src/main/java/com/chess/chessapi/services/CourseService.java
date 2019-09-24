@@ -338,8 +338,8 @@ public class CourseService {
         return paginations;
     }
 
-    public List<CoursePaginationViewModel> getListCourseSuggestionByEloIdAndStatusId(int eloId,long statusId,long userId){
-        List<Object[]> rawData = this.courseRepository.findListCourseSuggestionByEloIdAndStatusId(eloId,statusId,userId);
+    public List<CoursePaginationViewModel> getListCourseSuggestionByEloIdAndStatusId(long statusId,long userId){
+        List<Object[]> rawData = this.courseRepository.findListCourseSuggestionByStatusId(statusId,userId);
         return ManualCastUtils.castListObjectToCourseFromGetCoursePaginations(rawData,this.categoryService.getAllCategory());
     }
 

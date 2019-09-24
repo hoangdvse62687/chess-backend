@@ -54,5 +54,5 @@ app:
     authorizedRedirectUris:
       - http://localhost:8084/oauth2/redirect
   courseSuggestionJob:
-    #one day will trigger to run calculator the suggestion for learner
-    frequency: 86400
+    #one day will trigger to run calculator the suggestion for learner Msec
+    frequency: 86400000
