@@ -83,42 +83,18 @@ public class SuggestionAlgorithmService {
     public void executeUserFilterSuggestionAlgorithm(){
         SuggestionAlgorithmData suggestionAlgorithmData = new SuggestionAlgorithmData();
         //init data for start algorithm
-        suggestionAlgorithmData.setAllUserBeginner(this.getListUserIdByRangeElo(0,EloRatingLevel.BEGINNER_ELO));
-        suggestionAlgorithmData.setAllUserMinor(this.getListUserIdByRangeElo(EloRatingLevel.BEGINNER_ELO,EloRatingLevel.MINOR_ELO));
-        suggestionAlgorithmData.setAllUserIntermediate(this.getListUserIdByRangeElo(EloRatingLevel.MINOR_ELO,EloRatingLevel.INTERMEDIATE_ELO));
-        suggestionAlgorithmData.setAllUserMajor(this.getListUserIdByRangeElo(EloRatingLevel.INTERMEDIATE_ELO,EloRatingLevel.MAJOR_ELO));
-        suggestionAlgorithmData.setAllUserMaster(this.getListUserIdByRangeElo(EloRatingLevel.MAJOR_ELO,EloRatingLevel.MAXIMUM_ELO));
+        suggestionAlgorithmData.setAllUser(this.getListUserIdByRangeElo());
 
-        suggestionAlgorithmData.setAllCourseBeginner(this.courseService.getListCoursePulishedIdsByEloId(EloRatingLevel.BEGINNER_ID));
-        suggestionAlgorithmData.setAllCourseMinor(this.courseService.getListCoursePulishedIdsByEloId(EloRatingLevel.MINOR_ID));
-        suggestionAlgorithmData.setAllCourseIntermediate(this.courseService.getListCoursePulishedIdsByEloId(EloRatingLevel.INTERMEDIATE_ID));
-        suggestionAlgorithmData.setAllCourseMajor(this.courseService.getListCoursePulishedIdsByEloId(EloRatingLevel.MAJOR_ID));
-        suggestionAlgorithmData.setAllCourseMaster(this.courseService.getListCoursePulishedIdsByEloId(EloRatingLevel.MASTER_ID));
+        suggestionAlgorithmData.setAllCourse(this.courseService.getAllListCoursePulishedIds());
 
-        this.getReviews(suggestionAlgorithmData.getAllUserBeginner(),suggestionAlgorithmData.getAllCourseBeginner());
-        this.getReviews(suggestionAlgorithmData.getAllUserMinor(),suggestionAlgorithmData.getAllCourseMinor());
-        this.getReviews(suggestionAlgorithmData.getAllUserIntermediate(),suggestionAlgorithmData.getAllCourseIntermediate());
-        this.getReviews(suggestionAlgorithmData.getAllUserMajor(),suggestionAlgorithmData.getAllCourseMajor());
-        this.getReviews(suggestionAlgorithmData.getAllUserMaster(),suggestionAlgorithmData.getAllCourseMaster());
+        this.getReviews(suggestionAlgorithmData.getAllUser(),suggestionAlgorithmData.getAllCourse());
 
         //find similar of each user in group
-        this.executeCosineSimilarity(suggestionAlgorithmData.getAllUserBeginner());
-        this.executeCosineSimilarity(suggestionAlgorithmData.getAllUserMinor());
-        this.executeCosineSimilarity(suggestionAlgorithmData.getAllUserIntermediate());
-        this.executeCosineSimilarity(suggestionAlgorithmData.getAllUserMajor());
-        this.executeCosineSimilarity(suggestionAlgorithmData.getAllUserMaster());
+        this.executeCosineSimilarity(suggestionAlgorithmData.getAllUser());
 
-        this.executeUserBasedFiltering(suggestionAlgorithmData.getAllUserBeginner(),suggestionAlgorithmData.getAllCourseBeginner());
-        this.executeUserBasedFiltering(suggestionAlgorithmData.getAllUserMinor(),suggestionAlgorithmData.getAllCourseMinor());
-        this.executeUserBasedFiltering(suggestionAlgorithmData.getAllUserIntermediate(),suggestionAlgorithmData.getAllCourseIntermediate());
-        this.executeUserBasedFiltering(suggestionAlgorithmData.getAllUserMajor(),suggestionAlgorithmData.getAllCourseMajor());
-        this.executeUserBasedFiltering(suggestionAlgorithmData.getAllUserMaster(),suggestionAlgorithmData.getAllCourseMaster());
+        this.executeUserBasedFiltering(suggestionAlgorithmData.getAllUser(),suggestionAlgorithmData.getAllCourse());
 
-        this.saveUserFilterSuggestionOnRedis(suggestionAlgorithmData.getAllUserBeginner());
-        this.saveUserFilterSuggestionOnRedis(suggestionAlgorithmData.getAllUserMinor());
-        this.saveUserFilterSuggestionOnRedis(suggestionAlgorithmData.getAllUserIntermediate());
-        this.saveUserFilterSuggestionOnRedis(suggestionAlgorithmData.getAllUserMajor());
-        this.saveUserFilterSuggestionOnRedis(suggestionAlgorithmData.getAllUserMaster());
+        this.saveUserFilterSuggestionOnRedis(suggestionAlgorithmData.getAllUser());
     }
 
     private double checkCategory(List<CategoryViewModel> A,List<CategoryViewModel> B){
@@ -221,9 +197,9 @@ public class SuggestionAlgorithmService {
         });
     }
 
-    private List<UserSuggestionAlgorithm> getListUserIdByRangeElo(int minElo,int maxElo){
+    private List<UserSuggestionAlgorithm> getListUserIdByRangeElo(){
         List<UserSuggestionAlgorithm> users = new ArrayList<>();
-        List<Long> listUsers = this.userService.getListLearnerByRangePoint(minElo, maxElo);
+        List<Long> listUsers = this.userService.getAllListLearnerIds();
         listUsers.forEach((item) ->{
             users.add(new UserSuggestionAlgorithm(item));
         });

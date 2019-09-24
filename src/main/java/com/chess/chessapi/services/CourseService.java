@@ -288,8 +288,8 @@ public class CourseService {
                 (this.courseRepository.findCourseDetailForNotificationByCourseId(listCourseIds));
     }
 
-    public List<Long> getListCoursePulishedIdsByEloId(int eloId){
-        return this.courseRepository.findListCourseIdsByEloId(eloId,Status.COURSE_STATUS_PUBLISHED);
+    public List<Long> getAllListCoursePulishedIds(){
+        return this.courseRepository.findListCourseIdsByStatus(Status.COURSE_STATUS_PUBLISHED);
     }
 
     public PagedList<CoursePaginationViewModel> getCourseSuggestion(int pageIndex,int pageSize,long userId){

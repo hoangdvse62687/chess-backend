@@ -95,9 +95,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
             ,nativeQuery = true)
     void deleteUser(long userId);
 
-    @Query(value = "Select id From users where point > ?1 and point <= ?2 and role_id = ?3",nativeQuery = true)
-    List<Long> findListUserIdsByRangePoint(int minPoint,int maxPoint,long roleId);
-
     @Query(value = "Select id From users where role_id = ?1",nativeQuery = true)
     List<Long> findAllListUserIdsByRole(long roleId);
 }

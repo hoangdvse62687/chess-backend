@@ -218,9 +218,6 @@ public class UserService {
     public boolean isExist(long userId){
         return this.userRepository.existsById(userId);
     }
-    public List<Long> getListLearnerByRangePoint(int minElo,int maxElo){
-        return this.userRepository.findListUserIdsByRangePoint(minElo,maxElo,AppRole.ROLE_LEARNER);
-    }
 
     List<Long> getAllListLearnerIds(){
         return this.userRepository.findAllListUserIdsByRole(AppRole.ROLE_LEARNER);
