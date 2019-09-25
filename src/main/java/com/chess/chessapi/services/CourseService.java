@@ -87,11 +87,7 @@ public class CourseService {
     public void publishCourse(CoursePublishViewModel coursePublishViewModel,Course course){
         this.notificationService.sendNotificationToAdmin(AppMessage.CREATE_NEW_COURSE,course.getName(),
                 course.getImage(),ObjectType.COURSE,course.getCourseId());
-        try{
-            suggestionAlgorithmService.executeCommonItemFilterSuggestionAlgorithm(coursePublishViewModel.getCourseId());
-        }catch (Exception ex){
-            Logger.getLogger(CourseService.class.getName()).log(Level.SEVERE,null,ex);
-        }
+
         this.updateStatus(coursePublishViewModel.getCourseId(),Status.COURSE_STATUS_WAITING);
     }
 
@@ -263,6 +259,13 @@ public class CourseService {
         if(courseUpdateStatusViewModel.getStatusId() == Status.COURSE_STATUS_PUBLISHED){
             messageNotification = AppMessage.UPDATE_COURSE_STATUS_PUBLISHED;
             mailContent += AppMessage.PUBLISH_COURSE_REQUEST_CONTENT_PUBLISH;
+
+            try{
+                suggestionAlgorithmService.executeCommonItemFilterSuggestionAlgorithm(courseUpdateStatusViewModel.getCourseId());
+            }catch (Exception ex){
+                Logger.getLogger(CourseService.class.getName()).log(Level.SEVERE,null,ex);
+            }
+
         }else{
             messageNotification = AppMessage.UPDATE_COURSE_STATUS_REJECTED;
             courseUpdateStatusViewModel.setStatusId(Status.COURSE_STATUS_REJECTED);
