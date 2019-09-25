@@ -40,6 +40,7 @@ public class ChessGameSocketHandler implements WebSocketHandler {
 
     private final String ON_CONNECT_SUCCESS = "Kết nối thành công";
     private final String ON_CONNECT_FAIL = "Kết nối không thành công";
+    private final String INIT_CHESS_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
     private static final Logger log = LoggerFactory.getLogger(ChessGameSocketHandler.class);
 
@@ -172,6 +173,7 @@ public class ChessGameSocketHandler implements WebSocketHandler {
             chessGame.setNextTurnPlayer(TURN_PLAYER_2);
         }
 
+        chessGame.setCurrentFen(INIT_CHESS_FEN);
         return chessGame;
     }
 
@@ -193,6 +195,7 @@ public class ChessGameSocketHandler implements WebSocketHandler {
 
         chessGame.setGameContent(chessGame.getGameContent().concat(chessGameMove.getMove() + " "));
         chessGame.setLastAccessed(TimeUtils.getCurrentTime());
+        chessGame.setCurrentFen(chessGameMove.getCurrentFen());
 
         //check if game is over or status is end
         boolean isEnd = false;

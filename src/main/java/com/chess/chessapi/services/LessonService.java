@@ -132,8 +132,8 @@ public class LessonService {
 
     public void updateUninteractiveLesson(UninteractiveLessonUpdateViewModel uninteractiveLessonUpdateViewModel){
         //update lesson
-        this.updateLesson(uninteractiveLessonUpdateViewModel.getLessonId(),this.lessonFactory.toJson(uninteractiveLessonUpdateViewModel.getUninteractiveLesson(),ObjectType.UNINTERACTIVE_LESSON)
-                ,uninteractiveLessonUpdateViewModel.getName(),uninteractiveLessonUpdateViewModel.getDescription(),UPDATE_LESSON_NOTIFICATION_MESSAGE);
+        this.updateLesson(uninteractiveLessonUpdateViewModel.getLessonId(),uninteractiveLessonUpdateViewModel.getName(),this.lessonFactory.toJson(uninteractiveLessonUpdateViewModel.getUninteractiveLesson(),ObjectType.UNINTERACTIVE_LESSON)
+                ,uninteractiveLessonUpdateViewModel.getDescription(),UPDATE_LESSON_NOTIFICATION_MESSAGE);
 
     }
 

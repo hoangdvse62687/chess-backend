@@ -38,10 +38,10 @@ spring:
             scope:
               - email
               - profile
-#  redis:
-#    host: redis-12435.c83.us-east-1-2.ec2.cloud.redislabs.com
-#    port: 12435
-#    password: tJj3iBzUftBAwkWAQgDZZDUlffv9iXOQ
+  redis:
+    host: redis-12435.c83.us-east-1-2.ec2.cloud.redislabs.com
+    port: 12435
+    password: tJj3iBzUftBAwkWAQgDZZDUlffv9iXOQ
 app:
   auth:
     tokenSecret: ChessLearningSystem
@@ -55,4 +55,4 @@ app:
       - http://localhost:8084/oauth2/redirect
   courseSuggestionJob:
     #one day will trigger to run calculator the suggestion for learner Msec
-    frequency: 86400
+    frequency: 86400000

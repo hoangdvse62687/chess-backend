@@ -526,11 +526,11 @@ public class CourseController {
     @ApiOperation(value = "Get course by user id")
     @GetMapping("/courses/suggestion")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
-    public @ResponseBody JsonResult getCourseSuggestionPaginations(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize){
+    public @ResponseBody JsonResult getCourseSuggestionPaginations(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize, boolean isUsedItemFilter){
         PagedList<CoursePaginationViewModel> data = null;
         try{
             UserPrincipal userPrincipal = this.userService.getCurrentUser();
-            data = this.courseService.getCourseSuggestion(page,pageSize,userPrincipal.getId());
+            data = this.courseService.getCourseSuggestion(page,pageSize,userPrincipal.getId(),isUsedItemFilter);
         }catch (IllegalArgumentException ex){
             Logger.getLogger(CourseController.class.getName()).log(Level.SEVERE,null,ex);
             throw new ResourceNotFoundException("Page","number",page);

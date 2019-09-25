@@ -13,6 +13,7 @@ public class ChessGame implements Serializable {
     private int secondGameTime;
     private Timestamp lastAccessed;
     private int nextTurnPlayer;
+    private String currentFen;
     private PlayerInfo player1;
     private PlayerInfo player2;
 
@@ -94,5 +95,13 @@ public class ChessGame implements Serializable {
 
     public void setPlayer2(PlayerInfo player2) {
         this.player2 = player2;
+    }
+
+    public String getCurrentFen() {
+        return currentFen;
+    }
+
+    public void setCurrentFen(String currentFen) {
+        this.currentFen = currentFen;
     }
 }

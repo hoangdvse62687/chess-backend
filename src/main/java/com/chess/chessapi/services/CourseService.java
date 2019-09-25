@@ -292,7 +292,7 @@ public class CourseService {
         return this.courseRepository.findListCourseIdsByStatus(Status.COURSE_STATUS_PUBLISHED);
     }
 
-    public PagedList<CoursePaginationViewModel> getCourseSuggestion(int pageIndex,int pageSize,long userId){
+    public PagedList<CoursePaginationViewModel> getCourseSuggestion(int pageIndex,int pageSize,long userId,boolean isUsedItemFilter){
         int userEloId = EloRatingLevel.getIdByEloRange(this.userService.getPointByUserId(userId));
         CourseSuggestionRedis data = this.redisCourseSuggestionService.find(userId);
         List<CourseUserFilterData> suggestions = new ArrayList<>();
@@ -301,6 +301,10 @@ public class CourseService {
                 suggestions = data.getCourseItemFilterData();
             }else{
                 suggestions = data.getCourseUserFilterData();
+            }
+
+            if(isUsedItemFilter){
+                suggestions = data.getCourseItemFilterData();
             }
         }
         int isListNull = 1;

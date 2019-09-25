@@ -4,6 +4,7 @@ public class ChessGameMove {
     private int status;
     private int turnPlayer;
     private String move;
+    private String currentFen;
 
     public int getStatus() {
         return status;
@@ -27,5 +28,13 @@ public class ChessGameMove {
 
     public void setMove(String move) {
         this.move = move;
+    }
+
+    public String getCurrentFen() {
+        return currentFen;
+    }
+
+    public void setCurrentFen(String currentFen) {
+        this.currentFen = currentFen;
     }
 }
