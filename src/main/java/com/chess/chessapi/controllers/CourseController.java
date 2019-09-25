@@ -523,14 +523,34 @@ public class CourseController {
         return new JsonResult(null,data);
     }
 
-    @ApiOperation(value = "Get course by user id")
+    @ApiOperation(value = "Get course suggestion")
     @GetMapping("/courses/suggestion")
     @PreAuthorize("hasAuthority("+AppRole.ROLE_LEARNER_AUTHENTICATIION+")")
-    public @ResponseBody JsonResult getCourseSuggestionPaginations(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize, boolean isUsedItemFilter){
+    public @ResponseBody JsonResult getCourseSuggestionPaginations(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize){
         PagedList<CoursePaginationViewModel> data = null;
         try{
             UserPrincipal userPrincipal = this.userService.getCurrentUser();
-            data = this.courseService.getCourseSuggestion(page,pageSize,userPrincipal.getId(),isUsedItemFilter);
+            data = this.courseService.getCourseSuggestion(page,pageSize,userPrincipal.getId());
+        }catch (IllegalArgumentException ex){
+            Logger.getLogger(CourseController.class.getName()).log(Level.SEVERE,null,ex);
+            throw new ResourceNotFoundException("Page","number",page);
+        }
+
+        return new JsonResult(null,data);
+    }
+
+    @ApiOperation(value = "Get common course suggestion")
+    @GetMapping("/courses/common-suggestion")
+    public @ResponseBody JsonResult getCommonCourseSuggestionPaginations(@RequestParam("page") int page,@RequestParam("pageSize") int pageSize
+            ,@RequestParam("courseId")long courseId){
+        PagedList<CoursePaginationViewModel> data = null;
+        try{
+            UserPrincipal userPrincipal = this.userService.getCurrentUser();
+            long userId = 0;
+            if(userPrincipal != null){
+                userId = userPrincipal.getId();
+            }
+            data = this.courseService.getCommonCourseSuggestion(page,pageSize,courseId,userId);
         }catch (IllegalArgumentException ex){
             Logger.getLogger(CourseController.class.getName()).log(Level.SEVERE,null,ex);
             throw new ResourceNotFoundException("Page","number",page);

@@ -16,6 +16,7 @@ public class CourseSuggestionJob implements Job {
         if(this.suggestionAlgorithmService != null){
             this.suggestionAlgorithmService.executeUserFilterSuggestionAlgorithm();
             this.suggestionAlgorithmService.executeItemFilterSuggestionAlgorithm();
+            this.suggestionAlgorithmService.executeCommonItemFilterSuggestionAlgorithm();
         }
     }
 }

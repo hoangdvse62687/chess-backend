@@ -27,6 +27,9 @@ public class SuggestionAlgorithmService {
     @Autowired
     private RedisCourseSuggestionService redisCourseSuggestionService;
 
+    @Autowired
+    private RedisCommonCourseItemFilterService redisCommonCourseItemFilterService;
+
     private final int QUANTITY_USED_USER_FILTER = 5;
 
     public void executeItemFilterSuggestionAlgorithm(){
@@ -43,8 +46,66 @@ public class SuggestionAlgorithmService {
         }
     }
 
+    public void executeCommonItemFilterSuggestionAlgorithm(long courseId){
+        List<CoursePaginationViewModel> courses = courseService.getListCourseSuggestionByEloIdAndStatusId(Status.COURSE_STATUS_PUBLISHED,0);
+        if(courses != null && !courses.isEmpty()){
+            //finding index of course enrolling
+            int index = 0;
+            for (int i = 0; i < courses.size();i++) {
+                if(courses.get(i).getCourseId() == courseId){
+                    index = i;
+                    break;
+                }
+            }
+
+            CoursePaginationViewModel currentCourse = courses.get(index);
+            List<CourseUserFilterData> results = new ArrayList<>();
+            for(int i = 0; i < courses.size();i++){
+                if(i != index){
+                    ItemFilterSuggestion B = new ItemFilterSuggestion();
+                    B.setRating(courses.get(i).getRating());
+                    B.setSameAuthor(courses.get(i).getAuthor().getUserId()
+                            == currentCourse.getAuthor().getUserId() ? 1 : 0);
+                    B.setSameCategories(this.checkCategory(currentCourse.getListCategorys()
+                            ,courses.get(i).getListCategorys()));
+                    double result = this.itemFiltering(currentCourse.getRating(),B);
+                    results.add(new CourseUserFilterData(courses.get(i).getCourseId(),result));
+                }
+            }
+            Collections.sort(results);
+            CommonCourseItemSuggestionRedis commonCourseItemSuggestionRedis = new CommonCourseItemSuggestionRedis();
+            commonCourseItemSuggestionRedis.setCourseId(courseId);
+            commonCourseItemSuggestionRedis.setCourseItemFilterData(results);
+            this.redisCommonCourseItemFilterService.save(commonCourseItemSuggestionRedis);
+        }
+    }
+
+    public void executeCommonItemFilterSuggestionAlgorithm(){
+        List<CoursePaginationViewModel> courses = courseService.getListCourseSuggestionByEloIdAndStatusId(Status.COURSE_STATUS_PUBLISHED,0);
+        if(courses != null && !courses.isEmpty()) {
+            //finding index of course enrolling
+            for (int j = 0; j < courses.size(); j++) {
+                CoursePaginationViewModel currentCourse = courses.get(j);
+                List<CourseUserFilterData> results = new ArrayList<>();
+                for (int i = 0; i < courses.size(); i++) {
+                    if (i != j) {
+                        double result = this.itemFiltering(currentCourse.getRating(),
+                                this.calculaterItemFilterSimiler(courses.get(j),courses.get(i)));
+                        results.add(new CourseUserFilterData(courses.get(i).getCourseId(), result));
+                    }
+                }
+                //save
+                Collections.sort(results);
+                CommonCourseItemSuggestionRedis commonCourseItemSuggestionRedis = new CommonCourseItemSuggestionRedis();
+                commonCourseItemSuggestionRedis.setCourseId(currentCourse.getCourseId());
+                commonCourseItemSuggestionRedis.setCourseItemFilterData(results);
+                this.redisCommonCourseItemFilterService.save(commonCourseItemSuggestionRedis);
+            }
+        }
+    }
+
     public void executeItemFilterSuggestionAlgorithm(Course lastCourse,int userElo,long userId){
-        int userEloId = EloRatingLevel.getIdByEloRange(userElo);
+        //int userEloId = EloRatingLevel.getIdByEloRange(userElo);
         //get all course in elo id
         List<CoursePaginationViewModel> courses = courseService.getListCourseSuggestionByEloIdAndStatusId(Status.COURSE_STATUS_PUBLISHED,userId);
         if(courses != null && !courses.isEmpty()){
@@ -62,16 +123,11 @@ public class SuggestionAlgorithmService {
             List<CourseUserFilterData> results = new ArrayList<>();
             for(int i = 0; i < courses.size();i++){
                 if(i != index){
-                    ItemFilterSuggestion B = new ItemFilterSuggestion();
-                    B.setRating(courses.get(i).getRating());
-                    B.setSameAuthor(courses.get(i).getAuthor().getUserId()
-                            == currentEnrolLingCourse.getAuthor().getUserId() ? 1 : 0);
-                    B.setSameCategories(this.checkCategory(currentEnrolLingCourse.getListCategorys()
-                            ,courses.get(i).getListCategorys()));
                     if(this.reviewService.checkIsComment(userId,courses.get(i).getCourseId())){
                         counterComment++;
                     }
-                    double result = this.itemFiltering(currentEnrolLingCourse.getRating(),B);
+                    double result = this.itemFiltering(currentEnrolLingCourse.getRating(),
+                            this.calculaterItemFilterSimiler(currentEnrolLingCourse,courses.get(i)));
                     results.add(new CourseUserFilterData(courses.get(i).getCourseId(),result));
                 }
             }
@@ -94,6 +150,16 @@ public class SuggestionAlgorithmService {
         this.executeUserBasedFiltering(suggestionAlgorithmData.getAllUser(),suggestionAlgorithmData.getAllCourse());
 
         this.saveUserFilterSuggestionOnRedis(suggestionAlgorithmData.getAllUser());
+    }
+
+    private ItemFilterSuggestion calculaterItemFilterSimiler(CoursePaginationViewModel currentCourse,CoursePaginationViewModel difCourse){
+        ItemFilterSuggestion B = new ItemFilterSuggestion();
+        B.setRating(difCourse.getRating());
+        B.setSameAuthor(difCourse.getAuthor().getUserId()
+                == currentCourse.getAuthor().getUserId() ? 1 : 0);
+        B.setSameCategories(this.checkCategory(currentCourse.getListCategorys()
+                ,difCourse.getListCategorys()));
+        return B;
     }
 
     private double checkCategory(List<CategoryViewModel> A,List<CategoryViewModel> B){

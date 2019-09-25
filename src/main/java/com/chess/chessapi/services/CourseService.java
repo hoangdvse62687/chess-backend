@@ -2,10 +2,7 @@ package com.chess.chessapi.services;
 
 import com.chess.chessapi.constants.*;
 import com.chess.chessapi.entities.*;
-import com.chess.chessapi.models.CourseSuggestionRedis;
-import com.chess.chessapi.models.CourseUserFilterData;
-import com.chess.chessapi.models.Mail;
-import com.chess.chessapi.models.PagedList;
+import com.chess.chessapi.models.*;
 import com.chess.chessapi.repositories.CourseRepository;
 import com.chess.chessapi.security.UserPrincipal;
 import com.chess.chessapi.utils.MailContentBuilderUtils;
@@ -23,6 +20,8 @@ import javax.persistence.StoredProcedureQuery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 @Service
@@ -57,6 +56,12 @@ public class CourseService {
     @Autowired
     private RedisCourseSuggestionService redisCourseSuggestionService;
 
+    @Autowired
+    private RedisCommonCourseItemFilterService redisCommonCourseItemFilterService;
+
+    @Autowired
+    private SuggestionAlgorithmService suggestionAlgorithmService;
+
     //Public method
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public Course create(CourseCreateViewModel courseCreateViewModel, long userId){
@@ -82,6 +87,11 @@ public class CourseService {
     public void publishCourse(CoursePublishViewModel coursePublishViewModel,Course course){
         this.notificationService.sendNotificationToAdmin(AppMessage.CREATE_NEW_COURSE,course.getName(),
                 course.getImage(),ObjectType.COURSE,course.getCourseId());
+        try{
+            suggestionAlgorithmService.executeCommonItemFilterSuggestionAlgorithm(coursePublishViewModel.getCourseId());
+        }catch (Exception ex){
+            Logger.getLogger(CourseService.class.getName()).log(Level.SEVERE,null,ex);
+        }
         this.updateStatus(coursePublishViewModel.getCourseId(),Status.COURSE_STATUS_WAITING);
     }
 
@@ -292,7 +302,42 @@ public class CourseService {
         return this.courseRepository.findListCourseIdsByStatus(Status.COURSE_STATUS_PUBLISHED);
     }
 
-    public PagedList<CoursePaginationViewModel> getCourseSuggestion(int pageIndex,int pageSize,long userId,boolean isUsedItemFilter){
+    public PagedList<CoursePaginationViewModel> getCommonCourseSuggestion(int pageIndex,int pageSize,long courseId,long userId){
+        CommonCourseItemSuggestionRedis data = this.redisCommonCourseItemFilterService.find(courseId);
+        List<CourseUserFilterData> suggestions = new ArrayList<>();
+        PagedList<CoursePaginationViewModel> paginations = null;
+        if(data != null){
+            suggestions = data.getCourseItemFilterData();
+        }
+        String listCourseIdArr = "";
+        if(suggestions != null && !suggestions.isEmpty()){
+            for (CourseUserFilterData item:
+                    suggestions) {
+                listCourseIdArr += item.getCourseId() + ",";
+            }
+            if(listCourseIdArr.length() > 0){
+                listCourseIdArr.substring(0,listCourseIdArr.length()-1);
+            }
+
+            StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("getCommonCourseSuggestionPaginations");
+            query.setParameter("listCourseIdStr",listCourseIdArr);
+            query.setParameter("userId",userId);
+            query.setParameter("statusId",Status.COURSE_STATUS_PUBLISHED);
+            query.setParameter("totalElements",Long.parseLong("0"));
+            query.setParameter("pageIndex",(pageIndex - 1) * pageSize);
+            query.setParameter("pageSize",pageSize);
+
+            query.execute();
+            List<Object[]> rawData = query.getResultList();
+            final long totalElements = Long.parseLong(query.getOutputParameterValue("totalElements").toString());
+            paginations = this.fillDataToPaginationCustom(rawData,totalElements,pageSize);
+            this.sortCourseSuggestionByArray(paginations,suggestions);
+        }
+
+        return paginations;
+    }
+
+    public PagedList<CoursePaginationViewModel> getCourseSuggestion(int pageIndex,int pageSize,long userId){
         int userEloId = EloRatingLevel.getIdByEloRange(this.userService.getPointByUserId(userId));
         CourseSuggestionRedis data = this.redisCourseSuggestionService.find(userId);
         List<CourseUserFilterData> suggestions = new ArrayList<>();
@@ -301,10 +346,6 @@ public class CourseService {
                 suggestions = data.getCourseItemFilterData();
             }else{
                 suggestions = data.getCourseUserFilterData();
-            }
-
-            if(isUsedItemFilter){
-                suggestions = data.getCourseItemFilterData();
             }
         }
         int isListNull = 1;

@@ -1,6 +1,6 @@
 package com.chess.chessapi.services;
 
-import com.chess.chessapi.models.CourseSuggestionRedis;
+import com.chess.chessapi.models.CommonCourseItemSuggestionRedis;
 import com.chess.chessapi.repositories.RedisRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
@@ -11,13 +11,13 @@ import javax.annotation.PostConstruct;
 import java.util.Map;
 
 @Service
-public class RedisCourseSuggestionService implements RedisRepository<CourseSuggestionRedis> {
-    private static final String KEY = "COURSE_SUGGESTIONS";
+public class RedisCommonCourseItemFilterService implements RedisRepository<CommonCourseItemSuggestionRedis> {
+    private static final String KEY = "COMMON_COURSE_SUGGESTIONS";
     private RedisTemplate<String, Object> redisTemplate;
-    private HashOperations<String, Long, CourseSuggestionRedis> hashOperations;
+    private HashOperations<String, Long, CommonCourseItemSuggestionRedis> hashOperations;
 
     @Autowired
-    public RedisCourseSuggestionService(RedisTemplate<String, Object> redisTemplate){
+    public RedisCommonCourseItemFilterService(RedisTemplate<String, Object> redisTemplate){
         this.redisTemplate = redisTemplate;
     }
 
@@ -27,23 +27,23 @@ public class RedisCourseSuggestionService implements RedisRepository<CourseSugge
     }
 
     @Override
-    public void save(CourseSuggestionRedis entity){
-        hashOperations.put(KEY,entity.getUserId(),entity);
+    public void save(CommonCourseItemSuggestionRedis entity){
+        hashOperations.put(KEY,entity.getCourseId(),entity);
     }
 
     @Override
-    public CourseSuggestionRedis find(Long id) {
+    public CommonCourseItemSuggestionRedis find(Long id) {
         return hashOperations.get(KEY,id);
     }
 
     @Override
-    public Map<Long, CourseSuggestionRedis> findAll() {
+    public Map<Long, CommonCourseItemSuggestionRedis> findAll() {
         return hashOperations.entries(KEY);
     }
 
     @Override
-    public void update(CourseSuggestionRedis entity) {
-        hashOperations.put(KEY,entity.getUserId(),entity);
+    public void update(CommonCourseItemSuggestionRedis entity) {
+        hashOperations.put(KEY,entity.getCourseId(),entity);
     }
 
     @Override

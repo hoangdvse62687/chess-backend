@@ -123,6 +123,18 @@ import java.util.List;
                         @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalElements",type = Long.class)
                 }
         ),
+        @NamedStoredProcedureQuery(
+                name = "getCommonCourseSuggestionPaginations",
+                procedureName = "get_common_course_suggestion_paginations",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "listCourseIdStr",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "userId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "statusId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageIndex",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageSize",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalElements",type = Long.class)
+                }
+        ),
 })
 public class Course {
     @Id
