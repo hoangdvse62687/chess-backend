@@ -84,6 +84,10 @@ public class LearningLogService {
     public Optional<LearningLog> getById(long learningLogId){
         return this.learningLogRepository.findById(learningLogId);
     }
+
+    public boolean isExist(long userId,long courseId,long lessonId){
+        return this.learningLogRepository.isExist(userId,courseId,lessonId);
+    }
     //END PUBLIC DEFINED
 
     //PRIVATE DEFINED

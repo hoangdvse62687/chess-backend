@@ -51,7 +51,7 @@ public class GameHistoryService {
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public GameHistoryCreateResponse create(GameHistoryCreateViewModel gameHistoryCreateViewModel, long userId){
         GameHistory gameHistory = new GameHistory();
-        gameHistory.setColor(gameHistory.getColor());
+        gameHistory.setColor(gameHistoryCreateViewModel.getColor());
         gameHistory.setGameTime(gameHistoryCreateViewModel.getGameTime());
         gameHistory.setLevel(gameHistoryCreateViewModel.getLevel());
         gameHistory.setRecord("");

@@ -51,6 +51,10 @@ public class LearningLogController {
         }else{
             try{
                 UserPrincipal userPrincipal = this.userService.getCurrentUser();
+                if(this.learningLogService.isExist(userPrincipal.getId()
+                        ,learningLogCreateViewModel.getCourseId(),learningLogCreateViewModel.getLessonId())){
+                    throw new BadRequestException(AppMessage.PERMISSION_DENY_MESSAGE);
+                }
                 learningLogCreateResponse = this.learningLogService.create(learningLogCreateViewModel,userPrincipal.getId());
                 message =  AppMessage.getMessageSuccess(AppMessage.CREATE,AppMessage.LEARNING_LOG);
             }catch (DataIntegrityViolationException ex){
