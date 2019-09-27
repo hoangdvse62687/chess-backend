@@ -16,6 +16,7 @@ public class ChessGame implements Serializable {
     private String currentFen;
     private PlayerInfo player1;
     private PlayerInfo player2;
+    private PredictionEloStockfish predictionEloStockfish;
 
     public Long getGameHistoryId() {
         return gameHistoryId;
@@ -103,5 +104,13 @@ public class ChessGame implements Serializable {
 
     public void setCurrentFen(String currentFen) {
         this.currentFen = currentFen;
+    }
+
+    public PredictionEloStockfish getPredictionEloStockfish() {
+        return predictionEloStockfish;
+    }
+
+    public void setPredictionEloStockfish(PredictionEloStockfish predictionEloStockfish) {
+        this.predictionEloStockfish = predictionEloStockfish;
     }
 }

@@ -166,6 +166,15 @@ public class ChessGameSocketHandler implements WebSocketHandler {
         player2.setSecondCountDown(gameHistory.getGameTime());
         chessGame.setPlayer2(player2);
 
+        PredictionEloStockfish predictionEloStockfish = new PredictionEloStockfish();
+        float userElo = this.userService.getPointByUserId(gameHistory.getUser().getUserId());
+        predictionEloStockfish.setPredictionWinningElo(this.gameHistoryService.getUserEloPointByStatus(userElo,gameHistory.getLevel()
+                ,GameHistoryStatus.WIN,gameHistory.getUser().getUserId(),true));
+        predictionEloStockfish.setPredictionLoseElo(this.gameHistoryService.getUserEloPointByStatus(userElo,gameHistory.getLevel()
+                ,GameHistoryStatus.LOSE,gameHistory.getUser().getUserId(),true));
+        predictionEloStockfish.setPredictionDrawnElo(this.gameHistoryService.getUserEloPointByStatus(userElo,gameHistory.getLevel()
+                ,GameHistoryStatus.DRAWN,gameHistory.getUser().getUserId(),true));
+        chessGame.setPredictionEloStockfish(predictionEloStockfish);
         //player chosen color white, player plays first
         if(gameHistory.getColor() == 0){
             chessGame.setNextTurnPlayer(TURN_PLAYER_1);
@@ -220,7 +229,8 @@ public class ChessGameSocketHandler implements WebSocketHandler {
         gameHistory.setStatus(status);
         float userElo = this.userService.getPointByUserId(gameHistory.getUser().getUserId());
         gameHistory.setPoint(this.gameHistoryService.getUserEloPointByStatus(userElo,gameHistory.getLevel()
-                ,gameHistory.getStatus(),gameHistory.getUser().getUserId()));
+                ,gameHistory.getStatus(),gameHistory.getUser().getUserId(),false));
+        gameHistory.setRecord(chessGame.getGameContent());
         this.gameHistoryService.update(gameHistory,gameHistory.getUser().getUserId());
         this.redisChessGameService.deleteById(gameHistory.getGamehistoryId());
         return new JsonResult(this.gameHistoryService.getContentPointLog

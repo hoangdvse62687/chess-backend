@@ -69,11 +69,11 @@ public class GameHistoryService {
         PredictionEloStockfish predictionEloStockfish = new PredictionEloStockfish();
         float userElo = this.userService.getPointByUserId(userId);
         predictionEloStockfish.setPredictionWinningElo(this.getUserEloPointByStatus(userElo,gameHistory.getLevel()
-                ,GameHistoryStatus.WIN,gameHistory.getUser().getUserId()));
+                ,GameHistoryStatus.WIN,gameHistory.getUser().getUserId(),true));
         predictionEloStockfish.setPredictionLoseElo(this.getUserEloPointByStatus(userElo,gameHistory.getLevel()
-                ,GameHistoryStatus.LOSE,gameHistory.getUser().getUserId()));
+                ,GameHistoryStatus.LOSE,gameHistory.getUser().getUserId(),true));
         predictionEloStockfish.setPredictionDrawnElo(this.getUserEloPointByStatus(userElo,gameHistory.getLevel()
-                ,GameHistoryStatus.DRAWN,gameHistory.getUser().getUserId()));
+                ,GameHistoryStatus.DRAWN,gameHistory.getUser().getUserId(),true));
         gameHistoryCreateResponse.setPredictionEloStockfish(predictionEloStockfish);
         return gameHistoryCreateResponse;
     }
@@ -96,9 +96,9 @@ public class GameHistoryService {
         return this.gameHistoryRepository.findById(gameHistoryId);
     }
 
-    public int getUserEloPointByStatus(float userElo,int level,int status,long userId){
+    public int getUserEloPointByStatus(float userElo,int level,int status,long userId,boolean isPrediction){
         return EloRatingUtils.getEloByStockfishLevel(userElo
-                ,level,status, KFactor.getKFactor(userElo,this.isUnderThirtyGame(userId)));
+                ,level,status, KFactor.getKFactor(userElo,this.isUnderThirtyGame(userId,isPrediction)));
     }
 
     public String getContentPointLog(int status,float point,int level) {
@@ -157,9 +157,10 @@ public class GameHistoryService {
         return new PagedList<GameHistoryViewModel>(totalPages,totalElements,content);
     }
 
-    private boolean isUnderThirtyGame(long userId){
+    private boolean isUnderThirtyGame(long userId,boolean isPrediction){
         int counter = this.gameHistoryRepository.countByUserId(userId);
-        return counter > 30 ? true : false;
+
+        return counter > (isPrediction ? 31 : 30) ? false : true;
     }
     //END PRIVATE METHOD DEFINED
 }

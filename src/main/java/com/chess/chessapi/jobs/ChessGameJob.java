@@ -41,7 +41,7 @@ public class ChessGameJob implements Job {
                         gameHistory.setStatus(GameHistoryStatus.WIN);
                     }
                     gameHistory.setPoint(this.gameHistoryService.getUserEloPointByStatus(userElo,gameHistory.getLevel()
-                            ,gameHistory.getStatus(),gameHistory.getUser().getUserId()));
+                            ,gameHistory.getStatus(),gameHistory.getUser().getUserId(),false));
                     this.gameHistoryService.update(gameHistory,gameHistory.getUser().getUserId());
                     this.redisChessGameService.deleteById(gameHistory.getGamehistoryId());
                 }
