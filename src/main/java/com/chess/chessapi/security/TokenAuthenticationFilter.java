@@ -1,5 +1,8 @@
 package com.chess.chessapi.security;
 
+import com.chess.chessapi.constants.AppMessage;
+import com.chess.chessapi.exceptions.AccessDeniedException;
+import com.chess.chessapi.services.RedisUserPrincipleService;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +17,6 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
@@ -23,6 +25,9 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
+
+    @Autowired
+    private RedisUserPrincipleService redisUserPrincipleService;
 
     private static final Logger logger = LoggerFactory.getLogger(TokenAuthenticationFilter.class);
 
@@ -34,20 +39,21 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
                 Long userId = tokenProvider.getUserIdFromToken(jwt);
 
-                UserDetails userDetails;
-                HttpSession session = request.getSession();
-                //check user login is on session
-                if(session.getAttribute(userId.toString()) != null){
-                    userDetails = (UserDetails) session.getAttribute(userId.toString());
-                }else{
-                    userDetails = customUserDetailsService.loadUserById(userId);
-                    //set sesson
-                    session.setAttribute(userId.toString(),userDetails);
+                UserDetails userDetails = this.redisUserPrincipleService.find(userId);
+                if( userDetails == null){
+                    userDetails = this.customUserDetailsService.loadUserById(userId);
                 }
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                UserPrincipal userPrincipal = (UserPrincipal) userDetails;
+                this.redisUserPrincipleService.save(userPrincipal);
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                if(userPrincipal.isStatus()){
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }else {
+                    throw new AccessDeniedException(AppMessage.PERMISSION_DENY_MESSAGE);
+                }
             }
         } catch (Exception ex) {
             logger.error("Could not set user authentication in security context", ex);

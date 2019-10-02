@@ -23,6 +23,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.StoredProcedureQuery;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ReviewService {
@@ -55,7 +56,7 @@ public class ReviewService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
-    public long create(ReviewCreateViewModel reviewCreateViewModel,long userId,String userName){
+    public long create(ReviewCreateViewModel reviewCreateViewModel,long userId,String userAvatar,String userName){
         Review review = new Review();
         review.setContent(reviewCreateViewModel.getContent());
         review.setCreatedDate(TimeUtils.getCurrentTime());
@@ -71,13 +72,14 @@ public class ReviewService {
         Review savedReview = this.reviewRepository.save(review);
 
         long authorId = this.courseService.getAuthorIdByCourseId(reviewCreateViewModel.getCourseId());
-        this.notificationService.sendNotificationToUser(AppMessage.NOTIFICATION_REVIEW,userName,ObjectType.REVIEW,
-                savedReview.getReviewId(),authorId,AppRole.ROLE_INSTRUCTOR);
+        this.notificationService.sendNotificationToUser(AppMessage.NOTIFICATION_REVIEW,userName,userAvatar,ObjectType.REVIEW,
+                reviewCreateViewModel.getCourseId(),authorId,AppRole.ROLE_INSTRUCTOR);
         return savedReview.getReviewId();
     }
 
     public void update(ReviewUpdateViewModel reviewUpdateViewModel){
-        this.reviewRepository.update(reviewUpdateViewModel.getReviewId(),reviewUpdateViewModel.getContent(),reviewUpdateViewModel.getRating());
+        this.reviewRepository.update(reviewUpdateViewModel.getReviewId(),reviewUpdateViewModel.getContent()
+                ,reviewUpdateViewModel.getRating(),TimeUtils.getCurrentTime());
     }
 
     public void remove(long reviewId){
@@ -85,10 +87,6 @@ public class ReviewService {
     }
 
     public boolean checkPermissionModifyReview(long reviewId,long userId,long courseId){
-        long authorId = this.courseService.getAuthorIdByCourseId(courseId);
-        if(authorId == userId){
-            return true;
-        }
         if(this.reviewRepository.checkPermissionModifyReview(reviewId,userId)){
             return true;
         }
@@ -106,11 +104,23 @@ public class ReviewService {
     public boolean isExist(long reviewId){
         return this.reviewRepository.existsById(reviewId);
     }
+
+    public boolean checkIsComment(long userId,long courseId){
+        return this.reviewRepository.checkIsComment(userId,courseId);
+    }
+
+    public Integer getRatingByUserIdAndCourseId(long userId,long courseId){
+        return this.reviewRepository.findRatingByUserIdAndCourseId(userId,courseId);
+    }
+
+    public Optional<Review> getById(long reviewId){
+        return this.reviewRepository.findById(reviewId);
+    }
     //END PUBLIC DEFINED
 
     //PRIVATE DEFINED
     private PagedList<ReviewPaginationViewModel> fillDataToPaginationCustom(List<Object[]> rawData,long totalElements,int pageSize){
-        long totalPages = (totalElements / pageSize) + 1;
+        long totalPages = (long) Math.ceil(totalElements / (double) pageSize);
         List<ReviewPaginationViewModel> data = ManualCastUtils.castListObjectToReviewFromGetReview(rawData);
         return new PagedList<ReviewPaginationViewModel>(Math.toIntExact(totalPages),totalElements,data);
     }

@@ -4,22 +4,37 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.NotNull;
 
 public class Step {
-    @NotNull(message = "Content must not be null")
+    private int id;
+
+    @Length(max = 1000,message = "Move is required not large than 1000 characters")
+    private String move;
+
     @Length(max = 1000,message = "Content is required not large than 1000 characters")
     private String content;
 
-    @NotNull(message = "Step code must not be null")
-    @Length(max = 255,message = "step_code is required not large than 255 characters")
-    private String stepCode;
+    @Length(max = 1000,message = "Move direction is required not large than 1000 characters")
+    private String moveDirection;
 
-    @NotNull(message = "Right response must not be null")
-    @Length(max = 255,message = "right_response is required not large than 255 characters")
-    private String rightResponse;
+    @Length(max = 1000,message = "Fen is required not large than 1000 characters")
+    private String fen;
 
-    @NotNull(message = "Wrong response must not be null")
-    @Length(max = 255,message = "wrong_response is required not large than 255 characters")
-    private String wrongResponse;
+    private int preId;
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getMove() {
+        return move;
+    }
+
+    public void setMove(String move) {
+        this.move = move;
+    }
 
     public String getContent() {
         return content;
@@ -29,27 +44,27 @@ public class Step {
         this.content = content;
     }
 
-    public String getStepCode() {
-        return stepCode;
+    public String getMoveDirection() {
+        return moveDirection;
     }
 
-    public void setStepCode(String stepCode) {
-        this.stepCode = stepCode;
+    public void setMoveDirection(String moveDirection) {
+        this.moveDirection = moveDirection;
     }
 
-    public String getRightResponse() {
-        return rightResponse;
+    public String getFen() {
+        return fen;
     }
 
-    public void setRightResponse(String rightResponse) {
-        this.rightResponse = rightResponse;
+    public void setFen(String fen) {
+        this.fen = fen;
     }
 
-    public String getWrongResponse() {
-        return wrongResponse;
+    public int getPreId() {
+        return preId;
     }
 
-    public void setWrongResponse(String wrongResponse) {
-        this.wrongResponse = wrongResponse;
+    public void setPreId(int preId) {
+        this.preId = preId;
     }
 }

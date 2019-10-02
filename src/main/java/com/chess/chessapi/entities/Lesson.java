@@ -29,6 +29,19 @@ import java.util.List;
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "lessonId",type = Long.class),
                         @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "hasPermission",type = Boolean.class)
                 }
+        ),
+        @NamedStoredProcedureQuery(
+                name = "getLessonPaginationByUserid",
+                procedureName = "get_lesson_pagination_by_userid",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "userId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "lessonName",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageIndex",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageSize",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortBy",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortDirection",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalElements",type = Long.class)
+                }
         )
 })
 public class Lesson {
@@ -41,14 +54,18 @@ public class Lesson {
     @Length(max = 1000,message = "name is required not large than 1000 characters")
     private String name;
 
+    @Length(max = 1000,message = "Description is required not large than 1000 characters")
+    private String description;
+
+    @NotNull(message = "Content must not be null")
+    @JsonIgnore
+    private String content;
+
+    @Transient
+    private Object lessonContent;
+
     @Column(name = "created_date")
     private Timestamp createdDate;
-
-    @OneToOne(mappedBy = "lesson",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    private InteractiveLesson interactiveLesson;
-
-    @OneToOne(mappedBy = "lesson",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    private UninteractiveLesson uninteractiveLesson;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "lesson")
     @JsonIgnore
@@ -65,6 +82,9 @@ public class Lesson {
 
     @Column(name = "type")
     private int lessonType;
+
+    @Column(name = "modified_date")
+    private java.sql.Timestamp modifiedDate;
 
     public long getLessonId() {
         return lessonId;
@@ -106,22 +126,6 @@ public class Lesson {
         this.user = user;
     }
 
-    public InteractiveLesson getInteractiveLesson() {
-        return interactiveLesson;
-    }
-
-    public void setInteractiveLesson(InteractiveLesson interactiveLesson) {
-        this.interactiveLesson = interactiveLesson;
-    }
-
-    public UninteractiveLesson getUninteractiveLesson() {
-        return uninteractiveLesson;
-    }
-
-    public void setUninteractiveLesson(UninteractiveLesson uninteractiveLesson) {
-        this.uninteractiveLesson = uninteractiveLesson;
-    }
-
     public List<LearningLog> getLearningLogs() {
         return learningLogs;
     }
@@ -136,5 +140,37 @@ public class Lesson {
 
     public void setLessonType(int lessonType) {
         this.lessonType = lessonType;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Timestamp getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(Timestamp modifiedDate) {
+        this.modifiedDate = modifiedDate;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public Object getLessonContent() {
+        return lessonContent;
+    }
+
+    public void setLessonContent(Object lessonContent) {
+        this.lessonContent = lessonContent;
     }
 }

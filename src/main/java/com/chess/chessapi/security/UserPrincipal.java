@@ -1,6 +1,7 @@
 package com.chess.chessapi.security;
 
 import com.chess.chessapi.entities.User;
+import com.chess.chessapi.models.UserSecurityRedis;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,6 +29,19 @@ public class UserPrincipal implements OAuth2User, UserDetails {
     }
 
     public static UserPrincipal create(User user) {
+        List<GrantedAuthority> authorities = Collections.
+                singletonList(new SimpleGrantedAuthority(Long.toString(user.getRoleId())));
+
+        return new UserPrincipal(
+                user.getUserId(),
+                user.getEmail(),
+                null,
+                user.isActive(),
+                authorities
+        );
+    }
+
+    public static UserPrincipal create(UserSecurityRedis user) {
         List<GrantedAuthority> authorities = Collections.
                 singletonList(new SimpleGrantedAuthority(Long.toString(user.getRoleId())));
 

@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 public class LessonViewModel {
     private long lessonId;
     private String name;
+    private String description;
     private Timestamp createdDate;
     private int lessonOrdered;
     private int lessonType;
@@ -46,5 +47,13 @@ public class LessonViewModel {
 
     public void setLessonType(int lessonType) {
         this.lessonType = lessonType;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

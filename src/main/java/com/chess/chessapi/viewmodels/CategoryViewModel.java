@@ -11,6 +11,7 @@ public class CategoryViewModel {
     @Length(max = 1000,message = "name is required not large than 1000 characters")
     private String name;
 
+
     public long getCategoryId() {
         return categoryId;
     }
