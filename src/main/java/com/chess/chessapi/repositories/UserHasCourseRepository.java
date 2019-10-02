@@ -1,5 +1,6 @@
 package com.chess.chessapi.repositories;
 
+import com.chess.chessapi.constants.AppRole;
 import com.chess.chessapi.entities.UserHasCourse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -29,5 +30,22 @@ public interface UserHasCourseRepository extends JpaRepository<UserHasCourse,Lon
             ,nativeQuery = true)
     List<UserHasCourse> findAllByCourseIdAndStatusId(long courseId,long statusId);
 
+    @Query(value = "Select user.id From user_has_course userHasCourse " +
+            "Inner Join users user " +
+            "On user.id = userHasCourse.user_id " +
+            "Where userHasCourse.course_id = ?1 and user.role_id = ?2"
+            ,nativeQuery = true)
+    List<Long> getAllLearnerByCourseId(long courseId,long learnerId);
 
+    @Query(value = "Select If(count(id) > 0 ,1,0) From user_has_course Where user_id = ?2 and course_id = ?1",nativeQuery = true)
+    Long isEnrolled(long courseId,long userId);
+
+    @Query(value = "Select * From user_has_course where user_id = ?1 and course_id = ?2 " +
+            "Order by id Asc LIMIT 1",nativeQuery = true)
+    UserHasCourse findByCourseIdAndUserId(long userId,long courseId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "Update user_has_course Set status_id = ?3 where course_id = ?1 and user_id =?2",nativeQuery = true)
+    void updateStatusByCourseIdAndUserId(long courseId, long userId,long statusId);
 }

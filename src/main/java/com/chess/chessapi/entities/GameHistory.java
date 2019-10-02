@@ -12,6 +12,22 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "game_history")
 @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="gamehistoryId",scope = GameHistory.class)
+@NamedStoredProcedureQueries({
+        @NamedStoredProcedureQuery(
+                name = "getRateWinnableReport",
+                procedureName = "get_rate_winnable_report",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "year",type = Integer.class)
+                }
+        ),
+        @NamedStoredProcedureQuery(
+                name = "getRateWinnableLevelReport",
+                procedureName = "get_rate_winnable_level_report",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "year",type = Integer.class),
+                }
+        )
+})
 public class GameHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -23,7 +39,6 @@ public class GameHistory {
     private Timestamp startTime;
 
     @NotNull(message = "Record must not be null")
-    @Length(max = 3000, message = "record shouldn't larger than 3000 characters")
     private String record;
 
     @NotNull(message = "Level must not be null")
@@ -43,6 +58,8 @@ public class GameHistory {
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private User user;
+
+    private int status;
 
     public long getGamehistoryId() {
         return gamehistoryId;
@@ -106,5 +123,13 @@ public class GameHistory {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

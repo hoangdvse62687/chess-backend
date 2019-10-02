@@ -1,6 +1,7 @@
 package com.chess.chessapi.viewmodels;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 public class CoursePaginationViewModel {
     private long courseId;
@@ -8,10 +9,15 @@ public class CoursePaginationViewModel {
     private String courseDescription;
     private String courseImage;
     private Timestamp courseCreatedDate;
-    private Float point;
+    private int requiredElo;
     private long statusId;
     private UserDetailViewModel author;
     private boolean isEnrolled;
+    private List<CategoryViewModel> listCategorys;
+    private double rating;
+    private long totalRating;
+    private int learningProcessPercent;
+
 
     public CoursePaginationViewModel() {
 
@@ -49,14 +55,6 @@ public class CoursePaginationViewModel {
         this.courseCreatedDate = courseCreatedDate;
     }
 
-    public Float getPoint() {
-        return point;
-    }
-
-    public void setPoint(Float point) {
-        this.point = point;
-    }
-
     public long getStatusId() {
         return statusId;
     }
@@ -87,5 +85,45 @@ public class CoursePaginationViewModel {
 
     public void setEnrolled(boolean enrolled) {
         isEnrolled = enrolled;
+    }
+
+    public List<CategoryViewModel> getListCategorys() {
+        return listCategorys;
+    }
+
+    public void setListCategorys(List<CategoryViewModel> listCategorys) {
+        this.listCategorys = listCategorys;
+    }
+
+    public double getRating() {
+        return rating;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
+    }
+
+    public long getTotalRating() {
+        return totalRating;
+    }
+
+    public void setTotalRating(long totalRating) {
+        this.totalRating = totalRating;
+    }
+
+    public int getLearningProcessPercent() {
+        return learningProcessPercent;
+    }
+
+    public void setLearningProcessPercent(int learningProcessPercent) {
+        this.learningProcessPercent = learningProcessPercent;
+    }
+
+    public int getRequiredElo() {
+        return requiredElo;
+    }
+
+    public void setRequiredElo(int requiredElo) {
+        this.requiredElo = requiredElo;
     }
 }

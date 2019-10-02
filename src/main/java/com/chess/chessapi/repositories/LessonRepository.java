@@ -9,20 +9,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
+
 
 @Repository
 public interface LessonRepository extends JpaRepository<Lesson,Long> {
-    @Query(value = "Select l.owner From lesson l where l.id = ?1",nativeQuery = true)
+    @Query(value = "Select If(count(l.owner) > 0,l.owner,0) From lesson l where l.id = ?1",nativeQuery = true)
     Long findLessonAuthorByLessonId(long lessonId);
 
-    @Query(value = "Update lesson l Set l.name = ?2 where id = ?1",nativeQuery = true)
+    @Query(value = "Update lesson l Set l.name = ?2,l.content = ?3,l.description = ?4,l.modified_date = ?5 where id = ?1",nativeQuery = true)
     @Modifying
     @Transactional
-    void update(long lessonId,String name);
-
-    @Query(value = "Select l.id,l.name,l.created_date,l.type" +
-            " From lesson l where l.owner = ?2 and l.name like ?1"
-            ,countQuery = "Select count(l.id) From lesson l where l.owner = ?2 and l.name like ?1"
-            ,nativeQuery = true)
-    Page<Object> findAllByOwner(Pageable pageable,String name, long userId);
+    void update(long lessonId, String name,String content, String description, Timestamp modifiedDate);
 }

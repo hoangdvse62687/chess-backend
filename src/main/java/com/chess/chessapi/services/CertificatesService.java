@@ -1,6 +1,7 @@
 package com.chess.chessapi.services;
 
 import com.chess.chessapi.entities.Certificate;
+import com.chess.chessapi.entities.User;
 import com.chess.chessapi.repositories.CertificatesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,11 +19,14 @@ public class CertificatesService {
         return this.certificatesRepository.findAllByUserId(userId);
     }
 
-    public void updateCertifications(List<Certificate> oldCetificates, List<Certificate> newCetificates){
+    public void updateCertifications(List<Certificate> oldCetificates, List<Certificate> newCetificates,long userId){
         if(oldCetificates == null || oldCetificates.isEmpty()){
             //add all
             for (Certificate newCetificate:
                     newCetificates) {
+                User user = new User();
+                user.setUserId(userId);
+                newCetificate.setUser(user);
                 this.certificatesRepository.save(newCetificate);
             }
         }else if(newCetificates != null && !newCetificates.isEmpty()){
@@ -40,6 +44,9 @@ public class CertificatesService {
                     }
                 }
                 if(!isExist){
+                    User user = new User();
+                    user.setUserId(userId);
+                    newCetificate.setUser(user);
                     this.certificatesRepository.save(newCetificate);
                 }
             }

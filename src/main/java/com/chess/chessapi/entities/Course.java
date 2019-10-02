@@ -1,6 +1,7 @@
 package com.chess.chessapi.entities;
 
 import com.chess.chessapi.viewmodels.CategoryViewModel;
+import com.chess.chessapi.viewmodels.LearningLogViewModel;
 import com.chess.chessapi.viewmodels.LessonViewModel;
 import com.chess.chessapi.viewmodels.UserDetailViewModel;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -9,9 +10,9 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -28,6 +29,8 @@ import java.util.List;
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageSize",type = Integer.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "statusId",type = String.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "userId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortBy",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortDirection",type = String.class),
                         @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalElements",type = Long.class)
                 }
         ),
@@ -42,10 +45,29 @@ import java.util.List;
                 name = "getCourseByCategoryId",
                 procedureName = "get_courses_by_categoryid",
                 parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseName",type = String.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageIndex",type = Integer.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageSize",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "statusId",type = String.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "categoryId",type = Long.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "userId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortBy",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortDirection",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalElements",type = Long.class)
+                }
+        ),
+        @NamedStoredProcedureQuery(
+                name = "getCoursesByEloId",
+                procedureName = "get_courses_by_elo_id",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseName",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageIndex",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageSize",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "statusId",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "eloId",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "userId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortBy",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortDirection",type = String.class),
                         @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalElements",type = Long.class)
                 }
         ),
@@ -72,7 +94,44 @@ import java.util.List;
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseName",type = String.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageIndex",type = Integer.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageSize",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "statusId",type = String.class),
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "userId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortBy",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "sortDirection",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalElements",type = Long.class)
+                }
+        ),
+        @NamedStoredProcedureQuery(
+                name = "getPublishCourseReport",
+                procedureName = "get_publish_course_report"
+        ),
+        @NamedStoredProcedureQuery(
+                name = "getCourseStatusReport",
+                procedureName = "get_course_status_report"
+        ),
+        @NamedStoredProcedureQuery(
+                name = "getCourseSuggestionPaginations",
+                procedureName = "get_course_suggestion_paginations",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "listCourseIdStr",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "userId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "userEloId",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "isListNull",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "statusId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageIndex",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageSize",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalElements",type = Long.class)
+                }
+        ),
+        @NamedStoredProcedureQuery(
+                name = "getCommonCourseSuggestionPaginations",
+                procedureName = "get_common_course_suggestion_paginations",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "listCourseIdStr",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "userId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "statusId",type = Long.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageIndex",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "pageSize",type = Integer.class),
                         @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "totalElements",type = Long.class)
                 }
         ),
@@ -93,14 +152,19 @@ public class Course {
     @Column(name = "created_date")
     private Timestamp createdDate;
 
-    @Min(value =0,message = "Point should equal or larger than 0")
-    private float point;
+    @Min(value =0,message = "Required Elo should equal or larger than 0")
+    @Max(value = 5,message = "Required Elo should less than 5")
+    @Column(name = "required_elo")
+    private int requiredElo;
 
     @Column(name = "status_id")
     private Long statusId;
 
     @Length(max = 255,message = "Image must not be larger than 255 characters")
     private String image;
+
+    @Column(name = "modified_date")
+    private java.sql.Timestamp modifiedDate;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "course")
     @JsonIgnore
@@ -120,10 +184,6 @@ public class Course {
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "course")
     @JsonIgnore
-    private List<Exercise> exercises;
-
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "course")
-    @JsonIgnore
     private List<Review> reviews;
 
     @Transient
@@ -136,13 +196,10 @@ public class Course {
     private List<CategoryViewModel> listCategorys;
 
     @Transient
-    private List<Long> listLearningLogLessonIds;
+    private List<LearningLogViewModel> listLearningLogLessonIds;
 
     @Transient
     private List<Long> listLogExerciseIds;
-
-    @Transient
-    private List<Long> listExerciseIds;
 
     @Transient
     private List<LessonViewModel> lessonViewModels;
@@ -183,14 +240,6 @@ public class Course {
 
     public void setCreatedDate(Timestamp createdDate) {
         this.createdDate = createdDate;
-    }
-
-    public Float getPoint() {
-        return point;
-    }
-
-    public void setPoint(Float point) {
-        this.point = point;
     }
 
     public Long getStatusId() {
@@ -267,20 +316,12 @@ public class Course {
         this.learningLogs = learningLogs;
     }
 
-    public List<Long> getListLearningLogLessonIds() {
+    public List<LearningLogViewModel> getListLearningLogLessonIds() {
         return listLearningLogLessonIds;
     }
 
-    public void setListLearningLogLessonIds(List<Long> listLearningLogLessonIds) {
+    public void setListLearningLogLessonIds(List<LearningLogViewModel> listLearningLogLessonIds) {
         this.listLearningLogLessonIds = listLearningLogLessonIds;
-    }
-
-    public List<Exercise> getExercises() {
-        return exercises;
-    }
-
-    public void setExercises(List<Exercise> exercises) {
-        this.exercises = exercises;
     }
 
     public List<Review> getReviews() {
@@ -307,10 +348,6 @@ public class Course {
         this.tutors = tutors;
     }
 
-    public void setPoint(float point) {
-        this.point = point;
-    }
-
     public List<Long> getListLogExerciseIds() {
         return listLogExerciseIds;
     }
@@ -319,11 +356,19 @@ public class Course {
         this.listLogExerciseIds = listLogExerciseIds;
     }
 
-    public List<Long> getListExerciseIds() {
-        return listExerciseIds;
+    public int getRequiredElo() {
+        return requiredElo;
     }
 
-    public void setListExerciseIds(List<Long> listExerciseIds) {
-        this.listExerciseIds = listExerciseIds;
+    public void setRequiredElo(int requiredElo) {
+        this.requiredElo = requiredElo;
+    }
+
+    public Timestamp getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(Timestamp modifiedDate) {
+        this.modifiedDate = modifiedDate;
     }
 }

@@ -22,8 +22,14 @@ import java.util.List;
                 name = "getUsersByCourseid",
                 procedureName = "get_users_by_courseid",
                 parameters = {
-                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseId",type = Long.class),
-                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "userHasCourseStatusId",type = Long.class)
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "courseId",type = Long.class)
+                }
+        ),
+        @NamedStoredProcedureQuery(
+                name = "getUsersRegisterReport",
+                procedureName = "get_users_register_report",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "year",type = Integer.class)
                 }
         )
 })
@@ -39,7 +45,7 @@ public class User {
     private String email;
 
     @NotNull(message = "Full Name is required not null")
-    @Length(max = 255, message = "Full name shouldn't larger than 255 characters")
+    @Length(min = 6,max = 255, message = "Full name should be in range 6~255 characters")
     @Column(name = "full_name")
     private String fullName;
 
@@ -53,21 +59,22 @@ public class User {
     @Column(name = "is_active")
     private boolean isActive;
 
-    private float point;
+    private int point;
 
     @Column(name = "role_id")
     private long roleId;
 
+    @Column(name = "is_reviewed")
+    private boolean isReviewed;
+
+    @Column(name = "modified_date")
+    private java.sql.Timestamp modifiedDate;
 
     @Length(max = 255, message = "Achievement shouldn't larger than 255 characters")
     private String achievement;
 
     @OneToMany( fetch = FetchType.LAZY,mappedBy = "user")
     private List<Certificate> certificates;
-
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
-    @JsonIgnore
-    private List<ResourceLink> resourceLinks;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
     @JsonIgnore
@@ -99,7 +106,7 @@ public class User {
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "user")
     @JsonIgnore
-    private List<ExerciseLog> exerciseLogs;
+    private List<PointLog> pointLogs;
 
     @Transient
     private List<CourseDetailViewModel> courseDetailViewModels;
@@ -192,11 +199,11 @@ public class User {
         this.certificates = certificates;
     }
 
-    public float getPoint() {
+    public int getPoint() {
         return point;
     }
 
-    public void setPoint(float point) {
+    public void setPoint(int point) {
         this.point = point;
     }
 
@@ -249,14 +256,6 @@ public class User {
         this.learningLogs = learningLogs;
     }
 
-    public List<ResourceLink> getResourceLinks() {
-        return resourceLinks;
-    }
-
-    public void setResourceLinks(List<ResourceLink> resourceLinks) {
-        this.resourceLinks = resourceLinks;
-    }
-
     public List<Review> getReviews() {
         return reviews;
     }
@@ -281,11 +280,27 @@ public class User {
         this.notifications = notifications;
     }
 
-    public List<ExerciseLog> getExerciseLogs() {
-        return exerciseLogs;
+    public boolean isReviewed() {
+        return isReviewed;
     }
 
-    public void setExerciseLogs(List<ExerciseLog> exerciseLogs) {
-        this.exerciseLogs = exerciseLogs;
+    public void setReviewed(boolean reviewed) {
+        isReviewed = reviewed;
+    }
+
+    public List<PointLog> getPointLogs() {
+        return pointLogs;
+    }
+
+    public void setPointLogs(List<PointLog> pointLogs) {
+        this.pointLogs = pointLogs;
+    }
+
+    public Timestamp getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(Timestamp modifiedDate) {
+        this.modifiedDate = modifiedDate;
     }
 }

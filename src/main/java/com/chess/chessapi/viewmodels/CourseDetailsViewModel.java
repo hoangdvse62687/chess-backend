@@ -1,7 +1,5 @@
 package com.chess.chessapi.viewmodels;
 
-import com.chess.chessapi.entities.Exercise;
-
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -10,19 +8,19 @@ public class CourseDetailsViewModel {
     private String name;
     private String description;
     private Timestamp createdDate;
-    private Float point;
+    private int requiredElo;
     private Long statusId;
     private String image;
     private UserDetailViewModel author;
     private List<UserDetailViewModel> userEnrolleds;
     private List<UserDetailViewModel> tutors;
     private List<CategoryViewModel> listCategorys;
-    private List<Long> listLearningLogLessonIds;
+    private List<LearningLogViewModel> listLearningLogLessonIds;
     private List<LessonViewModel> lessonViewModels;
     private int totalLesson;
     private boolean isEnrolled;
     private List<Long> listLogExerciseIds;
-    private List<Long> exerciseViewModels;
+    private boolean isCommented;
 
     public long getCourseId() {
         return courseId;
@@ -54,14 +52,6 @@ public class CourseDetailsViewModel {
 
     public void setCreatedDate(Timestamp createdDate) {
         this.createdDate = createdDate;
-    }
-
-    public Float getPoint() {
-        return point;
-    }
-
-    public void setPoint(Float point) {
-        this.point = point;
     }
 
     public Long getStatusId() {
@@ -104,11 +94,11 @@ public class CourseDetailsViewModel {
         isEnrolled = enrolled;
     }
 
-    public List<Long> getListLearningLogLessonIds() {
+    public List<LearningLogViewModel> getListLearningLogLessonIds() {
         return listLearningLogLessonIds;
     }
 
-    public void setListLearningLogLessonIds(List<Long> listLearningLogLessonIds) {
+    public void setListLearningLogLessonIds(List<LearningLogViewModel> listLearningLogLessonIds) {
         this.listLearningLogLessonIds = listLearningLogLessonIds;
     }
 
@@ -152,11 +142,19 @@ public class CourseDetailsViewModel {
         this.listLogExerciseIds = listLogExerciseIds;
     }
 
-    public List<Long> getExerciseViewModels() {
-        return exerciseViewModels;
+    public int getRequiredElo() {
+        return requiredElo;
     }
 
-    public void setExerciseViewModels(List<Long> exerciseViewModels) {
-        this.exerciseViewModels = exerciseViewModels;
+    public void setRequiredElo(int requiredElo) {
+        this.requiredElo = requiredElo;
+    }
+
+    public boolean isCommented() {
+        return isCommented;
+    }
+
+    public void setCommented(boolean commented) {
+        isCommented = commented;
     }
 }

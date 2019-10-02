@@ -67,10 +67,16 @@ public class OAuth2AuthenticationSuccessHandler extends SavedRequestAwareAuthent
 
         String token = tokenProvider.createToken(authentication);
         UserPrincipal  userPrincipal = userService.getCurrentUser();
-        return UriComponentsBuilder.fromUriString(targetUrl)
-                .queryParam("token", token)
-                .queryParam("role",userPrincipal.getRole())
-                 .build().toUriString();
+        String urlReturn = "";
+        if(userPrincipal.isStatus()){
+            urlReturn = UriComponentsBuilder.fromUriString(targetUrl)
+                    .queryParam("token", token)
+                    .queryParam("role",userPrincipal.getRole())
+                    .build().toUriString();
+        }else{
+            urlReturn = UriComponentsBuilder.fromUriString(targetUrl).build().toUriString();
+        }
+        return urlReturn;
     }
 
     protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {

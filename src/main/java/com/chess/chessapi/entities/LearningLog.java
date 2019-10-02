@@ -17,6 +17,9 @@ public class LearningLog {
     @Column(name = "id")
     private long learninglogId;
 
+    @Column(name = "is_passed")
+    private boolean isPassed;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
     @JsonIgnore
@@ -74,5 +77,13 @@ public class LearningLog {
 
     public void setFinishedDate(Timestamp finishedDate) {
         this.finishedDate = finishedDate;
+    }
+
+    public boolean isPassed() {
+        return isPassed;
+    }
+
+    public void setPassed(boolean passed) {
+        isPassed = passed;
     }
 }

@@ -5,8 +5,10 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import java.io.Serializable;
+
 @Service
-public class MailContentBuilderUtils {
+public class MailContentBuilderUtils implements Serializable {
     private TemplateEngine templateEngine;
     public static final String MAIL_INSTRUCTOR_APPROVED_TEMPLATE = "mailTemplate";
     public static final String SOURCE_LINK_GO_TO_PROFILE = "http://cols-capstone.ml/profile";
@@ -19,7 +21,7 @@ public class MailContentBuilderUtils {
         this.templateEngine = templateEngine;
     }
 
-    public String buildInstructorApprove(String username,String message,String source,String sourceName) {
+    public String build(String username,String message,String source,String sourceName) {
         Context context = new Context();
         context.setVariable("name",username);
         context.setVariable("message", message);

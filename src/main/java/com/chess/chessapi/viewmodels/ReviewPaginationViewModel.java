@@ -13,6 +13,8 @@ public class ReviewPaginationViewModel {
 
     private Timestamp createdDate;
 
+    private Timestamp modifiedDate;
+
     public void setRating(int rating) {
         this.rating = rating;
     }
@@ -51,5 +53,13 @@ public class ReviewPaginationViewModel {
 
     public void setReviewId(long reviewId) {
         this.reviewId = reviewId;
+    }
+
+    public Timestamp getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(Timestamp modifiedDate) {
+        this.modifiedDate = modifiedDate;
     }
 }

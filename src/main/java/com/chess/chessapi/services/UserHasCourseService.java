@@ -64,5 +64,17 @@ public class UserHasCourseService {
     public List<UserHasCourse> getAllByCourseIdAndStatusId(long courseId,long statusId){
         return this.userHasCourseRepository.findAllByCourseIdAndStatusId(courseId,statusId);
     }
+
+    public List<Long> getAllLearnerByCourseId(long courseId,long learnerId){
+        return this.userHasCourseRepository.getAllLearnerByCourseId(courseId,learnerId);
+    }
+
+    public boolean isEnrolled(long courseId,long userId){
+        if(this.userHasCourseRepository.isEnrolled(courseId,userId) == 1){
+            return true;
+        }else{
+            return false;
+        }
+    }
     //end public method
 }
